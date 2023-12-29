@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.JobAlimMapper">
+	<select id="selectListCntWorkerSeq" parameterType="JobAlimReceiveDTO" resultType="int">
+		/* jobAlim.xml selectListCntWorkerSeq */
+		SELECT
+			COUNT(worker_seq) AS CNT
+		FROM
+		<choose>
+			<when test="queryFlag neq null and queryFlag neq '' and queryFlag eq 'W'.toString()">
+				worker 
+				<if test="company_seq neq null and company_seq neq '' and company_seq neq '13'">
+					WHERE
+						company_seq = #{company_seq }
+				</if>
+			</when>
+			<otherwise>
+				ilbo 
+			WHERE 
+				ilbo_date = #{ilbo_date }
+				AND (output_status_code IS NULL 
+				OR output_status_code IN (100012, 100017, 100002, 100020)) 
+				<if test="company_seq neq null and company_seq neq '' and company_seq neq '13'">
+					AND company_seq = #{company_seq }				
+				</if>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getWorkerSeq" parameterType="JobAlimReceiveDTO" resultType="JobAlimReceiveDTO">	
+		/* jobAlim.xml getWorkerSeq */
+		SELECT 
+			worker_seq 
+		FROM 
+		<choose>
+			<when test="queryFlag neq null and queryFlag neq '' and queryFlag eq 'W'.toString()">
+				worker 
+				<if test="company_seq neq null and company_seq neq '' and company_seq neq '13'">
+					WHERE
+						company_seq = #{company_seq }
+						AND (worker_app_use_status = '1' OR worker_app_use_status = '5')
+						AND worker_app_status = '1'
+				</if>
+			</when>
+			<otherwise>
+				ilbo 
+			WHERE 
+				(output_status_code IS NULL 
+				OR output_status_code IN (100012, 100017, 100002, 100020)) 
+				<if test="company_seq neq null and company_seq neq '' and company_seq neq '13'">
+					AND company_seq = #{company_seq }				
+					AND (worker_app_use_status = '1' OR worker_app_use_status = '5')
+					AND worker_app_status = '1'
+				</if>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insertInfo" parameterType="JobAlimDTO" useGeneratedKeys="true" keyProperty="jobAlim_seq">
+		/* jobAlim.xml insertInfo */
+		INSERT INTO tbl_jobalim (
+			jobalim_content,
+			jobalim_writer,
+			company_seq,
+			del_yn,
+			<if test="main_view_yn neq null and main_view_yn neq ''">
+				main_view_yn,
+			</if>
+			reg_date,
+			reg_admin,
+			mod_date,
+			mod_admin
+		) 
+		VALUES
+		(
+			#{jobAlim_content },
+			#{jobAlim_writer },
+			#{company_seq },
+			'0',
+			<if test="main_view_yn neq null and main_view_yn neq ''">
+				#{main_view_yn },
+			</if>
+			NOW(),
+			#{reg_admin },
+			NOW(),
+			#{reg_admin }
+		)
+	</insert>
+	
+	<insert id="insertInfoReceive" parameterType="JobAlimReceiveDTO" useGeneratedKeys="true" keyProperty="receive_seq">
+		INSERT INTO tbl_jobalim_receive (
+			jobalim_seq,
+			worker_seq,
+			read_yn,
+			del_yn,
+			read_date,
+			mod_date,
+			mod_admin
+		) 
+		VALUES 
+		<foreach item="item" index="index" separator="," collection="workerSeqList">
+			(
+				#{jobAlim_seq },
+				#{item.worker_seq },
+				'0',
+				'0',
+				NULL,
+				NOW(),
+				#{reg_admin }
+			)
+		</foreach>
+	</insert>
+	
+	<select id="selectListCnt" parameterType="JobAlimDTO" resultType="int">
+		SELECT
+			COUNT(jobalim_seq) AS CNT
+		FROM
+			tbl_jobalim
+		WHERE
+			1 = 1
+			AND del_yn = '0'
+			<if test="searchKey neq '' and searchKey neq null and searchValue neq '' and searchValue neq null">
+				AND #{searchKey } LIKE CONCAT('%', #{searchValue }, '%')
+			</if>
+			<if test="searchKey neq '' and searchKey neq null and searchValue neq '' and searchValue neq null">
+				AND #{searchKey } LIKE CONCAT('%', #{searchValue }, '%')
+			</if>
+			<if test="searchKey eq '' or searchKey eq null and searchValue neq '' and searchValue neq null">
+				AND (jobalim_content LIKE CONCAT('%', #{searchValue }, '%') 
+				OR jobalim_writer LIKE CONCAT('%', #{searchValue }, '%'))
+			</if>
+			<if test="startDate neq '' and startDate neq null">	
+				AND DATE_FORMAT(reg_date, "%Y-%m-%d") <![CDATA[>=]]>  #{startDate}	AND DATE_FORMAT(reg_date, "%Y-%m-%d") <![CDATA[<=]]>  #{endDate}	
+			</if>
+			<if test="company_seq neq null and company_seq neq '' and company_seq neq '13'">
+				AND (company_seq = #{company_seq } OR company_seq = '13')
+			</if>
+	</select>
+	
+	<select id="selectList" parameterType="JobAlimDTO" resultType="JobAlimDTO">
+		SELECT 
+			jobalim_seq,
+			jobalim_content,
+			company_seq,
+			jobalim_writer,
+			del_yn,
+			reg_date,
+			reg_admin,
+			mod_date,
+			mod_admin
+		FROM
+			tbl_jobalim
+		WHERE
+			1 = 1
+			AND del_yn = '0' 
+			<if test="searchKey neq '' and searchKey neq null and searchValue neq '' and searchValue neq null">
+				AND #{searchKey } LIKE CONCAT('%', #{searchValue }, '%')
+			</if>
+			<if test="searchKey neq '' and searchKey neq null and searchValue neq '' and searchValue neq null">
+				AND #{searchKey } LIKE CONCAT('%', #{searchValue }, '%')
+			</if>
+			<if test="searchKey eq '' or searchKey eq null and searchValue neq '' and searchValue neq null">
+				AND (jobalim_content LIKE CONCAT('%', #{searchValue }, '%') 
+				OR jobalim_writer LIKE CONCAT('%', #{searchValue }, '%'))
+			</if>
+			<if test="startDate neq '' and startDate neq null">	
+				AND DATE_FORMAT(reg_date, "%Y-%m-%d") <![CDATA[>=]]>  #{startDate}	AND DATE_FORMAT(reg_date, "%Y-%m-%d") <![CDATA[<=]]>  #{endDate}	
+			</if>
+			<if test="company_seq neq null and company_seq neq '' and company_seq neq '13'">
+				AND (company_seq = #{company_seq } OR company_seq = '13')
+			</if>
+		ORDER BY reg_date DESC
+		<if test="paging neq null">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+	</select>
+	
+	<select id="selectInfoToken" parameterType="WorkerDTO" resultType="WorkerDTO">
+		/* jobAlim.xml selectInfoToken */
+		SELECT
+			worker_seq,
+			PUSH_TOKEN,
+			os_type,
+			app_version
+		FROM
+			WORKER
+		WHERE
+			1 = 1
+			AND worker_seq IN
+			<foreach collection="sel_worker_seq" open="(" close=")" separator="," item="item" index="i">
+				#{item }
+			</foreach>
+			AND app_version >= 20
+			AND push_token IS NOT NULL
+			AND worker_push_yn = '1'
+			AND (worker_app_use_status = '1' OR worker_app_use_status = '5' OR worker_app_use_status = '4')
+			AND worker_app_status = '1'
+	</select>
+	
+	<select id="selectInfo" parameterType="JobAlimDTO" resultType="JobAlimDTO">
+		/* jobAlim.xml selectInfo */
+		SELECT
+			jobalim_seq,
+			jobalim_content,
+			company_seq,
+			jobalim_writer,
+			del_yn,
+			reg_date,
+			reg_admin,
+			mod_date,
+			mod_admin
+		FROM
+			tbl_jobalim
+		WHERE
+			1 = 1
+			AND del_yn = '0'
+			<if test="jobAlim_seq neq null and jobAlim_seq neq ''">
+				AND jobalim_seq = #{jobAlim_seq }
+			</if>
+	</select>
+	
+	<select id="selectListReceive" parameterType="JobAlimReceiveDTO" resultType="JobAlimReceiveDTO">
+		/* jobAlim.xml selectListReceive */
+		SELECT
+			A.receive_seq,
+			A.jobalim_seq,
+			A.worker_seq,
+			A.read_yn,
+			A.del_yn,
+			A.read_date,
+			B.worker_name
+		FROM
+			tbl_jobalim_receive A
+			LEFT OUTER JOIN worker B ON A.worker_seq = B.worker_seq
+		WHERE
+			1 = 1 
+			<if test="jobAlim_seq neq null and jobAlim_seq neq ''">
+				AND	jobalim_seq = #{jobAlim_seq }
+			</if>
+	</select>
+	
+	<update id="updateInfo" parameterType="JobAlimDTO">
+		/* jobAlim.xml updateInfo */
+		UPDATE
+			tbl_jobalim
+		SET
+			jobalim_content = #{jobAlim_content },
+			mod_date = NOW(),
+			mod_admin = #{reg_admin }
+		WHERE 
+			jobalim_seq = #{jobAlim_seq }
+	</update>
+	
+	<update id="deleteInfo" parameterType="JobAlimDTO">
+		/* jobAlim.xml deleteInfo */
+		UPDATE
+			tbl_jobalim
+			mod_date = NOW(),
+			mod_admin = #{reg_admin }
+		SET
+			del_yn = '1'
+		WHERE
+			jobalim_seq = #{jobAlim_seq }
+	</update>
+	
+	<update id="deleteInfoReceive" parameterType="JobAlimDTO">
+		/* jobAlim.xml deleteInfoReceive */
+		UPDATE
+			tbl_jobalim_receive
+		SET
+			del_yn = '1'
+			mod_date = NOW(),
+			mod_admin = #{reg_admin }
+		WHERE
+			jobalim_seq = #{jobAlim_seq }
+	</update>
+	
+	<select id="selectListCntToAPI" parameterType="JobAlimReceiveDTO" resultType="int">
+		/* jobAlim.xml selectListCntToApi */
+		SELECT
+			COUNT(RECEIVE_SEQ) AS CNT
+		FROM
+			tbl_jobalim A
+			LEFT OUTER JOIN tbl_jobalim_receive B 
+			ON A.jobalim_seq = B.jobalim_seq
+		WHERE 
+			1 = 1
+			AND A.del_yn = '0'
+			AND B.del_yn = '0'
+			<if test="worker_seq neq null and worker_seq neq ''">
+				AND worker_seq = #{worker_seq }
+			</if>
+	</select>
+	
+	<select id="selectListToAPI" parameterType="JobAlimReceiveDTO" resultType="JobAlimReceiveDTO">
+		/* jobAlim.xml selectListToAPI */
+		SELECT 
+			A.jobalim_seq,
+			A.jobalim_content,
+			A.company_seq,
+			A.jobalim_writer,
+			A.reg_date,
+			A.reg_admin,
+			A.mod_date,
+			A.mod_admin,
+			B.receive_seq,
+			B.worker_seq,
+			B.read_yn,
+			B.read_date 
+		FROM
+			tbl_jobalim A
+			LEFT OUTER JOIN tbl_jobalim_receive B 
+			ON A.jobalim_seq = B.jobalim_seq
+		WHERE
+			1 = 1
+			AND A.del_yn = '0'
+			AND B.del_yn = '0'
+			<if test="worker_seq neq null and worker_seq neq ''">
+				AND worker_seq = #{worker_seq }			
+			</if>
+	</select>
+	
+	<update id="updateInfoToAPI" parameterType="JobAlimReceiveDTO">
+		/* jobAlim.xml updateInfoToAPI */
+		UPDATE
+			tbl_jobalim_receive
+		SET
+			mod_date = now(),
+			mod_admin = "WORKER",
+			<if test="del_yn neq null and del_yn neq ''">
+				, del_yn = #{del_yn }
+			</if>
+			<if test="read_yn neq null and read_yn neq ''">
+				, read_yn = #{read_yn }
+			</if>
+		WHERE 1= 1
+				AND receive_seq = #{receive_seq }
+	</update>
+</mapper>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.TransferWorkerOptionMapper">
+	
+	<insert id="insertTransferWorkerOption" parameterType="TransferWorkerOptionDTO" useGeneratedKeys="true" keyProperty="option_seq">
+		/* insertTransferWorkerOption 구직자 이관 옵션 추가 write.transferWorkerOption.xml */
+		INSERT INTO tbl_transfer_worker_option(
+			option_rank
+			, company_seq
+			, gender
+			, job_kind
+			<if test="job_code neq null and job_code neq ''">, job_code</if>
+			<if test="job_name neq null and job_name neq ''">, job_name</if>
+			, osh_yn
+			, use_yn
+			, reg_admin
+			, mod_admin
+		)VALUES(
+			#{option_rank}
+			, #{company_seq}
+			, #{gender}
+			, #{job_kind}
+			<if test="job_code neq null and job_code neq ''">, #{job_code}</if>
+			<if test="job_name neq null and job_name neq ''">, #{job_name}</if>
+			, #{osh_yn}
+			, #{use_yn}
+			, #{reg_admin}
+			, #{mod_admin}
+		)
+	</insert>    
+	
+	<update id="updateTransferWorkerOption" parameterType="TransferWorkerOptionDTO">
+		/* updateTransferWorkerOption 구직자 이관 옵션 수정 write.transferWorkerOption.xml */
+		UPDATE tbl_transfer_worker_option 
+		SET
+			mod_admin = #{mod_admin}
+			<if test="option_rank neq null and option_rank neq ''">, option_rank = #{option_rank}</if>
+			<if test="company_seq neq null and company_seq neq ''">, company_seq = #{company_seq}</if>
+			<if test="gender neq null and gender neq ''">, gender = #{gender}</if>
+			<if test="job_kind neq null and job_kind neq ''">, job_kind = #{job_kind}</if>
+			<if test="job_code neq null and job_code neq ''">, job_code = #{job_code}</if>
+			<if test="job_name neq null and job_name neq ''">, job_name = #{job_name}</if>
+			<if test="osh_yn neq null and osh_yn neq ''">, osh_yn = #{osh_yn}</if>
+			<if test="use_yn neq null and use_yn neq ''">, use_yn = #{use_yn}</if>
+		WHERE transfer_seq = #{transfer_seq} 
+	</update>
+	
+	<update id="updateTransferWorkerOptionList" parameterType="TransferWorkerOptionDTO">
+		/* updateTransferWorkerOptionList 구직자 이관 옵션 리스트 수정 write.transferWorkerOption.xml */
+		UPDATE tbl_transfer_worker_option 
+		SET
+			mod_admin = #{mod_admin}
+			<if test="option_rank neq null and option_rank neq ''">, option_rank = #{option_rank}</if>
+			<if test="company_seq neq null and company_seq neq ''">, company_seq = #{company_seq}</if>
+			<if test="gender neq null and gender neq ''">, gender = #{gender}</if>
+			<if test="job_kind neq null and job_kind neq ''">, job_kind = #{job_kind}</if>
+			<if test="job_code neq null and job_code neq ''">, job_code = #{job_code}</if>
+			<if test="job_name neq null and job_name neq ''">, job_name = #{job_name}</if>
+			<if test="osh_yn neq null and osh_yn neq ''">, osh_yn = #{osh_yn}</if>
+			<if test="use_yn neq null and use_yn neq ''">, use_yn = #{use_yn}</if>
+		WHERE 
+			<foreach collection="sel_transfer_seq" open="transfer_seq IN (" close=")" item="transfer_seq" separator=", ">
+				#{transfer_seq}
+			</foreach>
+	</update>
+	
+	<update id="updateRankReset">
+		/* updateRankReset 구직자 이관 옵션 순위 재설정 write.transferWorkerOption.xml */
+		UPDATE
+  			tbl_transfer_worker_option o,
+  			(SELECT transfer_Seq, RANK() OVER (ORDER BY option_rank) AS nr FROM tbl_transfer_worker_option WHERE use_yn = 1) r
+		SET
+  			o.option_rank = r.nr
+		WHERE 
+			o.transfer_seq = r.transfer_seq;
+	</update>
+</mapper>

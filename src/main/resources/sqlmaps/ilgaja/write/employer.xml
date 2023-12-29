@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.EmployerMapper">
+  	<insert id="setEmployerCell" parameterType="EmployerDTO" useGeneratedKeys="true" keyProperty="employer_seq">
+    	/* 구인처 생성 employer.setEmployerCell */
+    	INSERT INTO employer (
+        	reg_date
+      		<if test="company_seq neq '' and company_seq      neq null"> , company_seq        </if>
+      		<if test="employer_name neq '' and employer_name    neq null"> , employer_name      </if>
+      		<if test="employer_phone1 neq '' and employer_phone1  neq null"> , employer_phone1    </if>          
+      		<if test="employer_num neq '' and employer_num      neq null"> , employer_num      </if>
+      		<if test="employer_owner neq '' and employer_owner    neq null"> , employer_owner    </if>
+      		<if test="employer_business neq '' and employer_business neq null"> , employer_business </if>
+      		<if test="employer_sector     neq '' and employer_sector   neq null"> , employer_sector   </if>
+      		<if test="is_tax        neq '' and is_tax      neq null"> , is_tax      </if>
+      		<if test="tax_name        neq '' and tax_name      neq null"> , tax_name      </if>
+      		<if test="tax_phone        neq '' and tax_phone      neq null"> , tax_phone      </if>
+      		<if test="employer_tel        neq '' and employer_tel      neq null"> , employer_tel      </if>
+      		<if test="employer_fax        neq '' and employer_fax      neq null"> , employer_fax      </if>
+      		<if test="employer_phone2     neq '' and employer_phone2   neq null"> , employer_phone2   </if>
+      		<if test="employer_phone3     neq '' and employer_phone3   neq null"> , employer_phone3   </if>
+      		<if test="employer_phone4     neq '' and employer_phone4   neq null"> , employer_phone4   </if>
+      		<if test="employer_email      neq '' and employer_email    neq null"> , employer_email    </if>
+      		<if test="employer_addr       neq '' and employer_addr     neq null"> , employer_addr     </if>
+      		<if test="employer_feature    neq '' and employer_feature  neq null"> , employer_feature  </if>
+      		<if test="employer_memo       neq '' and employer_memo     neq null"> , employer_memo     </if>
+	  		<if test="owner_id            neq '' and owner_id          neq null">, owner_id </if> 
+	  		<if test="manager_seq         neq '' and manager_seq       neq null">, manager_seq</if>
+	  		<if test="limit_count		  neq '' and limit_count 	   neq null">, limit_count</if>  
+  			, labor_contract_seq
+  			, receive_contract_seq
+      		, reg_admin, mod_admin
+      		, employer_insurance
+      		, accident_insurance
+   		) VALUES (
+       		now()
+	      	<if test="company_seq neq     '' and company_seq      neq null">,  #{company_seq      }</if>
+      		<if test="employer_name neq   '' and employer_name    neq null"> , #{employer_name    }</if>
+      		<if test="employer_phone1 neq '' and employer_phone1  neq null"> , #{employer_phone1  }</if>
+      		<if test="employer_num        neq '' and employer_num      neq null"> , #{employer_num     } </if>
+      		<if test="employer_owner      neq '' and employer_owner    neq null"> , fn_encrypt(#{employer_owner}) </if>
+      		<if test="employer_business   neq '' and employer_business neq null"> , #{employer_business} </if>
+      		<if test="employer_sector     neq '' and employer_sector   neq null"> , #{employer_sector  } </if>
+      		<if test="is_tax        neq '' and is_tax      neq null"> , #{is_tax }     </if>
+      		<if test="tax_name        neq '' and tax_name      neq null"> , fn_encrypt(#{tax_name})      </if>
+      		<if test="tax_phone        neq '' and tax_phone      neq null"> , fn_encrypt(#{tax_phone})      </if>
+      		<if test="employer_tel        neq '' and employer_tel      neq null"> , fn_encrypt(#{employer_tel}) </if>
+      		<if test="employer_fax        neq '' and employer_fax      neq null"> , #{employer_fax     } </if>
+      		<if test="employer_phone2     neq '' and employer_phone2   neq null"> , fn_encrypt(#{employer_phone2}) </if>
+      		<if test="employer_phone3     neq '' and employer_phone3   neq null"> , fn_encrypt(#{employer_phone3}) </if>
+      		<if test="employer_phone4     neq '' and employer_phone4   neq null"> , fn_encrypt(#{employer_phone4}) </if>
+      		<if test="employer_email      neq '' and employer_email    neq null"> , fn_encrypt(#{employer_email}) </if>
+      		<if test="employer_addr       neq '' and employer_addr     neq null"> , #{employer_addr    } </if>
+      		<if test="employer_feature    neq '' and employer_feature  neq null"> , #{employer_feature } </if>
+      		<if test="employer_memo       neq '' and employer_memo     neq null"> , #{employer_memo    } </if>
+	  		<if test="owner_id            neq '' and owner_id          neq null"> , #{owner_id} </if>
+	  		<if test="manager_seq         neq '' and manager_seq       neq null">, #{manager_seq}</if>
+	  		<if test="limit_count		  neq '' and limit_count 	   neq null">, #{limit_count}</if>  
+	  		<choose>
+	  			<when test="labor_contract_seq neq '' and labor_contract_seq neq null">
+	  				, #{labor_contract_seq }
+	  			</when>
+	  			<otherwise>
+	  				, IFNULL((SELECT 
+		  				contract_seq 
+		  			FROM 
+		  				tbl_contract c 
+		  				LEFT OUTER JOIN tbl_category ca ON c.category_seq = ca.category_seq
+		  			WHERE 
+		  				ca.category_code = 'ELM'
+		  				AND c.use_yn = '1'
+		  				AND c.contract_default_use_yn = '1'), 0)	
+	  			</otherwise>
+	  		</choose>
+  			<choose>
+  				<when test="receive_contract_seq neq '' and receive_contract_seq neq null">
+  					, #{receive_contract_seq }
+  				</when>
+  				<otherwise>
+		  			, IFNULL((SELECT 
+		  				contract_seq 
+		  			FROM 
+		  				tbl_contract c 
+		  				LEFT OUTER JOIN tbl_category ca ON c.category_seq = ca.category_seq
+		  			WHERE 
+		  				ca.category_code = 'ERM'
+		  				AND c.use_yn = '1'
+		  				AND c.contract_default_use_yn = '1'), 0)
+  				</otherwise>
+  			</choose>
+      		, #{reg_admin}, #{reg_admin}
+      		, '1'
+      		, '1'
+		)
+	</insert>
+
+	<update id="setEmployerInfo" parameterType="EmployerDTO">
+    	/* 구인처정보 수정 employer.setEmployerInfo */
+    	UPDATE 
+    		employer 
+    	SET
+      		mod_admin = #{reg_admin}
+      		<if test="company_seq       neq '' and company_seq   neq null"> , company_seq    = #{company_seq}   </if>
+      		<if test="employer_num      neq null"> , employer_num      = #{employer_num     } </if>
+  	  		<if test="employer_pass   	neq null"> , employer_pass 	= PASSWORD(#{employer_pass   }) </if>
+      		<if test="employer_name     neq null"> , employer_name     = #{employer_name    } </if>
+      		<if test="employer_owner    neq null"> , employer_owner    = fn_encrypt(#{employer_owner}) </if>
+      		<if test="employer_business neq null"> , employer_business = #{employer_business} </if>
+      		<if test="employer_sector   neq null"> , employer_sector   = #{employer_sector  } </if>
+      		<if test="is_tax        neq '' and is_tax      neq null"> , is_tax = #{is_tax }     </if>
+      		<if test="tax_name        neq '' and tax_name      neq null"> , tax_name =  fn_encrypt(#{tax_name})      </if>
+      		<if test="tax_phone        neq '' and tax_phone      neq null"> ,tax_phone = fn_encrypt(#{tax_phone})      </if>
+      		<if test="employer_tel      neq null"> , employer_tel      = fn_encrypt(#{employer_tel}) </if>
+      		<if test="employer_fax      neq null"> , employer_fax      = #{employer_fax     } </if>
+      		<if test="employer_phone1   neq null"> , employer_phone1   = fn_encrypt(#{employer_phone1}) </if>
+      		<if test="employer_phone2   neq null"> , employer_phone2   = fn_encrypt(#{employer_phone2}) </if>
+      		<if test="employer_phone3   neq null"> , employer_phone3   = fn_encrypt(#{employer_phone3}) </if>
+      		<if test="employer_phone4   neq null"> , employer_phone4   = fn_encrypt(#{employer_phone4}) </if>
+      		<if test="employer_email    neq null"> , employer_email    = fn_encrypt(#{employer_email}) </if>
+      		<if test="employer_addr     neq null"> , employer_addr     = #{employer_addr    } </if>
+      		<if test="employer_feature  neq null"> , employer_feature  = #{employer_feature } </if>
+      		<if test="employer_memo     neq null"> , employer_memo     = #{employer_memo    } </if>
+      		<if test="employer_corp_scan_yn     neq null and employer_corp_scan_yn           neq ''"> , employer_corp_scan_yn     = #{employer_corp_scan_yn    } </if>
+      		<if test="employer_etc_scan_yn     neq null and employer_etc_scan_yn           neq ''"> , employer_etc_scan_yn     = #{employer_etc_scan_yn    } </if>
+      		<if test="use_yn            neq '' and use_yn            neq null"> , use_yn            = #{use_yn           } </if>
+      		<if test="push_token          neq '' and push_token       neq null"> , push_token   	= #{push_token   } </if>
+	  		<if test="os_type             neq '' and os_type       	neq null"> , os_type   		= #{os_type   } </if>
+	  		<if test="app_version         neq '' and app_version    	neq null"> , app_version	= #{app_version   } </if>
+	  		<if test="visit_date           neq '' and visit_date      	neq null"> , visit_date   	= now() </if>
+	  		<if test="manager_seq           neq '' and manager_seq      	neq null"> , manager_seq   	= #{manager_seq} </if>
+	  		<if test="limit_count neq null and limit_count neq ''">, limit_count = #{limit_count }</if>
+	  		<if test="payment neq null and payment neq ''">
+	  			, payment = #{payment }
+	  			<if test="payment neq '3'.toString()">
+	  				, wage = '0'
+	  			</if>
+	  		</if>
+	  		<if test="wage neq null and wage neq ''">
+	  			, wage = #{wage }
+	  		</if>
+	  		<if test="employer_insurance neq '' and employer_insurance neq null">
+	  			, employer_insurance = #{employer_insurance }
+	  		</if>
+	  		<if test="accident_insurance neq '' and accident_insurance neq null">
+	  			, accident_insurance = #{accident_insurance }
+	  		</if>
+	  		<if test="national_pension neq '' and national_pension neq null">
+	  			, national_pension = #{national_pension }
+	  		</if>
+	  		<if test="health_insurance neq '' and health_insurance neq null">
+	  			, health_insurance = #{health_insurance }
+	  		</if>
+	  		<if test="labor_contract_seq neq '' and labor_contract_seq neq null">
+	  			, labor_contract_seq = #{labor_contract_seq }
+	  		</if>
+	  		<if test="receive_contract_seq neq '' and receive_contract_seq neq null">
+	  			, receive_contract_seq = #{receive_contract_seq }
+	  		</if>
+	  		<if test="sign_manager_type neq '' and sign_manager_type neq null">
+      			, sign_manager_type = #{sign_manager_type }
+      		</if>
+      		<if test="sign_manager_seq neq '' and sign_manager_seq neq null">
+      			, sign_manager_seq = #{sign_manager_seq }
+      		</if>
+      		<if test="employer_detail_memo neq null">
+      			, employer_detail_memo = #{employer_detail_memo }
+      		</if>
+      		<if test="employer_income_code neq null">
+      			, employer_income_code = #{employer_income_code }
+      		</if>
+      		<if test="employer_income_name neq null">
+      			, employer_income_name = #{employer_income_name }
+      		</if>
+      		<if test="employer_pay_code neq null">
+      			, employer_pay_code = #{employer_pay_code }
+      		</if>
+      		<if test="employer_pay_name neq null">
+      			, employer_pay_name = #{employer_pay_name }
+      		</if>
+      		<choose>
+      			<when test="health_insurance eq '1'.toString() or national_pension eq '1'.toString()">
+      				, insurance_check_date = NOW()
+      			</when>
+      			<otherwise>
+      				, insurance_check_date = NULL
+      			</otherwise>
+      		</choose>
+      	WHERE 
+      		1 = 1 
+      		AND
+			<choose>
+				<when test="employer_seq neq '' and employer_seq neq null">
+					employer_seq = #{employer_seq } 
+               	</when>
+               	<otherwise>
+                   	employer_num = #{employer_num }
+               	</otherwise>
+    			</choose>
+ 	</update>
+
+  	<update id="removeEmployerInfo" parameterType="EmployerDTO">
+    	/* 회사정보 삭제 employer.removeEmployerInfo */
+    	UPDATE 
+    		employer 
+    	SET
+      		use_yn = 0
+      	<if test="reg_admin neq '' and reg_admin neq null"> , mod_admin = #{reg_admin} </if> 
+			WHERE 
+				employer_seq IN
+				<foreach collection="sel_employer_seq" item="sel_seq"  open="(" close=")" separator=", ">
+					#{sel_seq}
+				</foreach>
+	</update>
+
+  	<update id="updateEmployerVisit" parameterType="EmployerDTO">
+    	/* 오더 메니져 정보 수정 setManagerInfo  */
+    	UPDATE 
+    		employer 
+    	SET
+      		visit_date = now()
+      		,visit_count = visit_count +1
+      		,visit_type  = #{visit_type   } 
+    	WHERE 
+    		1 = 1
+			AND employer_seq 	= #{employer_seq   } 
+  	</update>
+  	
+  	<select id="getEmployerView" parameterType="EmployerDTO" resultType="EmployerDTO">
+    	/* 구인처 정보 조회 employer.getEmployerInfo */
+    	SELECT 
+    		c.company_name
+			, e.employer_seq
+			, e.company_seq
+			, e.employer_num
+			, e.employer_pass
+			, e.employer_name
+			, fn_decrypt(e.employer_owner) as employer_owner
+			, e.employer_business
+			, e.employer_sector
+			, e.is_tax
+			, fn_decrypt(e.tax_name) as tax_name
+			, fn_decrypt(e.tax_phone) as tax_phone
+			, fn_decrypt(e.employer_tel) as employer_tel
+			, e.employer_fax
+			, fn_decrypt(e.employer_phone) as employer_phone
+			, fn_decrypt(e.employer_phone1) as employer_phone1
+			, fn_decrypt(e.employer_phone2) as employer_phone2
+			, fn_decrypt(e.employer_phone3) as employer_phone3
+			, fn_decrypt(e.employer_phone4) as employer_phone4
+			, fn_decrypt(e.employer_email) as employer_email
+			, e.employer_addr
+			, e.employer_feature
+			, e.employer_memo
+			, e.use_yn
+			, e.owner_id
+			, e.manager_seq
+			, e.reg_date
+			, e.reg_admin
+			, e.mod_date
+			, e.mod_admin
+			, e.employer_corp_scan_yn
+			, e.employer_etc_scan_yn
+			, e.visit_date
+			, e.visit_count
+			, e.visit_type
+			, e.os_type
+			, e.push_token
+			, e.app_version  
+			, e.limit_count   		
+			, e.labor_contract_seq
+			, co.contract_name AS labor_contract_name
+			, e.receive_contract_seq
+			, co2.contract_name AS receive_contract_name
+			, e.sign_manager_type
+			, e.sign_manager_seq
+			, FN_DECRYPT(m.manager_name) AS sign_manager_name
+			, e.employer_detail_memo
+			, e.employer_income_code
+			, e.employer_income_name
+			, e.employer_pay_code
+			, e.employer_pay_name
+    	FROM 
+    		employer e 
+    		LEFT OUTER JOIN company c 
+    			ON e.company_seq = c.company_seq
+   			LEFT OUTER JOIN tbl_contract co
+	    		ON e.labor_contract_seq = co.contract_seq
+	    	LEFT OUTER JOIN tbl_contract co2
+	    		ON e.receive_contract_seq = co2.contract_seq
+	    	LEFT OUTER JOIN manager m
+	    		ON e.sign_manager_seq = m.manager_seq
+    	WHERE 
+    		e.employer_seq = #{employer_seq}
+    		${where}
+    		<if test="srh_use_yn neq '' and srh_use_yn neq null"> 
+    			AND e.use_yn = #{srh_use_yn} 
+    		</if>
+    		<if test="owner_id neq '' and owner_id neq null"> 
+    			AND e.owner_id = #{owner_id} 
+    		</if>
+  	</select>
+</mapper>

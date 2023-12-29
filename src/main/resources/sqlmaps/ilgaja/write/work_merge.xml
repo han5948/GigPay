@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.WorkMergeMapper">
+	<update id="updateIlboWork" parameterType="WorkDTO">
+		/* work_merge.xml updateIlboWork */
+		UPDATE
+			ilbo
+		SET
+			work_seq = #{work_seq }
+			, ilbo_work_name = #{work_name }
+			, ilbo_work_addr = #{work_addr }
+			, work_sido = #{work_sido }
+			, work_sigugun = #{work_sigugun }
+			, work_dongmyun = #{work_dongmyun }
+			, work_rest = #{work_rest }
+			, ilbo_work_latlng = #{work_latlng }
+			, mod_date = NOW()
+			, mod_admin = #{mod_admin }
+		WHERE
+			work_seq = #{source_work_seq }
+	</update>
+	
+	<delete id="deleteWork" parameterType="WorkDTO">
+		/* work_merge.xml deleteWork */
+		UPDATE
+			work
+		SET
+			use_yn = '0'
+			, mod_date = NOW()
+			, mod_admin = #{mod_admin }
+		WHERE
+			work_seq = #{source_work_seq }
+	</delete>
+	
+	<select id="selectMergeWmList" parameterType="WorkDTO" resultType="WmDTO">
+		/* work_merge.xml selectMergeWmList */
+		SELECT
+			wm_seq,
+			work_seq,
+			manager_seq,
+			employer_seq
+		FROM
+			tbl_relation_wm
+		WHERE
+			work_seq = #{source_work_seq }
+			AND use_yn = '1'
+	</select>
+	
+	<select id="selectWm" parameterType="WmDTO" resultType="WmDTO">
+		SELECT
+			wm_seq,
+			work_seq,
+			manager_seq,
+			employer_seq
+		FROM
+			tbl_relation_wm
+		WHERE
+			work_seq = #{work_seq }
+			AND manager_seq = #{manager_seq }
+			AND employer_seq = #{employer_seq }
+	</select>
+	
+	<update id="updateWmWork" parameterType="WmDTO">
+		/* work_merge.xml updateWmWork */
+		UPDATE
+			tbl_relation_wm
+		SET
+			work_seq = #{work_seq }
+			, mod_admin = #{mod_admin }
+			, mod_date = NOW()
+		WHERE
+			wm_seq = #{wm_seq }
+	</update>
+	
+	<update id="updateWmUse" parameterType="WmDTO">
+		UPDATE
+			tbl_relation_wm
+		SET
+			use_yn = '0'
+			, mod_admin = #{mod_admin }
+			, mod_date = NOW()
+		WHERE
+			wm_seq = #{wm_seq }
+	</update>
+</mapper>

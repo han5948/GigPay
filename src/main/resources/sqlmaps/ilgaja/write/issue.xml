@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.IssueMapper">
+	<insert id="insertIssue" parameterType="IssueDTO" useGeneratedKeys="true" keyProperty="issue_seq">
+		INSERT INTO tbl_issue (
+			company_seq,
+			admin_seq,
+			duty_type,
+			issue_date,
+			issue_text,
+			reg_admin,
+			reg_date,
+			mod_admin,
+			mod_date			
+		) VALUES (
+			#{company_seq },
+			#{admin_seq },
+			#{duty_type },
+			#{issue_date },
+			#{issue_text },
+			#{reg_admin },
+			NOW(),
+			#{reg_admin },
+			NOW()
+		)
+	</insert>
+	
+	<select id="selectIssueListCnt" parameterType="IssueDTO" resultType="int">
+		/* issue.xml selectIssueListCnt */
+		SELECT
+			COUNT(issue_seq) AS totalCnt
+		FROM
+			tbl_issue
+		WHERE
+			1 = 1
+			AND use_yn = '1'
+			AND del_yn = '0'
+			AND ( company_seq = 13 OR company_seq   = #{company_seq} )
+			<!-- <if test="auth_level neq '0'.toString()">
+				AND admin_seq = #{admin_seq }
+			</if> -->
+	</select>
+	
+	<select id="selectIssueList" parameterType="IssueDTO" resultType="IssueDTO">
+		/* issue.xml selectIssueList */
+		SELECT
+			issue_seq,
+			i.company_seq,
+			c.company_name,
+			duty_type,
+			issue_date,
+			issue_text,
+			i.use_yn,
+			i.del_yn,
+			i.reg_date,
+			i.reg_admin,
+			i.mod_date,
+			i.mod_admin
+		FROM
+			tbl_issue i
+			LEFT OUTER JOIN company c ON i.company_seq = c.company_seq
+		WHERE
+			1 = 1
+			AND i.use_yn = '1'
+			AND i.del_yn = '0'
+			AND ( i.company_seq = 13 OR i.company_seq   = #{company_seq} )
+			<!-- <if test="auth_level neq '0'.toString()">
+				AND admin_seq = #{admin_seq }
+			</if> -->
+		ORDER BY issue_seq DESC
+		<if test="paging neq null">
+			LIMIT ${paging.startPage }, ${paging.endPage }
+		</if>
+	</select>
+	
+	<select id="selectIssueInfo" parameterType="IssueDTO" resultType="IssueDTO">
+		/* issue.xml selectIssueInfo */
+		SELECT
+			issue_seq,
+			i.company_seq,
+			c.company_name,
+			duty_type,
+			issue_date,
+			issue_text,
+			i.use_yn,
+			i.del_yn,
+			i.reg_date,
+			i.reg_admin,
+			i.mod_date,
+			i.mod_admin
+		FROM
+			tbl_issue i
+			LEFT OUTER JOIN company c ON i.company_seq = c.company_seq
+		WHERE
+			1 = 1
+			AND i.use_yn = '1'
+			AND i.del_yn = '0'
+			AND issue_seq = #{issue_seq }
+	</select>
+	
+	<update id="updateIssueInfo" parameterType="IssueDTO">
+		UPDATE
+			tbl_issue
+		SET
+			issue_date = #{issue_date },
+			issue_text = #{issue_text },
+			mod_date = NOW(),
+			mod_admin = #{mod_admin }
+		WHERE
+			issue_seq = #{issue_seq }
+	</update>
+	
+	<update id="deleteIssueInfo" parameterType="IssueDTO">
+		UPDATE
+			tbl_issue
+		SET
+			del_yn = '1',
+			use_yn = '0',
+			mod_date = NOW(),
+			mod_admin = #{mod_admin }
+		WHERE
+			issue_seq = #{issue_seq }
+	</update>
+</mapper>

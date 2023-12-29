@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.read.ReplicationBranchMapper">
+	<select id="getWork" parameterType="String" resultType="WorkDTO">
+    	<!--  1. 현장테이블에서 현장 메니져 폰번호에 맞는 현장을 찾는다. -->
+    	WITH tbl_dummy AS (SELECT fn_encrypt(#{phoneNo }) AS phoneNo)
+		SELECT 
+			work_seq
+			, company_seq
+			, employer_seq
+			, work_name
+			, work_arrival
+			, work_finish
+			, work_addr
+			, work_latlng
+			, work_addr_comment
+			, work_breakfast_yn
+			, work_age_min
+			, work_age
+			, work_blood_pressure
+			, fn_decrypt(work_manager_name) as work_manager_name
+			, work_manager_fax
+			, fn_decrypt(work_manager_phone) as work_manager_phone
+			, fn_decrypt(work_manager_email) as work_manager_email
+			, work_memo
+			, work_comment
+			, manager_seq
+			, fn_decrypt(manager_phone) as manager_phone
+			, fn_decrypt(manager_name) as manager_name
+			, is_worker_info
+			, use_yn
+			, owner_id
+		 FROM 
+		 	work 
+		 WHERE 
+		 	manager_phone = (SELECT phoneNo FROM tbl_dummy) 
+		 ORDER BY work_seq DESC 
+		 LIMIT 0,1
+  	</select>
+  	
+  	<select id="selectIlboLimitOne" parameterType="IlboDTO" resultType="IlboDTO">
+	    /* ilbo_seq 정보 조회 selectIlboInfo ilbo.xml */
+	    <if test="ilbo_work_manager_phone neq '' and ilbo_work_manager_phone neq null">
+	    WITH tbl_dummy AS (SELECT fn_encrypt(#{ilbo_work_manager_phone }) AS phoneNo)
+	    </if>
+	    SELECT 
+	    	 i.ilbo_seq, i.ilbo_date
+            , i.ilbo_work_name
+            , i.ilbo_work_arrival
+            , i.ilbo_work_finish
+            , i.ilbo_work_addr
+            , i.ilbo_kind_code
+            , i.ilbo_kind_name
+            , i.ilbo_unit_price
+            , fn_decrypt(i.ilbo_work_manager_name) as ilbo_work_manager_name
+            , fn_decrypt(i.ilbo_work_manager_phone) as ilbo_work_manager_phone
+            ,(SELECT company_name FROM company WHERE company_seq = i.company_seq) AS company_name
+	    	,(SELECT employer_name FROM employer WHERE employer_seq = i.employer_seq) AS employer_name
+	    	,(SELECT manager_seq FROM work WHERE work_seq = i.work_seq) AS manager_seq
+	    	,(SELECT fn_decrypt(manager_name) FROM work WHERE work_seq = i.work_seq) AS manager_name
+	    	,(SELECT fn_decrypt(manager_phone) FROM work WHERE work_seq = i.work_seq) AS manager_phone
+	    FROM 
+	    	ilbo i
+	    WHERE 
+	    	1 = 1
+	    <if test="ilbo_seq neq '' and ilbo_seq neq null"> 
+    		AND ilbo_seq = #{ilbo_seq} 
+	    </if>
+	    <if test="work_seq neq '' and work_seq neq null"> 
+	    		AND work_seq = #{work_seq}  
+	    	ORDER BY ilbo_seq DESC 
+	    	LIMIT 0,1 
+	    </if>
+    	<if test="ilbo_work_manager_phone neq '' and ilbo_work_manager_phone neq null"> 
+    			AND ilbo_work_manager_phone = (SELECT phoneNo FROM tbl_dummy)  
+    		ORDER BY ilbo_seq DESC 
+    		LIMIT 0,1 
+    	</if>
+    
+  	</select>
+  
+    <select id="selectManagerInfo" parameterType="ManagerDTO" resultType="ManagerDTO">
+    	/* 구인처 메니져 정보 조회 selectManagerInfo manager.xml */
+    	WITH tbl_dummy AS (SELECT fn_encrypt(#{manager_phone }) AS phoneNo)
+    	SELECT 
+	    	m.manager_seq
+			, fn_decrypt(m.manager_phone) as manager_phone
+			, m.manager_pass
+			, fn_decrypt(m.manager_name) as manager_name
+			, m.manager_type
+			, m.manager_memo
+			, m.manager_etc
+			, m.parent_company_seq
+			, m.company_seq
+			, m.employer_seq
+	    	, (SELECT company_name FROM company WHERE company_seq = m.company_seq ) AS company_name
+	    	, (SELECT employer_name FROM employer WHERE employer_seq = m.employer_seq ) AS employer_name
+	    	, (SELECT fn_decrypt(company_tel) FROM company WHERE company_seq = m.company_seq ) as company_tel
+	    	, (SELECT fn_decrypt(admin_phone) FROM admin WHERE admin_id = m.owner_id ) AS partner_tel  
+	    FROM manager m
+	    WHERE 
+	    	1=1
+	    	AND manager_phone = (SELECT phoneNo FROM tbl_dummy)
+	    	AND parent_company_seq = 0 
+	    ORDER BY manager_seq DESC, manager_type DESC 
+	    LIMIT 0,1
+	</select>
+	
+	<select id="selectWorkerInfo" parameterType="WorkerDTO" resultType="WorkerDTO">
+	/* Worker 정보 조회 selectWorkerInfo worker.xml */
+    	WITH tbl_dummy AS (SELECT fn_encrypt(#{worker_phone }) AS phoneNo)
+    	SELECT 
+    		w.worker_seq
+			, w.company_seq
+			, fn_decrypt(w.worker_name) as worker_name
+			, w.worker_sex
+			, fn_decrypt(w.worker_phone) as worker_phone
+			, w.worker_addr
+			, w.worker_latlng
+			, w.worker_ilgaja_addr
+			, w.worker_ilgaja_latlng
+			, fn_decrypt(w.worker_jumin) as worker_jumin
+			, w.worker_pass
+			, w.login_key
+			, w.worker_job_code
+			, w.worker_job_name
+			, fn_decrypt(w.worker_tel1) as worker_tel1
+			, fn_decrypt(w.worker_tel2) as worker_tel2
+			, fn_decrypt(w.worker_tel3) as worker_tel3
+			, w.worker_barcode
+			, w.worker_memo
+			, w.worker_bank_code
+			, w.worker_bank_name
+			, fn_decrypt(w.worker_bank_account) as worker_bank_account
+			, fn_decrypt(w.worker_bank_owner) as worker_bank_owner
+			, w.worker_feature
+			, w.worker_blood_pressure
+			, w.worker_OSH_yn
+			, w.worker_myphoto_scan_yn
+			, w.worker_jumin_scan_yn
+			, w.worker_bankbook_scan_yn
+			, w.worker_job_scan_yn
+			, w.worker_OSH_scan_yn
+			, w.worker_certificate_scan_yn
+			, w.worker_rating
+			, w.worker_app_status
+			, w.worker_app_use_status
+			, w.worker_app_work_status
+			, w.worker_reserve_push_status
+			, w.worker_push_yn
+			, w.os_type
+			, w.app_last_date
+			, w.app_version
+			, w.use_yn
+			, w.owner_id
+		    ,(SELECT company_name FROM company WHERE company_seq = w.company_seq) as company_name
+		    ,(SELECT fn_decrypt(company_account) FROM company WHERE company_seq = w.company_seq) as company_account
+		    ,(SELECT company_license_num FROM company WHERE company_seq = w.company_seq) as company_license_num
+		    ,(SELECT fn_decrypt(company_phone) FROM company WHERE company_seq = w.company_seq) as company_phone
+    FROM 
+    	worker w
+    WHERE 
+    	1 = 1
+    	AND worker_phone = (SELECT phoneNo FROM tbl_dummy)
+    LIMIT 0,1
+  </select>
+	
+
+</mapper>

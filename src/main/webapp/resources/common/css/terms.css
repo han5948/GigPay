@@ -1,0 +1,79 @@
+/* 약관 */
+.box-terms .t-tit {
+	margin-bottom: 30px;
+	font-size: 16px;
+	text-align: center;
+}
+.box-terms .area-term {
+	margin-top: 30px;
+}
+.box-terms .a-tit {
+	margin: 20px 0 5px;
+	font-size: 14px;
+}
+.box-terms .a-exp {
+	margin: 5px 0 15px;
+	font-size: 13px;
+	font-weight: 700;
+}
+.box-terms .a-par-tit {
+	margin: 15px 0 5px;
+	font-weight: 700;
+}
+.box-terms .a-list li {
+	position: relative;
+}
+.box-terms .a-list.hyphen li {
+	padding-left: 10px;
+}
+.box-terms .a-list.hyphen li:before {
+	content: "-";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+.box-terms .a-list.square li {
+	padding-left: 10px;
+}
+.box-terms .a-list.square li:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 5px;
+	left: 0;
+	width: 6px;
+	height: 6px;
+	background: #343540;
+}
+.box-terms .a-list.circle li {
+	padding-left: 10px;
+}
+.box-terms .a-list.circle li:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 6px;
+	left: 0;
+	width: 4px;
+	height: 4px;
+	border-radius: 2px;
+	background: #343540;
+}
+.box-terms *:not(.a-tit) + .a-paragraph {
+	margin-top: 15px;
+}
+.box-terms .middot {
+	overflow: hidden;
+	display: inline-block;
+	height: 14px;
+	font-size: 20px;
+	vertical-align: middle;
+}
+.box-terms .a-tbl {
+	text-align: center;
+}
+.box-terms .a-tbl tr > * {
+	padding: 5px;
+	border: 1px solid #000;
+}

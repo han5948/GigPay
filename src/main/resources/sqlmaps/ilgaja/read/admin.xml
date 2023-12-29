@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.read.ReplicationAdminMapper">
+  	<select id="selectInfo" parameterType="AdminDTO" resultType="AdminDTO">
+    	/* 관리자 정보 조회 selectAdminInfo admin.xml */
+    	<if test="admin_phone neq '' and admin_phone neq null">
+    		WITH tbl_dummy AS (SELECT FN_ENCRYPT(#{admin_phone }) AS adminPhone	)
+    	</if>
+    	SELECT 
+    		c.company_name, 
+			a.admin_seq,
+			a.company_seq,
+			FN_DECRYPT(a.admin_name) AS admin_name,
+			a.admin_id,
+			a.admin_pass,
+			FN_DECRYPT(a.admin_phone) AS admin_phone,
+			FN_DECRYPT(a.admin_email) AS admin_email,
+			a.admin_memo,
+			a.auth_level,
+			a.push_token,
+			a.web_token,
+			a.use_yn,
+			a.reg_date,
+			a.reg_admin,
+			a.mod_date,
+			a.mod_admin,
+			a.worker_menu,
+			a.recommendation,
+			a.work_menu,
+			a.worker_app,
+			a.work_app,
+			a.work_app_sms,
+			a.web_push_use_yn,
+			a.app_push_use_yn,
+			a.order_use_yn,
+			a.ilbo_use_yn,
+			a.static_use_yn,
+			a.setting_use_yn,
+			a.counselor_rate,
+    		c.share_yn
+    		, c.auto_company_use_yn
+	    FROM 
+	    	admin a 
+	    	LEFT JOIN company c 
+	    		ON a.company_seq = c.company_seq
+	    WHERE 
+	    	1=1
+	    	<if test="admin_seq neq '' and admin_seq neq null"> 
+	    		AND a.admin_seq = #{admin_seq}		
+	    	</if>
+	   		<if test="admin_phone neq '' and admin_phone neq null"> 
+	   			AND a.admin_phone = (SELECT adminPhone FROM tbl_dummy)		
+	   		</if>
+	   		<if test="admin_id neq '' and admin_id neq null"> 
+	   			AND a.admin_id = #{admin_id}		
+	   		</if>
+	   		<if test="admin_pass neq '' and admin_pass neq null"> 
+	   			AND a.admin_pass = PASSWORD(#{admin_pass})		
+	   		</if>
+	   		<if test="use_yn neq '' and use_yn neq null"> 
+	   			AND a.use_yn = #{use_yn}		
+	   		</if>
+  	</select>
+  
+	<select id="selectList" parameterType="AdminDTO" resultType="AdminDTO">
+    	/* 관리자정보 조회 selectList .admin.xml */
+    	<if test="admin_phone neq '' and admin_phone neq null">
+    		WITH tbl_dummy AS (SELECT	FN_ENCRYPT(#{admin_phone }) AS adminPhone) 
+    	</if>
+    	
+	    SELECT 
+	    	admin_seq,
+  			company_seq,
+  			FN_DECRYPT(admin_name) AS admin_name,
+			admin_id,
+			admin_pass,
+			FN_DECRYPT(admin_phone) AS admin_phone,
+			FN_DECRYPT(admin_email) AS admin_email,
+			admin_memo,
+			auth_level,
+			push_token,
+			web_token,
+			use_yn,
+			reg_date,
+			reg_admin,
+			mod_date,
+			mod_admin,
+			worker_menu,
+			work_menu,
+			worker_app,
+			work_app,
+			work_app_sms,
+			web_push_use_yn,
+			app_push_use_yn,
+			counselor_rate
+	    FROM 
+	    	admin 
+	    WHERE 
+	    	1=1
+	    	<if test="sel_admin_seq neq '' and sel_admin_seq neq null">
+	    		AND admin_seq IN
+	    		<foreach collection="sel_admin_seq" item="sel_seq" open="(" close=")" separator=", ">
+	      			#{sel_seq}
+	    		</foreach>
+	    	</if>
+	    	<if test="admin_phone neq '' and admin_phone neq null"> 
+	    		AND admin_phone = (SELECT adminPhone FROM tbl_dummy)		
+	    	</if>
+  	</select>
+
+	<select id="selectCounselorList" parameterType="AdminDTO" resultType="AdminDTO">
+		/* 상담사 리스트 selectCounselorList admin.xml */
+		SELECT
+			admin_seq,
+  			company_seq,
+  			FN_DECRYPT(admin_name) AS admin_name,
+			admin_id,
+			admin_pass,
+			FN_DECRYPT(admin_phone) AS admin_phone,
+			FN_DECRYPT(admin_email) AS admin_email,
+			admin_memo,
+			auth_level,
+			push_token,
+			web_token,
+			use_yn,
+			reg_date,
+			reg_admin,
+			mod_date,
+			mod_admin,
+			worker_menu,
+			work_menu,
+			worker_app,
+			work_app,
+			work_app_sms,
+			web_push_use_yn,
+			app_push_use_yn,
+			counselor_rate
+		FROM
+			admin
+		WHERE
+			1 = 1
+			AND auth_level = '3'
+			AND company_seq = #{company_seq }
+			<if test="use_yn neq '' and use_yn neq null"> 
+				AND use_yn = #{use_yn}		
+			</if> 
+	</select>
+	
+  	<select id="getAdminTotalCnt" parameterType="AdminDTO" resultType="int">
+    	/* 관리자정보 조회 admin.xml.getAdminTotalCnt */
+    	SELECT 
+    		COUNT(1)
+    	FROM 
+    		admin a 
+    		LEFT OUTER JOIN company c 
+    			ON a.company_seq = c.company_seq
+    	WHERE 
+    		1 = 1
+    		${where}
+    		<if test="srh_company_seq neq '' and srh_company_seq neq null"> 
+    			AND a.company_seq = #{srh_company_seq} 
+    		</if>
+    		<if test="auth_level neq '' and auth_level neq null"> 
+    			AND a.auth_level = #{auth_level} 
+    		</if>
+    		<if test="start_reg_date neq '' and start_reg_date neq null"> 
+    			AND DATE_FORMAT(a.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_reg_date} 
+    		</if>
+    		<if test="end_reg_date neq '' and end_reg_date neq null"> 
+    			AND DATE_FORMAT(a.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_reg_date} 
+    		</if>
+    		<if test="srh_use_yn neq '' and srh_use_yn neq null"> 
+    			AND a.use_yn = #{srh_use_yn} 
+    		</if>
+  	</select>
+
+  	<select id="getAdminList" parameterType="AdminDTO" resultType="AdminDTO">
+    	/* 관리자정보 조회 admin.xml.getAdminList */
+    	SELECT 
+	    	c.company_name, 
+	    	a.admin_seq,
+			a.company_seq,
+			FN_DECRYPT(a.admin_name) AS admin_name,
+			a.admin_id,
+			a.admin_pass,
+			FN_DECRYPT(a.admin_phone) AS admin_phone,
+			FN_DECRYPT(a.admin_email) AS admin_email,
+			a.admin_memo,
+			a.recommendation,
+			FN_DECRYPT(a.recommendation) AS recommendationDecrypt,
+			a.auth_level,
+			a.push_token,
+			a.web_token,
+			a.use_yn,
+			a.reg_date,
+			a.reg_admin,
+			a.mod_date,
+			a.mod_admin,
+			a.worker_menu,
+			a.work_menu,
+			a.worker_app,
+			a.work_app,
+			a.work_app_sms,
+			a.web_push_use_yn,
+			a.app_push_use_yn,
+			a.order_use_yn,
+			a.ilbo_use_yn,
+			a.static_use_yn,
+			a.setting_use_yn,
+			a.counselor_rate,
+			a.admin_comment
+    	FROM 
+    		admin a 
+    		LEFT OUTER JOIN company c 
+    			ON a.company_seq = c.company_seq 
+    	WHERE 
+    		1 = 1
+    		${where}
+    		<if test="srh_company_seq neq '' and srh_company_seq neq null"> 
+    			AND a.company_seq = #{srh_company_seq} 
+    		</if>
+    		<if test="auth_level neq '' and auth_level neq null"> 
+    			AND a.auth_level = #{auth_level} 
+    		</if>
+    		<if test="start_reg_date neq '' and start_reg_date neq null"> 
+    			AND DATE_FORMAT(a.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_reg_date} 
+    		</if>
+   			<if test="end_reg_date neq '' and end_reg_date neq null"> 
+   				AND DATE_FORMAT(a.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_reg_date} 
+   			</if>
+    		<if test="srh_use_yn neq '' and srh_use_yn neq null"> 
+    			AND a.use_yn = #{srh_use_yn} 
+    		</if>
+			<if test="work_app_sms neq '' and work_app_sms neq null"> 
+				AND a.work_app_sms = #{work_app_sms} 
+			</if>
+    	ORDER BY ${sidx} ${sord}
+    	<if test="paging != null">
+      		<choose>
+        		<when test="paging.pageNo gt 0">
+    				LIMIT ${paging.startPage}, ${paging.endPage}
+        		</when>
+        		<otherwise>
+    				LIMIT 0, ${paging.endPage}
+        		</otherwise>
+      		</choose>
+    	</if>
+  	</select>
+
+  	<insert id="setAdminCell" parameterType="AdminDTO" useGeneratedKeys="true" keyProperty="admin_seq">
+    	/* 관리자정보 생성 admin.xml.setAdminCell */
+    	INSERT INTO admin (
+       		reg_date
+       		<if test="company_seq  neq '' and company_seq  neq null "> 
+       			, company_seq 
+       		</if>
+      		, admin_name
+      		, admin_id
+      		, admin_pass
+      		, reg_admin
+      		, mod_admin
+    	) VALUES (
+        	NOW()
+      		<if test="company_seq  neq '' and company_seq  neq null"> 
+      			, #{company_seq } 
+      		</if>
+      		, '?'
+      		, '?'
+      		, '?'
+      		, #{reg_admin}
+      		, #{reg_admin}
+    	)
+  	</insert>
+
+  	<select id="selectIlgajaMenu" parameterType="AdminLogDTO" resultType="AdminLogDTO">
+    	/* 메뉴 조회 admin.xml.selectIlgajaMenu */
+    	SELECT 
+    		*
+    	FROM 
+    		tbl_ilgaja_menu 
+    	WHERE 
+    		1 = 1
+    		<if test="menu_path neq '' and menu_path neq null"> 
+    			AND menu_path = #{menu_path} 
+    		</if>
+    	limit 0,1	
+  	</select>
+  	
+</mapper>

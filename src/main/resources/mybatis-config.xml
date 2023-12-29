@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+		
+	<settings>
+		<setting name="defaultStatementTimeout" value="60000"/>
+		<setting name="cacheEnabled" value="true" />
+		<setting name="mapUnderscoreToCamelCase" value="false" />
+	</settings>
+	
+	<typeAliases>
+		<typeAlias type="java.util.HashMap" alias="hmap" />		
+		<package name="com.nemo.kr.dto"/>
+		<package name="com.ilgajaComm.dto" />
+	</typeAliases>
+	
+	<typeHandlers>
+		<typeHandler handler="com.nemo.kr.common.handler.LimitCountTypeHandler"/>
+	</typeHandlers>
+</configuration>
+
+
+
+	

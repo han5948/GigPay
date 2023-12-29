@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.AdMapper">
+	<select id="selectAdListCnt" parameterType="AdDTO" resultType="int">
+		/* ad.xml selectAdListCnt */
+		SELECT
+			COUNT(ad_seq) AS totalCnt
+		FROM
+			tbl_ad
+		WHERE
+			1 = 1
+			<if test="query neq null and query neq ''">
+				${query }
+			</if>
+		ORDER BY ad_seq DESC
+	</select>
+	
+	<select id="selectAdList" parameterType="AdDTO" resultType="AdDTO">
+		/* ad.xml selectAdList */
+		SELECT
+			ad_seq,
+			ad_justnonamt,
+			ad_justamt,
+			ad_date,
+			ad_device,
+			ad_networktype,
+			ad_nonamt,
+			ad_amt,
+			ad_prductcode,
+			reg_date,
+			reg_admin
+		FROM
+			tbl_ad
+		WHERE
+			1 = 1
+			<if test="query neq null and query neq ''">
+				${query }
+			</if>
+		ORDER BY ad_seq DESC
+		<if test="paging neq null">
+			LIMIT ${paging.startPage }, ${paging.endPage }
+		</if>
+	</select>
+</mapper>

@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="ko">
+<head> 
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+<title>일가자인력</title>
+<link rel="icon" href="./images/ilgaja_logo_ico.ico" mce_href="/images/ilgaja_logo_ico.ico" type="image/x-icon">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="main.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+</head>
+<body>
+<!-- 팝업배경 -->
+	<div class="bgPopup" style="display:block;"></div>
+	<div class="popup" style="display:block;">
+		<!-- 사람구함 팝업 -->
+		<div class="jobOffer" style="display:block">
+			<div class="bgOffer"></div>
+			<div class="joHeader clear">
+				<p class="johHeadTxt"><strong>사람구함</strong>(구인신청)</p>
+				<p class="johHeadImg"><img src="images/buttonIcon01.png" alt=""></p>
+			</div>
+			<div class="joContents clear">
+				<form action="#none" id="jobOfferForm">
+					<div class="offerInfo01">
+						<p class="firstOI_01 clear">
+							<label>현 장<span>*</span></label>
+							<input type="text" placeholder="주소" required="required">
+						</p>
+						<p class="firstOI_02 clear">
+							<label class="tit1">작 업 일</label>
+							<input type="text" class="date" id="datepicker" required="required" readonly>
+							<label class="tit2">작업일수</label>
+							<select name="offerDay1" id="offerDay" required="required">
+								<option value="od01" selected>1일</option>
+								<option value="od02">2일~3일</option>
+								<option value="od03">3일~4일</option>
+								<option value="od04">5일~6일</option>
+								<option value="od05">7일 이상</option>
+							</select>
+						</p>
+						<p class="firstOI_02 clear">
+							<label class="tit1">도 착 시 간</label>
+							<select name="offerStart1" id="offerStart" class="case3">
+								<option value="os01">00:00</option>
+								<option value="os02">00:30</option>
+								<option value="os03">01:30</option>
+								<option value="os04">02:00</option>
+								<option value="os05">02:30</option>
+								<option value="os06">03:00</option>
+								<option value="os07">03:30</option>
+								<option value="os08">04:00</option>
+								<option value="os09">04:30</option>
+								<option value="os10">05:00</option>
+								<option value="os11">05:30</option>
+								<option value="os12">06:00</option>
+								<option value="os13">06:30</option>
+								<option value="os14">07:00</option>
+								<option value="os15">07:30</option>
+								<option value="os16" selected>08:00</option>
+								<option value="os17">08:30</option>
+								<option value="os18">09:00</option>
+								<option value="os19">09:30</option>
+								<option value="os20">10:00</option>
+								<option value="os21">10:30</option>
+								<option value="os22">11:00</option>
+								<option value="os23">11:30</option>
+								<option value="os24">12:00</option>
+								<option value="os25">12:30</option>
+								<option value="os26">13:00</option>
+								<option value="os27">13:30</option>
+								<option value="os28">14:00</option>
+								<option value="os29">14:30</option>
+								<option value="os30">15:00</option>
+								<option value="os31">15:30</option>
+								<option value="os32">16:00</option>
+								<option value="os33">16:30</option>
+								<option value="os34">17:00</option>
+								<option value="os35">17:30</option>
+								<option value="os36">18:00</option>
+								<option value="os37">18:30</option>
+								<option value="os38">19:00</option>
+								<option value="os39">19:30</option>
+								<option value="os40">20:00</option>
+								<option value="os41">20:30</option>
+								<option value="os42">21:00</option>
+								<option value="os43">21:30</option>
+								<option value="os44">22:00</option>
+								<option value="os45">22:30</option>
+								<option value="os46">23:00</option>
+								<option value="os47">23:30</option>
+								<option value="os48">24:00</option>
+							</select>
+							<label class="tit2">~종료시간</label>
+							<select name="offerClose1" id="offerClose">
+								<option value="oc01">00:00</option>
+								<option value="oc02">00:30</option>
+								<option value="oc03">01:30</option>
+								<option value="oc04">02:00</option>
+								<option value="oc05">02:30</option>
+								<option value="oc06">03:00</option>
+								<option value="oc07">03:30</option>
+								<option value="oc08">04:00</option>
+								<option value="oc09">04:30</option>
+								<option value="oc10">05:00</option>
+								<option value="oc11">05:30</option>
+								<option value="oc12">06:00</option>
+								<option value="oc13">06:30</option>
+								<option value="oc14">07:00</option>
+								<option value="oc15">07:30</option>
+								<option value="oc16">08:00</option>
+								<option value="oc17">08:30</option>
+								<option value="oc18">09:00</option>
+								<option value="oc19">09:30</option>
+								<option value="oc20">10:00</option>
+								<option value="oc21">10:30</option>
+								<option value="oc22">11:00</option>
+								<option value="oc23">11:30</option>
+								<option value="oc24">12:00</option>
+								<option value="oc25">12:30</option>
+								<option value="oc26">13:00</option>
+								<option value="oc27">13:30</option>
+								<option value="oc28">14:00</option>
+								<option value="oc29">14:30</option>
+								<option value="oc30">15:00</option>
+								<option value="oc31">15:30</option>
+								<option value="oc32">16:00</option>
+								<option value="oc33">16:30</option>
+								<option value="oc34" selected>17:00</option>
+								<option value="oc35">17:30</option>
+								<option value="oc36">18:00</option>
+								<option value="oc37">18:30</option>
+								<option value="oc38">19:00</option>
+								<option value="oc39">19:30</option>
+								<option value="oc40">20:00</option>
+								<option value="oc41">20:30</option>
+								<option value="oc42">21:00</option>
+								<option value="oc43">21:30</option>
+								<option value="oc44">22:00</option>
+								<option value="oc45">22:30</option>
+								<option value="oc46">23:00</option>
+								<option value="oc47">23:30</option>
+								<option value="oc48">24:00</option>
+							</select>
+						</p> 
+						<p class="firstOI_01 clear">
+							<label class="tit1">구인처상호<span>*</span></label>
+							<input type="text" placeholder="상호명(개인은 성함 입력)" required="required">
+						</p>
+						<p class="firstOI_03 clear">
+							<label class="tit1">오더하신분<span>*</span></label>
+							<input type="text" placeholder="이름" required="required">
+							<label class="tit2">연락처<span>*</span></label>
+							<input type="text" placeholder="핸드폰번호" required="required" class="con2">
+							<span class="btn"><span class="add"><img src="images/plusIcon.png" alt="추가"></span><span class="del"><img src="images/minusIcon.png" alt="삭제"></span></span>
+						</p>
+						<p class="firstOI_04 clear">
+							<label class="tit1">현장담당자</label>
+							<input type="text" placeholder="이름" required="required">
+							<label class="tit2">연락처</label>
+							<input type="text" placeholder="핸드폰번호" required="required" class="con2">
+						</p>
+					</div>
+					<div class="offerInfo02">
+						<div class="secondOI clear">
+							<div class="secValue1">
+							    <div class="secondOIpop">
+								<div class="sOIpopCon">
+									<span class="arrow"><img src="images/arrowIcon.png" alt=""></span>
+									<div class="sOItit">
+										<p><strong>전문분야</strong><br>단가는 2018년 기준이며, 지역별/강도별로 단가가 차이날 수 있습니다.</p>
+										<span><img src="images/subClose.png" alt="닫기"></span>	
+									</div>
+									<div class="sOIemp">
+										<div class="man clear">
+											<p class="empTit">남성인력</p>
+											<div class="empButton">
+												<p>신호수</p>
+												<p>잡부</p>
+												<p>공장</p>
+												<p>농사일</p>
+												<p>이사짐</p>
+												<p>조공</p>
+												<p>양중</p>
+												<p>자재정리</p>
+												<p>철거</p>
+												<p>철거뒷일</p>
+												<p>하스리</p>
+												<p>커팅</p>
+												<p>그라인드</p>
+												<p>곰방(2층)</p>
+												<p>곰방(3층)</p>
+												<p>곰방(4층~)</p>
+											</div>
+										</div>
+										<div class="women clear">
+											<p class="empTit">여성인력</p>
+											<div class="empButton">
+												<p>신호수</p>
+												<p>준공청소</p>
+												<p>이사정리</p>
+												<p>공장</p>
+												<p>농사일</p>
+											</div>
+										</div>
+										<div class="tech clear">
+											<p class="empTit">기술인력</p>
+											<div class="empButton">
+												<p>내장목수</p>
+												<p>목수+장비</p>
+												<p>타일</p>
+												<p>전기</p>
+												<p>미장</p>
+												<p>미장+장비</p>
+												<p>조적 벽돌</p>
+												<p>벽돌+장비</p>
+												<p>4인치블럭</p>
+												<p>6인치블럭</p>
+												<p>8인치블럭</p>
+												<p>메지</p>
+												<p>설비</p>
+												<p>페인트</p>
+												<p>실리콘</p>
+												<p>형틀목수</p>
+												<p>철근</p>
+												<p>타설</p>
+												<p>용접</p>
+												<p>비계설치</p>
+												<p>비계해체</p>
+												<p>경계석</p>
+												<p>보도블럭</p>
+											</div>
+										</div>
+									</div>
+									<p class="sOItxt">새벽시간, 거리가 먼 현장인 경우 "교통비"가 별도 책정될 수 있습니다.</p>
+								</div>
+							</div>
+								<label>직종</label>
+								<input type="text" placeholder="선택" class="opp" required="required" readonly onfocus="this.blur()">
+							</div>
+							<div class="secValue2">
+								<label>단가(원)</label>
+								<input type="text" class="price" required="required">
+							</div>
+							<div class="secValue3">
+								<label>상세작업설명</label>
+								<input type="text" class="price" placeholder="필수" required="required">
+							</div>
+							<div class="secValue4">
+								<label>인원</label>
+								<span class="personMiner"><img src="images/personMinu.png" alt=""></span>
+								<input type="text" value="1" class="num" name="num">
+								<span class="personPlus"><img src="images/personPlus.png" alt=""></span>
+							</div>
+							<div class="secValue5">
+								<span>추가</span>
+							</div>
+						</div>
+					</div>
+					<div class="offerInfo03 clear">
+						<dl>
+							<dt>단가지급 : </dt>
+							<dd>
+								<label><input type="radio" name="joInfo01" id="joi1" checked> 구직자통장송금</label>
+								<label><input type="radio" name="joInfo01" id="joi2"> 현장현금지급</label>
+							</dd>
+						</dl>
+						<dl>
+							<dt>나이제한 : </dt>
+							<dd>
+								<label><input type="radio" name="joInfo02" id="joi1" checked> 제한없음</label>
+								<label><input type="radio" name="joInfo02" id="joi2"> 30 이하</label>
+								<label><input type="radio" name="joInfo02" id="joi3"> 40 이하</label>
+								<label><input type="radio" name="joInfo02" id="joi4"> 50 이하</label>
+								<label><input type="radio" name="joInfo02" id="joi5"> 60 이하</label>
+							</dd>
+						</dl>
+						<dl>
+							<dt>혈압제한 : </dt>
+							<dd>
+								<label><input type="radio" name="joInfo03" id="joi1" checked> 제한없음</label>
+								<label><input type="radio" name="joInfo03" id="joi2"> 160 이하</label>
+								<label><input type="radio" name="joInfo03" id="joi3"> 150 이하</label>
+								<label><input type="radio" name="joInfo03" id="joi4"> 140 이하</label>
+							</dd>
+						</dl>
+					</div>
+					<div class="offerInfo04">
+						<div class="offerInfo04pop">
+							<p><strong>개인정보 수집 및 이용에 동의</strong></p>
+							<ol>
+								<li>1.수집/이용 목적 : 구인신청 등 구인자 요청 처리 및 결과 회신</li>
+								<li>2. 수집하는 항목 : 회사명, 이름, 연락처</li>
+								<li>3. 보유/이용 기간 : 구직알선 서비스 종료 후 2년</li>
+								<li>4. 동의를 거부할 수 있으며, 거부시 이용이 제한될 수 있습니다.</li>
+								<span>닫기</span>
+							</ol>
+						</div>
+						<p class="referCheck"><label><input type="checkbox"> 소개비 10% 면세계산서 요청</label></p>
+						<p class="refer clear">
+							<label class="tit1">계산서담당자</label>
+							<input type="text" placeholder="이름" class="con1">
+							<label class="tit2">연락처</label> 
+							<input type="text" placeholder="핸드폰번호" class="con2">
+						</p>
+						<p class="agreeCheck">
+							<label><input type="checkbox"> 작업자 노임대장/신분증/계좌번호 요청</label>
+							<label><input type="checkbox"> 개인정보 수집 및 이용에 동의합니다.<span class="conView">내용보기</span></label>
+						</p>
+					</div>
+					<div class="jobOfferBtn">
+						<span class="apply">신청</span>
+						<span class="close">닫기</span>
+					</div>
+				</form>
+			</div>
+			<div class="joFooter">
+				<div class="appInfo">
+					<p class="appInfoTxt">구인신청 후 아래 앱을 설치하면 배정된 인력 정보를 미리 알 수 있습니다.</p>
+					<div class="appInfoIcon clear">
+						<p class="aInfoIconButton"><img src="images/btnImg.png" alt=""></p>
+						<p class="aInfoIconApp"> 
+							<span><img src="images/appIcon01.png" alt="앱스토어"> <span><a href="#">아이폰</a></span></span>
+							<span><img src="images/appIcon02.png" alt=""> <span><a href="#">안드로이드</a></span></span>
+						</p>
+					</div>
+					<div class="jobFoot">
+						<img src="images/callIcon.png" alt="">
+						구인요청 : <strong>010.3808.5994</strong>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

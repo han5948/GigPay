@@ -1,0 +1,911 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.ManagerMapper">
+
+<resultMap id="ManagerTreeDTO" type="EmDTO">
+	<id property="em_seq" column="em_seq" />
+	<result property="id" column="em_seq" />
+	<result property="text" column="employer_name" />
+	<result property="manager_seq" column="manager_seq" />
+	<result property="manager_name" column="manager_name" />
+	<result property="manager_type" column="manager_type" />
+	<result property="employer_seq" column="employer_seq" />
+	<result property="employer_name" column="employer_name" />
+	<result property="employer_num" column="employer_num" />
+	
+	<collection property="children" column ="wm_seq" ofType="WmDTO" javaType="java.util.ArrayList" resultMap="children"/>
+</resultMap>
+
+ <resultMap id="children" type="WmDTO">
+ 	<id property="wm_seq" column="wm_seq" />
+ 	<result property="id" column="wm_seq" />
+	<result property="text" column="work_name" />              
+    <result property="work_seq"     column="work_seq" />
+    <result property="work_name"    column="work_name" />
+</resultMap>
+
+
+<select id="getManagerTotalCnt" parameterType="ManagerDTO" resultType="int">
+    /* 매니저 정보 조회 manager.getManagerTotalCnt */
+    SELECT 
+    	COUNT(1)
+    FROM manager m LEFT OUTER JOIN company c ON m.company_seq = c.company_seq LEFT OUTER JOIN employer e ON m.employer_seq = e.employer_seq
+    WHERE 1 = 1
+    ${where}
+    <if test="srh_company_seq neq '' and srh_company_seq neq null"> AND m.company_seq = #{srh_company_seq} </if>
+    <if test="start_reg_date neq '' and start_reg_date neq null"> AND DATE_FORMAT(m.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_reg_date} </if>
+    <if test="end_reg_date   neq '' and end_reg_date   neq null"> AND DATE_FORMAT(m.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_reg_date} </if>
+    <if test="srh_use_yn     neq '' and srh_use_yn     neq null"> AND m.use_yn = #{srh_use_yn} </if>
+    <if test="owner_id           neq '' and owner_id           neq null"> AND m.owner_id			= #{owner_id} </if>
+    <if test="manager_type           neq '' and manager_type           neq null"> AND m.manager_type			= #{manager_type} </if>
+    
+  </select>
+
+  <select id="getManagerList" parameterType="ManagerDTO" resultType="ManagerDTO">
+    /* 매니저 조회 company_admin.getManagerList */
+    SELECT 
+    	c.company_name
+    	, e.employer_name
+    	, e.employer_num
+    	, e.employer_pass
+    	, m.manager_seq
+		, FN_DECRYPT(m.manager_phone) as manager_phone
+		, m.manager_pass
+		, FN_DECRYPT(m.manager_name) as manager_name
+		, m.manager_type
+		, m.manager_memo
+		, m.manager_etc
+		, m.parent_company_seq
+		, m.company_seq
+		, m.employer_seq
+		, m.manager_push_yn
+		, m.push_token
+		, m.app_version
+		, m.manager_use_status
+		, m.os_type
+		, m.auth_num
+		, m.use_yn
+		, m.owner_id
+		, m.reg_date
+		, m.reg_admin
+		, m.mod_date
+		, m.mod_admin
+		, m.visit_date
+		, m.visit_count
+		, m.visit_type
+		,(SELECT COUNT(em_seq) FROM tbl_relation_em WHERE manager_seq = m.manager_seq) AS e_count
+		,(SELECT COUNT(wm_seq) FROM tbl_relation_wm WHERE manager_seq = m.manager_seq) AS w_count 
+    FROM manager m 
+    	LEFT OUTER JOIN company c ON m.company_seq = c.company_seq 
+    	LEFT OUTER JOIN employer e ON m.employer_seq = e.employer_seq
+    	
+    WHERE 1 = 1
+	    ${where}
+	    <if test="company_seq neq '' and company_seq neq null"> AND m.company_seq = #{company_seq} </if>
+	    <if test="start_reg_date neq '' and start_reg_date neq null"> AND DATE_FORMAT(m.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_reg_date} </if>
+	    <if test="end_reg_date   neq '' and end_reg_date   neq null"> AND DATE_FORMAT(m.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_reg_date} </if>
+	    <if test="srh_use_yn     neq '' and srh_use_yn     neq null"> AND m.use_yn = #{srh_use_yn} </if>
+		<if test="owner_id           neq '' and owner_id           neq null"> AND m.owner_id			= #{owner_id} </if>
+		<if test="manager_type           neq '' and manager_type           neq null"> AND m.manager_type			= #{manager_type} </if>
+    ORDER BY ${sidx} ${sord}
+
+    <if test="paging != null">
+      <choose>
+        <when test="paging.pageNo gt 0">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+        </when>
+        <otherwise>
+			LIMIT 0, ${paging.endPage}
+        </otherwise>
+      </choose>
+    </if>
+  </select>
+
+	<insert id="setManager" parameterType="ManagerDTO" useGeneratedKeys="true" keyProperty="manager_seq">
+		/* 메니져 생성 manager.xml setManager */
+		INSERT INTO manager (
+			manager_phone,
+			<if test="manager_pass neq '' and manager_pass neq null"> manager_pass, </if>
+			manager_name,
+			manager_type,
+			manager_memo,
+			<if test="parent_company_seq neq '' and parent_company_seq neq null"> parent_company_seq, </if>
+			company_seq,
+			employer_seq,
+			<if test="owner_id neq '' and owner_id neq null"> owner_id, </if>
+			<if test="join_route neq '' and join_route neq null"> join_route, </if>
+			reg_date,
+			reg_admin,
+			mod_admin
+		)VALUES(
+			FN_ENCRYPT(#{manager_phone}),
+			<if test="manager_pass neq '' and manager_pass neq null"> PASSWORD(#{manager_pass}), </if>
+		    <choose>
+				<when test="manager_name neq '' and manager_name neq null">
+					FN_ENCRYPT(#{manager_name}),
+				</when>
+		        <otherwise>
+					(SELECT manager_name FROM tbl_order where order_seq = #{order_seq}),
+				</otherwise>
+			</choose>
+			#{manager_type},
+			#{manager_memo},
+			<if test="parent_company_seq neq '' and parent_company_seq neq null">#{ parent_company_seq}, </if>
+			#{company_seq},
+			#{employer_seq},
+			<if test="owner_id neq '' and owner_id neq null"> #{owner_id}, </if>
+			<if test="join_route neq '' and join_route neq null"> #{join_route}, </if>
+			NOW(),
+			#{reg_admin},
+			#{reg_admin}
+		)
+	</insert>
+  
+  <select id="selectManagerCount" parameterType="ManagerDTO" resultType="int">
+  /* 메니져 카운터 조회 selectManagerCount manager.xml */
+  		<if test="manager_phone  		neq '' and manager_phone			neq null">
+  		WITH tbl_dummy AS (SELECT FN_ENCRYPT(#{manager_phone }) AS phoneNo)
+  		</if>
+  		SELECT count(*) from manager where 1=1
+  		<if test="manager_phone  		neq '' and manager_phone			neq null"> AND manager_phone  	= (SELECT phoneNo FROM tbl_dummy) </if>
+  		<if test="use_yn  					neq '' and use_yn  			neq null"> AND use_yn  	= #{use_yn} </if>
+  		<if test="company_seq           	neq '' and company_seq       			neq null"> AND company_seq			= #{company_seq} </if>
+  </select>
+  <select id="selectManagerInfo" parameterType="ManagerDTO" resultType="ManagerDTO">
+    /* 구인처 메니져 정보 조회 selectManagerInfo manager.xml */
+    <if test="manager_phone  		neq '' and manager_phone			neq null">
+    	WITH tbl_dummy AS (SELECT FN_ENCRYPT(#{manager_phone }) AS phoneNo)
+    </if>
+    SELECT 
+    	  m.manager_seq,
+		  FN_DECRYPT(m.manager_phone) AS manager_phone,
+		  m.manager_pass,
+		  FN_DECRYPT(m.manager_name) AS manager_name,
+		  m.manager_type,
+		  m.manager_memo,
+		  m.manager_etc,
+		  m.parent_company_seq,
+		  m.company_seq,
+		  m.employer_seq,
+		  m.manager_push_yn,
+		  m.push_token,
+		  m.app_version,
+		  m.os_type,
+		  m.auth_num,
+		  m.use_yn,
+		  m.owner_id,
+		  m.reg_date,
+		  m.reg_admin,
+		  m.mod_date,
+		  m.mod_admin,
+		  m.visit_date,
+		  m.visit_count,
+		  m.visit_type  
+    	, (SELECT company_name FROM company WHERE company_seq = m.company_seq ) AS company_name
+    	, (SELECT employer_name FROM employer WHERE employer_seq = m.employer_seq ) AS employer_name
+    	, (SELECT FN_DECRYPT(company_tel) AS company_tel FROM company WHERE company_seq = m.company_seq ) as company_tel
+    	, (SELECT FN_DECRYPT(admin_phone) AS admin_phone FROM admin WHERE admin_id = m.owner_id ) AS partner_tel
+    	, IFNULL((SELECT counselor_rate FROM admin WHERE admin_id = m.owner_id ), 0) AS counselor_rate  
+    	, IFNULL((SELECT auth_level FROM admin WHERE admin_id = m.owner_id ), 0) AS auth_level
+    FROM manager m
+    WHERE 1=1
+     <if test="use_yn  					neq '' and use_yn  			neq null"> AND use_yn  	= #{use_yn} </if>
+     <if test="manager_seq  			neq '' and manager_seq  			neq null"> AND manager_seq  	= #{manager_seq} </if>
+     <if test="manager_phone  		neq '' and manager_phone			neq null"> AND manager_phone  	= (SELECT phoneNo FROM tbl_dummy) </if>
+     <if test="manager_pass  			neq '' and manager_pass  			neq null"> AND manager_pass  	= PASSWORD(#{manager_pass}) </if>
+     <if test="parent_company_seq  neq '' and parent_company_seq neq null"> AND parent_company_seq  	= #{parent_company_seq} </if>
+     <if test="owner_id           		neq '' and owner_id       			neq null"> AND owner_id			= #{owner_id} </if>
+     <if test="company_seq           	neq '' and company_seq       			neq null"> AND company_seq			= #{company_seq} </if>
+     <if test="employer_seq           	neq '' and employer_seq       			neq null"> AND employer_seq			= #{employer_seq} </if>
+  </select>
+  
+  <select id="selectManagerList" parameterType="ManagerDTO" resultType="ManagerDTO">
+    /* 구인처 메니져리스트  조회 selectManagerList manager.xml */
+    <if test="manager_phone  		neq '' and manager_phone			neq null">
+    	WITH tbl_dummy AS (SELECT FN_ENCRYPT(#{manager_phone }) AS phoneNo)
+    </if>
+    SELECT 
+		m.manager_seq
+		, FN_DECRYPT(m.manager_phone) as manager_phone
+		, m.manager_pass
+		, FN_DECRYPT(m.manager_name) as manager_name
+		, m.manager_type
+		, m.manager_memo
+		, m.manager_etc
+		, m.parent_company_seq
+		, m.company_seq
+		, m.employer_seq
+		, m.manager_push_yn
+		, m.push_token
+		, m.app_version
+		, m.os_type
+		, m.auth_num
+		, m.use_yn
+		, m.owner_id
+		, m.reg_date
+		, m.reg_admin
+		, m.mod_date
+		, m.mod_admin
+		, m.visit_date
+		, m.visit_count
+		, m.visit_type 
+		, (SELECT company_name FROM company WHERE company_seq = m.company_seq ) AS company_name
+		, (SELECT FN_DECRYPT(company_tel) AS company_tel FROM company WHERE company_seq = m.company_seq ) as company_tel
+    	, (SELECT FN_DECRYPT(admin_phone) AS admin_phone FROM admin WHERE admin_id = m.owner_id ) AS partner_tel  
+    FROM manager m
+    WHERE 1=1
+     <if test="use_yn  					neq '' and use_yn  			neq null"> AND use_yn  	= #{use_yn} </if>
+     <if test="manager_seq  			neq '' and manager_seq  			neq null"> AND manager_seq  	= #{manager_seq} </if>
+     <if test="manager_phone  		neq '' and manager_phone			neq null"> AND manager_phone  	= (SELECT phoneNo FROM tbl_dummy) </if>
+     <if test="manager_pass  			neq '' and manager_pass  			neq null"> AND manager_pass  	= PASSWORD(#{manager_pass}) </if>
+     <if test="parent_company_seq  neq '' and parent_company_seq neq null"> AND parent_company_seq  	= #{parent_company_seq} </if>
+     <if test="owner_id           		neq '' and owner_id       			neq null"> AND owner_id			= #{owner_id} </if>
+     <if test="company_seq           	neq '' and company_seq       			neq null"> AND company_seq			= #{company_seq} </if>
+     <if test="employer_seq           	neq '' and employer_seq       			neq null"> AND employer_seq			= #{employer_seq} </if>
+     <if test="manager_type				neq '' and manager_type					neq null"> AND manager_type			= #{manager_type} </if>
+	 order by manager_seq desc
+     
+  </select>
+  
+  
+  
+  
+	<insert id="setManagerCell" parameterType="ManagerDTO" useGeneratedKeys="true" keyProperty="manager_seq">
+		/* 오더 메니져정보 생성 manager.setManagerCell */
+		INSERT INTO manager (
+			reg_date
+			<if test="manager_type neq '' and manager_type neq null"> , manager_type </if>
+			<if test="company_seq neq '' and company_seq neq null"> , company_seq </if>
+			<if test="owner_id neq '' and owner_id neq null"> , owner_id </if>
+			<if test="join_route neq '' and join_route neq null"> , join_route </if>
+			, reg_admin
+			, mod_admin
+		) VALUES (
+			NOW()
+			<if test="manager_type neq '' and manager_type neq null"> , #{manager_type } </if>
+			<if test="company_seq neq '' and company_seq neq null"> , #{company_seq } </if>
+			<if test="owner_id neq '' and owner_id neq null">, #{owner_id} </if>
+			<if test="join_route neq '' and join_route neq null"> , #{join_route} </if>
+			, #{reg_admin}, #{reg_admin}
+		)
+	</insert>
+
+  	<update id="setManagerInfo" parameterType="ManagerDTO">
+	    /* 오더 메니져 정보 수정 setManagerInfo  */
+		UPDATE manager SET
+			mod_date = NOW()
+			<if test="manager_pass   	neq null"> , manager_pass 	= PASSWORD(#{manager_pass   }) </if>
+			<if test="manager_phone    neq null"> , manager_phone  = FN_ENCRYPT(#{manager_phone   }) </if>
+			<if test="manager_name     neq null"> , manager_name   = FN_ENCRYPT(#{manager_name   }) </if>
+			<if test="manager_type     neq null"> , manager_type   = #{manager_type   } </if>
+			<if test="manager_memo     neq null"> , manager_memo   = #{manager_memo   } </if>
+			<if test="manager_etc		neq null"> , manager_etc   = #{manager_etc} </if>
+			<if test="parent_company_seq      neq null"> , parent_company_seq   	= #{parent_company_seq   } </if>
+			<if test="company_seq      neq null"> , company_seq   	= #{company_seq   } </if>
+			<if test="employer_seq     neq null"> , employer_seq   = #{employer_seq   } </if>
+			<if test="manager_push_yn  neq null"> , manager_push_yn= #{manager_push_yn   } </if>
+			<if test="push_token       neq null"> , push_token   	= #{push_token   } </if>
+			<if test="manager_use_status neq null">	, manager_use_status = #{manager_use_status } </if>
+			<if test="os_type       	neq null"> , os_type   		= #{os_type   } </if>
+			<if test="app_version    	neq null"> , app_version	= #{app_version   } </if>
+			<if test="auth_num       	neq null"> , auth_num   	= #{auth_num   } </if>
+			<if test="use_yn         	neq null"> , use_yn      	= #{use_yn   } </if>
+			<if test="reg_admin      	neq null"> , mod_admin   	= #{reg_admin} </if>
+			<if test="visit_date      	neq null"> , visit_date   	= NOW() </if>
+			<if test="join_route		neq null"> , join_route		= #{join_route} </if>
+		WHERE 1=1
+		<choose>
+			<when test="manager_seq             neq '' and manager_seq       	neq null">
+				AND manager_seq 	= #{manager_seq   } 
+			</when>
+			<otherwise>
+				AND manager_phone  	= FN_ENCRYPT(#{manager_phone   })
+			</otherwise>
+		</choose>
+	</update>
+  
+
+  <update id="updateManagerVisit" parameterType="ManagerDTO">
+    /* 오더 메니져 정보 수정 setManagerInfo  */
+    UPDATE manager SET
+      visit_date = NOW()
+      ,visit_count = visit_count +1
+      ,visit_type  = #{visit_type   } 
+    WHERE 1=1
+     <choose>
+          <when test="manager_seq             neq '' and manager_seq       	neq null">
+              AND manager_seq 	= #{manager_seq   } 
+          </when>
+          <otherwise>
+          		AND manager_phone  	= FN_ENCRYPT(#{manager_phone   }) 
+          </otherwise>
+     </choose>
+
+  </update>
+  
+
+
+  <update id="removeManagerInfo" parameterType="ManagerDTO">
+    /* 오더 메니져 삭제 manager.removeManagerInfo */
+    UPDATE manager SET
+      use_yn = 0
+      <if test="reg_admin neq '' and reg_admin neq null"> , mod_admin = #{reg_admin} </if> 
+    WHERE manager_seq IN
+    <foreach collection="sel_manager_seq" item="sel_seq"  open="(" close=")" separator=", ">
+      #{sel_seq}
+    </foreach>
+  </update>
+  
+  
+  
+  <select id="getCheckManagerEmployerNumList" parameterType="ManagerDTO" resultType="ManagerDTO">
+    /* 매니저 조회 company_admin.getManagerList */
+   SELECT 
+		(SELECT company_name FROM company WHERE company_seq = m.company_seq) AS company_name
+		, m.manager_seq
+		, FN_DECRYPT(m.manager_phone) as manager_phone
+		, m.manager_pass
+		, FN_DECRYPT(m.manager_name) as manager_name
+		, m.manager_type
+		, m.manager_memo
+		, m.manager_etc
+		, m.parent_company_seq
+		, m.company_seq
+		, m.employer_seq
+		, m.manager_push_yn
+		, m.push_token
+		, m.app_version
+		, m.os_type
+		, m.auth_num
+		, m.use_yn
+		, m.owner_id
+		, m.reg_date
+		, m.reg_admin
+		, m.mod_date
+		, m.mod_admin
+		, m.visit_date
+		, m.visit_count
+		, m.visit_type 
+	FROM manager m JOIN employer e ON m.employer_seq = e.employer_seq 
+	WHERE e.employer_num = #{employer_num} AND m.company_seq != #{company_seq}
+
+  </select>
+  
+  
+  
+  
+  
+  <select id="getIlboTotalCnt" parameterType="IlboDTO" resultType="int">
+   /* 일보카운트 getIlboTotalCnt manager.xml */
+   	<if test="login_type eq 'M'.toString()">
+	 WITH tbl_dummy AS (SELECT FN_ENCRYPT(#{manager_phone }) AS phoneNo)
+	 </if>
+		  	SELECT 
+				 count(*)
+			FROM
+			 ilbo i 
+			 LEFT OUTER JOIN work w ON i.work_seq = w.work_seq
+			 <if test="login_type eq 'M'.toString()">
+			 LEFT OUTER JOIN manager m  
+			 <if test="manager_type eq 'O'.toString()">   	ON m.manager_seq = w.manager_seq  </if>
+	    	<if test="manager_type eq 'E'.toString()"> 		ON m.employer_seq = w.employer_seq </if>
+	    	</if> 
+			 WHERE i.use_yn = 1
+				 
+				<if test="login_type eq 'M'.toString()">	
+					AND m.manager_phone = (SELECT phoneNo FROM tbl_dummy)
+					<if test="manager_type eq 'E'.toString()">	AND w.employer_seq= #{employer_seq}   </if>
+				</if>
+		
+				<if test="login_type eq 'E'.toString()">
+					AND w.employer_seq= #{employer_seq}
+				</if>
+				
+				<if test="work_seq    neq '0'.toString() and work_seq    neq '' and work_seq    neq null"> AND w.work_seq= #{work_seq} </if>
+	    		 AND ilbo_status_code NOT IN ('STA007','STA008','STA009')   <!--현장상태확인 ilbo_status_code  STA007: 휴지 STA008: 취소  STA009 : 메모 -->
+				 AND output_status_code NOT IN ('100008', '100010')  			<!--대마  -->  <!--째앰  -->
+			 
+				<if test="start_ilbo_date    neq '' and start_ilbo_date    neq null"> AND i.ilbo_date <![CDATA[ >= ]]> #{start_ilbo_date} </if>
+				<if test="end_ilbo_date      neq '' and end_ilbo_date      neq null"> AND i.ilbo_date <![CDATA[ <= ]]> #{end_ilbo_date} </if>
+			 
+  </select>
+  
+  <select id="getIlboList" parameterType="IlboDTO" resultType="IlboDTO">
+  /* 일보리스트API getIlboList manager.xml */
+		<if test="login_type eq 'M'.toString()">
+	 WITH tbl_dummy AS (SELECT FN_ENCRYPT(#{manager_phone }) AS phoneNo)
+	 </if>
+	  	SELECT 
+		  i.ilbo_seq
+		  , FN_DECRYPT (i.ilbo_work_manager_name) AS ilbo_work_manager_name
+		  , FN_DECRYPT (i.ilbo_work_manager_phone) AS ilbo_work_manager_phone
+		  , FN_DECRYPT (i.ilbo_work_manager_email) AS ilbo_work_manager_email
+		  , FN_DECRYPT (i.ilbo_worker_name) AS ilbo_worker_name
+		  , FN_DECRYPT (i.ilbo_worker_phone) AS ilbo_worker_phone
+		  , FN_DECRYPT (i.ilbo_worker_jumin) AS ilbo_worker_jumin
+		  , FN_DECRYPT (i.ilbo_worker_bank_account) AS ilbo_worker_bank_account
+		  , FN_DECRYPT (i.ilbo_worker_bank_owner) AS ilbo_worker_bank_owner
+		  <if test="login_type eq 'M'.toString()">
+		  	, FN_DECRYPT (m.manager_name) AS manager_name
+		  </if>
+		  , i.ilbo_date
+		  , i.ilbo_assign_type
+		  , i.company_seq
+		  , i.employer_seq
+		  , i.work_seq
+		  , i.worker_seq
+		  , i.order_work_seq
+		  , i.ilbo_work_name
+		  , i.ilbo_work_arrival
+		  , i.ilbo_work_finish
+		  , i.ilbo_work_addr
+		  , i.ilbo_work_latlng
+		  , i.ilbo_work_addr_comment
+		  , i.ilbo_work_breakfast_yn
+		  , i.ilbo_work_age_min
+		  , i.ilbo_work_age
+		  , i.ilbo_work_blood_pressure
+		  , i.ilbo_work_manager_fax
+		  , i.ilbo_order_code
+		  , i.ilbo_order_name
+		  , i.ilbo_work_order_code
+		  , i.ilbo_work_order_name
+		  , i.ilbo_status_code
+		  , i.ilbo_status_name
+		  , i.ilbo_use_code
+		  , i.ilbo_use_name
+		  , i.ilbo_kind_code
+		  , i.ilbo_kind_name
+		  , i.ilbo_job_comment
+		  , i.ilbo_chief_memo
+		  , i.ilbo_worker_addr
+		  , i.ilbo_worker_latlng
+		  , i.ilbo_worker_ilgaja_addr
+		  , i.ilbo_worker_ilgaja_latlng
+		  , i.ilbo_worker_status_code
+		  , i.ilbo_worker_status_name
+		  , i.ilbo_worker_job_code
+		  , i.ilbo_worker_job_name
+		  , i.ilbo_worker_barcode
+		  , i.ilbo_worker_memo
+		  , i.ilbo_worker_bank_code
+		  , i.ilbo_worker_bank_name
+		  , i.ilbo_worker_feature
+		  , i.ilbo_worker_blood_pressure
+		  , i.ilbo_worker_OSH_yn
+		  , i.ilbo_worker_jumin_scan_yn
+		  , i.ilbo_worker_bankbook_scan_yn
+		  , i.ilbo_worker_OSH_scan_yn
+		  , i.ilbo_worker_certificate_scan_yn
+		  , i.ilbo_worker_app_status
+		  , i.ilbo_worker_reserve_push_status
+		  , i.ilbo_worker_app_use_status
+		  , i.ilbo_unit_price
+		  , i.ilbo_gongsu
+		  , i.ilbo_fee
+		  , i.share_fee
+		  , i.ilbo_extra_pay
+		  , i.ilbo_deduction
+		  , i.counselor_fee
+		  , i.ilbo_pay
+		  , i.ilbo_pay_code
+		  , i.ilbo_pay_name
+		  , i.ilbo_pay_time
+		  , i.ilbo_pay_memo
+		  , i.ilbo_income_code
+		  , i.ilbo_income_name
+		  , i.ilbo_income_time
+		  , i.ilbo_income_memo
+		  , i.ilbo_confirm
+		  , i.ilbo_memo
+		  , i.ilbo_status
+		  , i.output_status_code
+		  , i.output_status_name
+		  , i.employer_rating
+		  , i.manager_rating
+		  , i.use_yn
+		  , i.reg_date
+		  , i.reg_admin
+		  , i.owner_id
+		  , i.mod_date
+		  , i.mod_admin
+		  , i.mod_output_date
+		  , i.worker_owner
+		  , i.work_owner
+		  , i.worker_company_seq
+		  , i.worker_company_name
+		FROM
+		  ilbo i 
+		  LEFT OUTER JOIN WORK w    ON i.work_seq = w.work_seq 
+		  <if test="login_type eq 'M'.toString()">
+			 LEFT OUTER JOIN manager m  
+			 <if test="manager_type eq 'O'.toString()">   	ON m.manager_seq = w.manager_seq  </if>
+	    	<if test="manager_type eq 'E'.toString()"> 		ON m.employer_seq = w.employer_seq </if>
+    	 </if> 
+		WHERE 1 = 1 
+		  	AND i.use_yn = 1 
+		  	AND i.ilbo_status_code NOT IN ('STA007', 'STA008', 'STA009') <!--현장상태확인 ilbo_status_code  STA007: 휴지 STA008: 취소  STA009 : 메모 -->
+		  	AND i.output_status_code NOT IN ('100008', '100010') <!--대마  -->  <!--째앰  -->
+		  	<if test="start_ilbo_date    neq '' and start_ilbo_date    neq null"> AND ilbo_date <![CDATA[ >= ]]> #{start_ilbo_date} </if>
+			<if test="end_ilbo_date      neq '' and end_ilbo_date      neq null"> AND ilbo_date <![CDATA[ <= ]]> #{end_ilbo_date} </if> 
+		  	
+		  	<if test="login_type eq 'M'.toString()">	
+				AND m.manager_phone = (SELECT phoneNo FROM tbl_dummy)
+				<if test="manager_type eq 'E'.toString()">	AND w.employer_seq= #{employer_seq}   </if>
+			</if>
+			
+			<if test="login_type eq 'E'.toString()">
+				AND w.employer_seq= #{employer_seq}
+			</if>
+			 <if test="work_seq    neq '0'.toString() and work_seq    neq '' and work_seq    neq null"> AND w.work_seq= #{work_seq} </if>
+			
+		 ORDER BY ilbo_date DESC,  ilbo_seq DESC
+		<if test="paging.pageSize neq 0">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+		</if> 
+	  	
+  </select>
+  
+   <select id="getIlboWorker" parameterType="IlboDTO" resultType="IlboDTO">
+    /* 근로자 조회 getIlboWorker manager.xml */
+    
+	SELECT 
+		i.ilbo_seq
+			, FN_DECRYPT(i.ilbo_work_manager_name) as ilbo_work_manager_name
+			, FN_DECRYPT(i.ilbo_work_manager_phone) as ilbo_work_manager_phone
+			, FN_DECRYPT(i.ilbo_work_manager_email) as ilbo_work_manager_email
+			, FN_DECRYPT(i.ilbo_worker_name) as ilbo_worker_name
+			, FN_DECRYPT(i.ilbo_worker_phone) as ilbo_worker_phone
+			, FN_DECRYPT(i.ilbo_worker_jumin) as ilbo_worker_jumin
+			, FN_DECRYPT(i.ilbo_worker_bank_account) as ilbo_worker_bank_account
+			, FN_DECRYPT(i.ilbo_worker_bank_owner) as ilbo_worker_bank_owner
+			, i.ilbo_date, i.ilbo_assign_type, i.company_seq, i.employer_seq, i.work_seq, i.worker_seq, i.order_work_seq, i.ilbo_work_name, i.ilbo_work_arrival, i.ilbo_work_finish, i.ilbo_work_addr, i.ilbo_work_latlng, i.ilbo_work_addr_comment, i.ilbo_work_breakfast_yn, i.ilbo_work_age_min, i.ilbo_work_age, i.ilbo_work_blood_pressure, i.ilbo_work_manager_fax
+			, i.ilbo_order_code, i.ilbo_order_name, i.ilbo_work_order_code, i.ilbo_work_order_name, i.ilbo_status_code, i.ilbo_status_name, i.ilbo_use_code, i.ilbo_use_name, i.ilbo_kind_code, i.ilbo_kind_name, i.ilbo_job_comment, i.ilbo_chief_memo
+			, i.ilbo_worker_sex, i.ilbo_worker_addr, i.ilbo_worker_latlng, i.ilbo_worker_ilgaja_addr, i.ilbo_worker_ilgaja_latlng, i.ilbo_worker_status_code, i.ilbo_worker_status_name, i.ilbo_worker_job_code, i.ilbo_worker_job_name, i.ilbo_worker_barcode, i.ilbo_worker_memo, i.ilbo_worker_bank_code, i.ilbo_worker_bank_name, i.ilbo_worker_feature, i.ilbo_worker_blood_pressure
+			, i.ilbo_worker_OSH_yn, i.ilbo_worker_jumin_scan_yn, i.ilbo_worker_bankbook_scan_yn, i.ilbo_worker_OSH_scan_yn, i.ilbo_worker_certificate_scan_yn, i.ilbo_worker_app_status, i.ilbo_worker_reserve_push_status, i.ilbo_worker_app_use_status
+			, i.ilbo_unit_price, i.ilbo_gongsu, i.ilbo_fee, i.share_fee, i.ilbo_extra_pay, i.ilbo_deduction, i.counselor_fee, i.ilbo_pay
+			, i.ilbo_pay_code, i.ilbo_pay_name, i.ilbo_pay_time, i.ilbo_pay_memo, i.ilbo_income_code, i.ilbo_income_name, i.ilbo_income_time, i.ilbo_income_memo
+			, i.ilbo_confirm, i.ilbo_memo, i.ilbo_status, i.output_status_code, i.output_status_name
+			, i.employer_rating, i.manager_rating
+			, i.use_yn, i.reg_date, i.reg_admin, i.owner_id, i.mod_date, i.mod_admin, i.mod_output_date, i.worker_owner, i.work_owner, i.worker_company_seq, i.worker_company_name 
+    	,(SELECT file_name FROM file_info WHERE i.worker_seq = service_seq AND service_type = 'WORKER' AND service_code = 'JUMIN') AS ilbo_worker_jumin_file_name
+    	,(SELECT file_name FROM file_info WHERE i.worker_seq = service_seq AND service_type = 'WORKER' AND service_code = 'OSH') AS ilbo_worker_OSH_file_name
+    	,(SELECT file_name FROM file_info WHERE i.worker_seq = service_seq AND service_type = 'WORKER' AND service_code = 'BANK') AS ilbo_worker_bankbook_file_name
+    	,(SELECT file_name FROM file_info WHERE i.worker_seq = service_seq AND service_type = 'WORKER' AND service_code = 'CERT') AS ilbo_worker_certificate_file_name
+    	,(SELECT file_name FROM file_info WHERE i.worker_seq = service_seq AND service_type = 'WORKER' AND service_code = 'PHOTO') AS ilbo_worker_photo_file_name
+    FROM ilbo i 
+    WHERE use_yn = '1'
+     <if test="ilbo_seq  	neq '' and ilbo_seq  	neq null"> AND ilbo_seq  = #{ilbo_seq} </if>
+  </select>
+  
+  <select id="getWorkList" parameterType="WorkDTO" resultType="WorkDTO">
+  /* 현장리스트 getWorkList manager.xml */
+  <if test="manager_phone    neq '' and manager_phone    neq null">
+  	WITH tbl_dummy AS (SELECT FN_ENCRYPT(#{manager_phone }) AS phoneNo)
+  </if>
+  	SELECT 
+		  w.work_seq
+		  , FN_DECRYPT (w.work_manager_name) AS work_manager_name
+		  , FN_DECRYPT (w.work_manager_phone) AS work_manager_phone
+		  , FN_DECRYPT (w.work_manager_email) AS work_manager_email
+		  , FN_DECRYPT (w.manager_phone) AS manager_phone
+		  , FN_DECRYPT (w.manager_name) AS manager_name
+		  , w.work_name
+		  , w.company_seq
+		  , w.employer_seq
+		  , w.work_arrival
+		  , w.work_finish
+		  , w.work_addr
+		  , w.work_latlng
+		  , w.work_addr_comment
+		  , w.work_breakfast_yn
+		  , w.work_age_min
+		  , w.work_age
+		  , w.work_blood_pressure
+		  , w.work_manager_fax
+		  , w.work_memo
+		  , w.work_comment
+		  , w.manager_seq
+		  , w.is_worker_info
+		  , w.use_yn
+		  , w.owner_id
+		  , w.complete_count
+		  , w.ilbo_last_date
+		  , w.reg_date
+		  , w.reg_admin
+		  , w.mod_date
+		  , w.mod_admin
+		  , e.employer_name 
+  	FROM work w left outer join employer e on e.employer_seq = w.employer_seq
+  	WHERE 
+  		w.use_yn=1 
+  		<if test="manager_phone    neq '' and manager_phone    neq null"> AND manager_phone= (SELECT phoneNo FROM tbl_dummy)</if>
+  		<if test="employer_seq neq '0'.toString() and employer_seq    neq '' and employer_seq    neq null"> AND w.employer_seq= #{employer_seq} </if>
+  	ORDER BY work_seq DESC
+  </select>
+  
+
+	<select id="getEmployerList" parameterType="WorkDTO" resultType="WorkDTO">
+  		/* 본사리스트 getWorkList manager.xml */
+  		<if test="manager_phone    neq '' and manager_phone    neq null">
+		  	WITH tbl_dummy AS (SELECT FN_ENCRYPT(#{manager_phone }) AS phoneNo)
+		  </if>
+	  	SELECT 
+	  		(select employer_name from employer where employer_seq = w.employer_seq ) as employer_name
+	  		, w.work_seq,
+			  w.company_seq,
+			  w.employer_seq,
+			  w.work_name,
+			  w.work_arrival,
+			  w.work_finish,
+			  w.work_addr,
+			  w.work_latlng,
+			  w.work_addr_comment,
+			  w.work_breakfast_yn,
+			  w.work_age_min,
+			  w.work_age,
+			  w.work_blood_pressure,
+			  FN_DECRYPT(w.work_manager_name) AS work_manager_name,
+			  w.work_manager_fax,
+			  FN_DECRYPT(w.work_manager_phone) AS work_manager_phone,
+			  FN_DECRYPT(w.work_manager_email) AS work_manager_email,
+			  w.work_memo,
+			  w.work_comment,
+			  w.manager_seq,
+			  FN_DECRYPT(w.manager_phone) AS manager_phone,
+			  FN_DECRYPT(w.manager_name) AS manager_name,
+			  w.is_worker_info,
+			  w.use_yn,
+			  w.owner_id,
+			  w.complete_count,
+			  w.ilbo_last_date,
+			  w.reg_date,
+			  w.reg_admin,
+			  w.mod_date,
+			  w.mod_admin  
+	  	FROM work w 
+	  	WHERE 
+	  		use_yn=1 
+	  		<if test="manager_phone    neq '' and manager_phone    neq null"> AND manager_phone= (SELECT phoneNo FROM tbl_dummy)</if>
+	  		<if test="employer_seq neq '0'.toString() and employer_seq    neq '' and employer_seq    neq null"> AND w.employer_seq= #{employer_seq} </if>
+	  	ORDER BY work_seq DESC
+  	</select>
+  
+  	<select id="selectParentCompanySeq" parameterType="ManagerDTO" resultType="String">
+  		/* manager.xml selectParentCompanySeq */
+  		<if test="manager_phone    neq '' and manager_phone    neq null">
+		  	WITH tbl_dummy AS (SELECT FN_ENCRYPT(#{manager_phone }) AS phoneNo)
+		  </if>
+  		SELECT
+  			company_seq
+  		FROM
+  			manager
+  		WHERE
+  			manager_phone = (SELECT phoneNo FROM tbl_dummy)
+  			AND parent_company_seq = '0'
+  			AND use_yn = '1'
+  	</select>
+  	
+  	<select id="getWorkManagerList" parameterType="ManagerDTO" resultType="ManagerDTO">
+  		/*manager.xml getWorkManagerList 현장에 등록된  매니져를 모두 출력한다. 본사매니져도 구해온다.*/
+		SELECT 
+			m.manager_seq
+			, FN_DECRYPT (manager_phone) AS manager_phone
+		  	, FN_DECRYPT (manager_name) AS manager_name
+		  	, company_name
+		  	, m.manager_type
+		FROM
+		  	tbl_relation_wm wm 
+		  	LEFT OUTER JOIN manager m 
+		    	ON wm.manager_seq = m.manager_seq 
+		  	LEFT OUTER JOIN company c 
+			    ON m.company_seq = c.company_seq 
+		WHERE 
+			wm.use_yn = '1' 
+		  	AND wm.work_seq = #{work_seq}
+		  	AND m.use_yn = '1'
+		  	
+		UNION  
+		
+		SELECT 
+			IFNULL(m.manager_seq, 0) as manager_seq
+		  	, FN_DECRYPT (m.manager_phone) AS manager_phone
+		  	, FN_DECRYPT (m.manager_name) AS manager_name
+		  	, company_name
+		  	, m.manager_type 
+		FROM
+		  	WORK w 
+		  	LEFT OUTER JOIN manager m 
+			    ON w.employer_seq = m.employer_seq 
+		  	LEFT OUTER JOIN company c 
+			    ON m.company_seq = c.company_seq 
+			WHERE 
+				w.work_seq = #{work_seq}  
+				AND m.manager_type = 'E' 
+				AND m.use_yn = '1'
+  	</select>
+  	
+  	
+  	<select id="selectWmList" parameterType="ManagerDTO" resultType="ManagerDTO">
+  	/*manager.xml selectWmList*/
+  		SELECT * FROM tbl_relation_wm where 1= 1
+  		<if test="use_yn    			neq '' and use_yn    neq null"> AND use_yn= #{use_yn} </if>
+  		<if test="employer_seq   neq '' and employer_seq    neq null"> AND employer_seq = #{employer_seq} </if>
+  		<if test="work_seq    		neq '' and work_seq    neq null"> AND work_seq = #{work_seq} </if>
+  		<if test="manager_seq    neq '' and manager_seq    neq null"> AND manager_seq = #{manager_seq} </if>
+  	
+  	</select>
+  	
+  	<select id="selectWmInfo" parameterType="ManagerDTO" resultType="ManagerDTO">
+  	/*manager.xml selectWmInfo */
+  		SELECT * FROM tbl_relation_wm where 1= 1
+  		<if test="wm_seq   neq '' and wm_seq    neq null"> AND wm_seq = #{wm_seq} </if>
+  		<if test="use_yn    			neq '' and use_yn    neq null"> AND use_yn= #{use_yn} </if>
+  		<if test="employer_seq   neq '' and employer_seq    neq null"> AND employer_seq = #{employer_seq} </if>
+  		<if test="work_seq    		neq '' and work_seq    neq null"> AND work_seq = #{work_seq} </if>
+  		<if test="manager_seq    neq '' and manager_seq    neq null"> AND manager_seq = #{manager_seq} </if>
+  	
+  	</select>
+  	
+  	<select id="selectEmList" parameterType="ManagerDTO" resultType="ManagerDTO">
+  	/*manager.xml selectEmList*/
+  		SELECT * FROM tbl_relation_em where 1= 1
+  		<if test="use_yn    			neq '' and use_yn    neq null"> AND use_yn= #{use_yn} </if>
+  		<if test="employer_seq   neq '' and employer_seq    neq null"> AND employer_seq = #{employer_seq} </if>
+  		<if test="manager_seq    neq '' and manager_seq    neq null"> AND manager_seq = #{manager_seq} </if>
+  	</select>
+  	
+  	
+  	<select id="selectEmInfo" parameterType="ManagerDTO" resultType="ManagerDTO">
+  	/*manager.xml selectVmInfo */
+  		SELECT * FROM tbl_relation_em where 1= 1
+  		<if test="use_yn    			neq '' and use_yn    neq null"> AND use_yn= #{use_yn} </if>
+  		<if test="employer_seq   neq '' and employer_seq    neq null"> AND employer_seq = #{employer_seq} </if>
+  		<if test="manager_seq    neq '' and manager_seq    neq null"> AND manager_seq = #{manager_seq} </if>
+  	</select>
+  	
+  	
+  <insert id="insertWm" parameterType="ManagerDTO" useGeneratedKeys="true" keyProperty="wm_seq">
+    /* Vm정보  manager.xml.insertVm */
+    
+    INSERT tbl_relation_wm SET
+    		 use_yn = 1
+    		 , reg_date = NOW()
+    		 , reg_admin 	= #{reg_admin}
+    		 , mod_admin = #{reg_admin}
+    		 <if test="work_seq      	 neq '' 	and work_seq      	neq null"> , work_seq      	= #{work_seq}	</if>
+    		 <if test="employer_seq   neq '' 	and employer_seq 	neq null"> , employer_seq	= #{employer_seq}	</if>
+    		 <if test="manager_seq    neq '' 	and manager_seq    neq null"> , manager_seq    = #{manager_seq} </if>
+  </insert>
+  	
+  <insert id="insertEm" parameterType="ManagerDTO">
+    /* Em정보 insert manager.xml.insertEm */
+    
+    INSERT tbl_relation_em SET
+    		 use_yn = 1
+    		 , reg_date = NOW()
+    		 , reg_admin 	= #{reg_admin}
+    		 , mod_admin = #{reg_admin}
+    		 <if test="employer_seq	neq '' 	and employer_seq	neq null"> , employer_seq	= #{employer_seq}	</if>
+    		 <if test="manager_seq	neq '' 	and manager_seq	neq null"> , manager_seq    = #{manager_seq} </if>
+  </insert>
+  	
+  	
+  <delete id="deleteWm" parameterType="ManagerDTO">
+	    /* WM 정보삭제 manager.xml.deleteWm */
+	    DELETE FROM tbl_relation_wm WHERE  wm_seq = #{wm_seq}
+  </delete>
+  
+  <delete id="deleteEm" parameterType="ManagerDTO">
+    /* EM 정보삭제 manager.xml.deleteEm */
+    DELETE FROM tbl_relation_em
+    WHERE 
+    <choose>
+        <when test="em_seq	neq '' 	and em_seq	neq null">
+    		em_seq = #{em_seq}
+        </when>
+        <otherwise>
+    		employer_seq   = #{employer_seq   } AND  manager_seq   = #{manager_seq   } 
+        </otherwise>
+      </choose>
+      
+     
+  </delete>
+  
+  <select id="selectWmCount" parameterType="ManagerDTO" resultType="int">
+  	/*manager.xml selectWmCount */
+  		SELECT count(*) FROM tbl_relation_wm where 1= 1
+  		<if test="use_yn    			neq '' and use_yn    neq null"> AND use_yn= #{use_yn} </if>
+  		<if test="employer_seq   neq '' and employer_seq    neq null"> AND employer_seq = #{employer_seq} </if>
+  		<if test="manager_seq    neq '' and manager_seq    neq null"> AND manager_seq = #{manager_seq} </if>
+  	
+  	</select>
+  	
+  	
+  <update id="updateWm" parameterType="ManagerDTO">
+   /* WM 정보업데이트  manager.xml.updateWm */
+    UPDATE tbl_relation_wm SET
+      mod_date = NOW()
+	  <if test="employer_seq        neq '' and employer_seq     neq null"> , employer_seq   = #{employer_seq   } </if>
+	  <if test="work_seq        neq '' and work_seq     neq null"> , work_seq   = #{work_seq   } </if>
+	  <if test="manager_seq        neq '' and manager_seq     neq null"> , manager_seq   = #{manager_seq   } </if>
+	  <if test="use_yn        neq '' and use_yn     neq null"> , use_yn   = #{use_yn   } </if>
+	 WHERE  wm_seq = #{wm_seq}
+    </update>
+    
+  <update id="updateEm" parameterType="ManagerDTO">
+   /* EM 정보업데이트  manager.xml.updateEm */
+    UPDATE tbl_relation_em SET
+      mod_date = NOW()
+	  <if test="employer_seq        neq '' and employer_seq     neq null"> , employer_seq   = #{employer_seq   } </if>
+	  <if test="manager_seq        neq '' and manager_seq     neq null"> , manager_seq   = #{manager_seq   } </if>
+	  <if test="use_yn        neq '' and use_yn     neq null"> , use_yn   = #{use_yn   } </if>
+	 WHERE  em_seq = #{em_seq}
+    </update>
+    
+    
+    
+  <select id="getSearchManagerList" parameterType="ManagerDTO" resultType="ManagerDTO">
+    /* 메니져 리스트 검색 getSearchManagerList manager.xml */
+    SELECT 
+    	  m.manager_seq,
+		  FN_DECRYPT(m.manager_phone) AS manager_phone,
+		  m.manager_pass,
+		  FN_DECRYPT(m.manager_name) AS manager_name,
+		  m.manager_type,
+		  m.manager_memo,
+		  m.manager_etc,
+		  m.parent_company_seq,
+		  m.company_seq,
+		  m.employer_seq,
+		  m.manager_push_yn,
+		  m.push_token,
+		  m.app_version,
+		  m.os_type,
+		  m.auth_num,
+		  m.use_yn,
+		  m.owner_id,
+		  m.reg_date,
+		  m.reg_admin,
+		  m.mod_date,
+		  m.mod_admin,
+		  m.visit_date,
+		  m.visit_count,
+		  m.visit_type  
+    	, (SELECT company_name FROM company WHERE company_seq = m.company_seq ) AS company_name
+    	, (SELECT employer_name FROM employer WHERE employer_seq = m.employer_seq ) AS employer_name
+    	, (SELECT FN_DECRYPT(company_tel) AS company_tel FROM company WHERE company_seq = m.company_seq ) as company_tel
+    	, (SELECT FN_DECRYPT(admin_phone) AS admin_phone FROM admin WHERE admin_id = m.owner_id ) AS partner_tel  
+    FROM manager m
+    WHERE 1=1
+     <if test="use_yn  					neq '' and use_yn  			neq null"> AND use_yn  	= #{use_yn} </if>
+     <if test="manager_phone  		neq '' and manager_phone			neq null"> AND FN_DECRYPT(manager_phone) like CONCAT('%', #{manager_phone}, '%') </if>
+     <if test="manager_name		neq '' and manager_name			neq null"> AND FN_DECRYPT(manager_name) like CONCAT('%', #{manager_name}, '%') </if>
+     AND manager_type = 'O'
+  </select>
+  
+    <select id="getManagerEWTreeList" parameterType="EmDTO" resultMap="ManagerTreeDTO">
+  	/*manager.xml selectEmList*/
+  		SELECT 
+  			em.em_seq
+  			, e.employer_name
+  			, e.employer_seq
+  			, wm.wm_seq
+  			, w.work_seq
+  			, w.work_name
+  		 FROM tbl_relation_em em 
+  			LEFT OUTER JOIN (SELECT * FROM tbl_relation_wm WHERE manager_seq= #{manager_seq}) wm
+    		ON em.employer_seq = wm.employer_seq 
+  			LEFT OUTER JOIN employer e ON em.employer_seq = e.employer_seq
+  			LEFT OUTER JOIN work w ON wm.work_seq = w.work_seq 
+  		where 1= 1
+  		<if test="use_yn    			neq '' and use_yn    neq null"> AND em.use_yn= #{use_yn} </if>
+  		<if test="employer_seq   neq '' and employer_seq    neq null"> AND employer_seq = #{employer_seq} </if>
+  		<if test="manager_seq    neq '' and manager_seq    neq null"> AND em.manager_seq = #{manager_seq} </if>
+  	</select>
+  	
+  	
+  
+    
+</mapper>

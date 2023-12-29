@@ -1,0 +1,11 @@
+@charset "UTF-8";
+
+.paging ul li{
+	display: inline;
+}
+.paging ul {
+	text-align: center;
+}
+#query {
+	display:none;
+}

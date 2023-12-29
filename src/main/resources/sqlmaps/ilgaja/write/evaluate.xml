@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.EvaluateMapper">
+
+
+	<select id="selectListCnt" parameterType="EvaluateDTO" resultType="int">
+		/* 평가하기 목록 Cnt selectListCnt tbl_evaluate.xml */
+		SELECT
+			COUNT(1)
+		FROM
+			tbl_evaluate
+		WHERE 1= 1
+				<if test="searchValue neq '' and searchValue neq null and searchKey neq '' and searchKey neq null">	AND ${searchKey} LIKE CONCAT('%', #{searchValue}, '%')	</if>
+				<if test="useYn neq '' and useYn neq null">	AND use_yn = #{useYn}		</if>
+				<if test="delYn neq '' and delYn neq null">	AND del_yn = #{delYn}		</if>
+		
+	</select>
+	
+	<select id="selectList" parameterType="EvaluateDTO" resultType="EvaluateDTO">
+		/* 평가하기 목록 selectList tbl_evaluate.xml */
+		SELECT
+			*
+		FROM
+			tbl_evaluate  
+		WHERE   1 = 1
+				<if test="searchValue neq '' and searchValue neq null and searchKey neq '' and searchKey neq null">	AND ${searchKey} LIKE CONCAT('%', #{searchValue}, '%')	</if>
+				<if test="useYn neq '' and useYn neq null">	AND use_yn = #{useYn}		</if>
+				<if test="delYn neq '' and delYn neq null">	AND del_yn = #{delYn}		</if>
+		
+		ORDER BY reg_date DESC
+		<if test="paging neq null">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+	</select>
+
+	<select id="selectInfo" parameterType="EvaluateDTO" resultType="EvaluateDTO">
+		/* 평가하기 내용 selectInfo tbl_evaluate.xml */
+		SELECT
+			*
+		FROM
+			tbl_evaluate		WHERE seq = #{seq}
+	</select>
+
+	<insert id="insertInfo" parameterType="EvaluateDTO" useGeneratedKeys="true" keyProperty="seq">
+		/* 평가하기 등록 insertInfo evaluate.xml */	
+		INSERT tbl_evaluate SET
+			 ilbo_seq = #{ilbo_seq}
+			<if test="employer_seq neq '' 	and 	employer_seq 	neq null"> , employer_seq 	= #{employer_seq }	</if>
+			<if test="work_seq neq '' 		and 	work_seq 			neq null"> , work_seq 		= #{work_seq}			</if>
+			<if test="worker_seq neq '' 		and 	worker_seq 		neq null"> , worker_seq 		= #{worker_seq}		</if>
+			, evaluate_grade = #{evaluate_grade}
+			<if test="evaluate_comment neq '' and evaluate_comment neq null"> , evaluate_comment = #{evaluate_comment}	</if>
+			, reg_date = now()
+			, reg_admin = #{reg_admin}
+			, mod_admin = #{reg_admin}
+			
+	</insert>
+
+	<update id="updateInfo" parameterType="EvaluateDTO">
+		/* 평가하기정보 수정 updateInfo evaluate.xml */	
+		UPDATE tbl_evaluate SET
+			 mod_admin	= #{mod_admin}
+			 ,mod_date		= now()
+			<if test="evaluate_grade neq '' and evaluate_grade neq null">, evaluate_grade = #{evaluate_grade} </if>
+			<if test="evaluate_comment neq '' and evaluate_comment neq null"> , evaluate_comment = #{evaluate_comment}	</if>
+			<if test="use_yn neq '' and use_yn neq null">, use_yn 	= #{use_yn}		</if>
+			<if test="del_yn neq '' and del_yn neq null">, del_yn 	= #{del_yn}		</if>
+	  WHERE
+			seq = #{seq}
+	</update>
+
+	<update id="deleteInfo" parameterType="EvaluateDTO">
+		/* 평가하기정보 삭제 deleteInfo evaluate.xml */
+		UPDATE tbl_evaluate SET
+			del_yn			= '1'
+			, mod_admin	= #{modAdmin}
+		WHERE
+		<choose>
+			<when test="seq neq '' and	seq neq	null">	seq = #{seq}	</when>
+			<otherwise>
+				seq IN
+				<foreach collection="seqArr" item="selSeq"  open="(" close=")" separator=", ">
+					#{selSeq}
+				</foreach>
+			</otherwise>
+		</choose>
+	</update>
+	
+
+</mapper>

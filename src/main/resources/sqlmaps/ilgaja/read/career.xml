@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.read.ReplicationCareerMapper">
+	<select id="selectCareerOption" resultType="CareerDTO">
+      SELECT
+         career_seq
+         , m_view_option
+         , kind_apply_option
+         , option_setting_use_yn_1
+         , option_setting_name_1
+         , option_setting_price_1
+         , option_setting_use_yn_2
+         , option_setting_name_2
+         , option_setting_price_2
+         , option_setting_use_yn_3
+         , option_setting_name_3
+         , option_setting_price_3
+         , option_setting_use_yn_4
+         , option_setting_name_4
+         , option_setting_price_4
+         , option_setting_default_name
+         , use_yn
+         , del_yn
+         , reg_admin
+         , reg_date
+         , mod_admin
+         , mod_date
+      FROM
+         tbl_career_option
+      WHERE
+         use_yn = '1'
+         AND del_yn = '0'
+   </select>
+</mapper>

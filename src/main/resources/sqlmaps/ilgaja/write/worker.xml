@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.WorkerMapper">
+
+  <select id="getWorkerTotalCnt" parameterType="WorkerDTO" resultType="int">
+    /* 구직자 정보 조회 getWorkTotalCnt worker.xml */
+    SELECT COUNT(1)
+    FROM (SELECT 
+		    w.worker_seq
+			<if test="search_work_latlng neq null">
+				, ROUND(
+			    (
+			      6371 * ACOS(
+			        COS(
+			          RADIANS(
+			            CAST(
+			              SUBSTRING_INDEX(#{search_work_latlng}, ',', 1) AS DECIMAL (10, 6)
+			            )
+			          )
+			        ) * COS(
+			          RADIANS(
+			            CAST(
+			              SUBSTRING_INDEX(worker_ilgaja_latlng, ',', 1) AS DECIMAL (10, 6)
+			            )
+			          )
+			        ) * COS(
+			          RADIANS(
+			            CAST(
+			              SUBSTRING_INDEX(worker_ilgaja_latlng, ',', - 1) AS DECIMAL (10, 6)
+			            )
+			          ) - RADIANS(
+			            CAST(
+			              SUBSTRING_INDEX(#{search_work_latlng }, ',', - 1) AS DECIMAL (10, 6)
+			            )
+			          )
+			        ) + SIN(
+			          RADIANS(
+			            CAST(
+			              SUBSTRING_INDEX(#{search_work_latlng}, ',', 1) AS DECIMAL (10, 6)
+			            )
+			          )
+			        ) * SIN(
+			          RADIANS(
+			            CAST(
+			              SUBSTRING_INDEX(worker_ilgaja_latlng, ',', 1) AS DECIMAL (10, 6)
+			            )
+			          )
+			        )
+			      )
+			    ),
+			    2
+			  ) AS distance
+		  </if>
+		  FROM  worker w  
+		  	LEFT OUTER JOIN company c   ON w.company_seq = c.company_seq
+		  	LEFT OUTER JOIN
+   			(
+   				SELECT       worker_phone AS g_worker_phone, COUNT(worker_phone) AS phone_ct FROM worker WHERE use_yn = 1 GROUP BY worker_phone ORDER BY NULL 
+   			) g 
+   			ON w.worker_phone = g.g_worker_phone
+   			<if test="done_join_query neq '' and done_join_query neq null">
+   			${done_join_query}
+   			</if>
+		WHERE 1 = 1 
+		    <if test="company_seq   neq '' and company_seq   neq null"> AND w.company_seq = #{company_seq} </if>
+		    <if test="start_reg_date    neq '' and start_reg_date    neq null"> AND DATE_FORMAT(w.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_reg_date} </if>
+		    <if test="end_reg_date      neq '' and end_reg_date      neq null"> AND DATE_FORMAT(w.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_reg_date} </if>
+		    <if test="srh_use_yn        neq '' and srh_use_yn        neq null"> AND w.use_yn = #{srh_use_yn} </if>
+		    <if test="srh_del_yn        neq '' and srh_del_yn        neq null"> AND w.del_yn = #{srh_del_yn} </if>
+		    <if test="srh_worker_app_status neq '' and srh_worker_app_status neq null"> AND w.worker_app_status = #{srh_worker_app_status} </if>
+		    <if test="owner_id           neq '' and owner_id           neq null"> AND w.owner_id			= #{owner_id} </if>
+		    ${where}
+		HAVING 
+			1 = 1
+			<if test="search_worker_latlng != null and search_worker_latlng != ''">
+				AND 
+				<foreach collection="search_worker_latlng" item="sel_seq"  separator="OR ">
+			      	<choose>
+			      		<when test="sel_seq eq '5'.toString()">
+			      			(distance <![CDATA[ <= ]]> 5)
+			      		</when>
+			      		<when test="sel_seq eq '10'.toString()">
+			      			(distance <![CDATA[ >= ]]> 5 AND distance <![CDATA[ <= ]]> 10)
+			      		</when>
+			      		<when test="sel_seq eq '20'.toString()">
+			      			(distance <![CDATA[ >= ]]> 10 AND distance <![CDATA[ <= ]]> 20)
+			      		</when>
+			      		<when test="sel_seq eq '30'.toString()">
+			      			(distance <![CDATA[ >= ]]> 20 AND distance <![CDATA[ <= ]]> 30)
+			      		</when>
+			      		<when test="sel_seq eq '40'.toString()">
+			      			(distance <![CDATA[ >= ]]> 30 AND distance <![CDATA[ <= ]]> 40)
+			      		</when>
+			      		<when test="sel_seq eq '50'.toString()">
+			      			(distance <![CDATA[ >= ]]> 40 AND distance <![CDATA[ <= ]]> 50)
+			      		</when>
+			      		<when test="sel_seq eq '100'.toString()">
+			      			(distance <![CDATA[ >= ]]> 50 AND distance <![CDATA[ <= ]]> 100)
+			      		</when>
+			      		<otherwise>
+			      			1 = 1	
+			      		</otherwise>
+			      	</choose>
+			    </foreach>
+		    </if>) t
+  </select>
+
+  <select id="getWorkerList" parameterType="WorkerDTO" resultType="WorkerDTO">
+    /* 구직자 정보 조회 getWorkerList worker.xml */
+		SELECT 
+	    	c.company_name
+	    	, w.worker_seq
+			, w.company_seq
+			, fn_decrypt(w.worker_name) as worker_name
+			, w.worker_sex
+			, fn_decrypt(w.worker_phone) as worker_phone
+			, w.worker_addr
+			, w.worker_latlng
+			, w.worker_ilgaja_addr
+			, w.worker_ilgaja_latlng
+			, fn_decrypt(w.worker_jumin) as worker_jumin
+			, w.worker_pass
+			, w.login_key
+			, w.worker_job_code
+			, w.worker_job_name
+			, fn_decrypt(w.worker_tel1) as worker_tel1
+			, fn_decrypt(w.worker_tel2) as worker_tel2
+			, fn_decrypt(w.worker_tel3) as worker_tel3
+			, w.worker_barcode
+			, w.worker_memo
+			, w.worker_bank_code
+			, w.worker_bank_name
+			, fn_decrypt(w.worker_bank_account) as worker_bank_account
+			, fn_decrypt(w.worker_bank_owner) as worker_bank_owner
+			, w.worker_feature
+			, w.worker_blood_pressure
+			, w.worker_OSH_yn
+			, w.worker_myphoto_scan_yn
+			, w.worker_jumin_scan_yn
+			, w.worker_bankbook_scan_yn
+			, w.worker_job_scan_yn
+			, w.worker_OSH_scan_yn
+			, w.worker_certificate_scan_yn
+			, w.worker_rating
+			, w.worker_app_status
+			, w.worker_app_use_status
+			, w.worker_app_work_status
+			, w.worker_reserve_push_status
+			, w.worker_push_yn
+			, w.admin_push_yn
+			, w.os_type
+			, w.app_last_date
+			, w.app_version
+			, w.push_token
+			, w.sms_auth
+			, w.use_yn
+			, w.owner_id
+			, w.a_seq
+			, w.complete_count
+			, w.ilbo_last_date
+			, w.reg_date
+			, w.reg_admin
+			, w.mod_date
+			, w.mod_admin
+			, w.term_date 
+			, w.ilbo_output_count
+			, w.ilbo_total_count
+			, g.phone_ct
+			, w.re_count
+			, IFNULL((w.rating_avg / w.rating_avg_cnt), 0) AS rating_avg
+			, w.rating_avg_cnt
+			, w.punk_cnt
+			, w.convert_score
+			, w.worker_education_yn
+			<if test="search_work_latlng neq null">
+				, ROUND(
+			    (
+			      6371 * ACOS(
+			        COS(
+			          RADIANS(
+			            CAST(
+			              SUBSTRING_INDEX(#{search_work_latlng}, ',', 1) AS DECIMAL (10, 6)
+			            )
+			          )
+			        ) * COS(
+			          RADIANS(
+			            CAST(
+			              SUBSTRING_INDEX(worker_ilgaja_latlng, ',', 1) AS DECIMAL (10, 6)
+			            )
+			          )
+			        ) * COS(
+			          RADIANS(
+			            CAST(
+			              SUBSTRING_INDEX(worker_ilgaja_latlng, ',', - 1) AS DECIMAL (10, 6)
+			            )
+			          ) - RADIANS(
+			            CAST(
+			              SUBSTRING_INDEX(#{search_work_latlng }, ',', - 1) AS DECIMAL (10, 6)
+			            )
+			          )
+			        ) + SIN(
+			          RADIANS(
+			            CAST(
+			              SUBSTRING_INDEX(#{search_work_latlng}, ',', 1) AS DECIMAL (10, 6)
+			            )
+			          )
+			        ) * SIN(
+			          RADIANS(
+			            CAST(
+			              SUBSTRING_INDEX(worker_ilgaja_latlng, ',', 1) AS DECIMAL (10, 6)
+			            )
+			          )
+			        )
+			      )
+			    ),
+			    2
+			  ) AS distance
+		  </if>
+		  FROM  worker w  
+		  	LEFT OUTER JOIN company c   ON w.company_seq = c.company_seq
+		  	LEFT OUTER JOIN
+   			(
+   				SELECT       worker_phone AS g_worker_phone, COUNT(worker_phone) AS phone_ct FROM worker WHERE use_yn = 1 GROUP BY worker_phone ORDER BY NULL 
+   			) g 
+   			ON w.worker_phone = g.g_worker_phone
+   			<if test="done_join_query neq '' and done_join_query neq null">
+   			${done_join_query}
+   			</if>
+		WHERE 1 = 1 
+		    <if test="company_seq   neq '' and company_seq   neq null"> AND w.company_seq = #{company_seq} </if>
+		    <if test="start_reg_date    neq '' and start_reg_date    neq null"> AND DATE_FORMAT(w.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_reg_date} </if>
+		    <if test="end_reg_date      neq '' and end_reg_date      neq null"> AND DATE_FORMAT(w.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_reg_date} </if>
+		    <if test="srh_use_yn        neq '' and srh_use_yn        neq null"> AND w.use_yn = #{srh_use_yn} </if>
+		    <if test="srh_del_yn        neq '' and srh_del_yn        neq null"> AND w.del_yn = #{srh_del_yn} </if>
+		    <if test="srh_worker_app_status neq '' and srh_worker_app_status neq null"> AND w.worker_app_status = #{srh_worker_app_status} </if>
+		    <if test="owner_id           neq '' and owner_id           neq null"> AND w.owner_id			= #{owner_id} </if>
+		    ${where}  
+		HAVING 
+			1 = 1
+			<if test="search_worker_latlng != null">
+				AND 
+				<foreach collection="search_worker_latlng" item="sel_seq"  separator="OR ">
+			      	<choose>
+			      		<when test="sel_seq eq '5'.toString()">
+			      			(distance <![CDATA[ <= ]]> 5)
+			      		</when>
+			      		<when test="sel_seq eq '10'.toString()">
+			      			(distance <![CDATA[ >= ]]> 5 AND distance <![CDATA[ <= ]]> 10)
+			      		</when>
+			      		<when test="sel_seq eq '20'.toString()">
+			      			(distance <![CDATA[ >= ]]> 10 AND distance <![CDATA[ <= ]]> 20)
+			      		</when>
+			      		<when test="sel_seq eq '30'.toString()">
+			      			(distance <![CDATA[ >= ]]> 20 AND distance <![CDATA[ <= ]]> 30)
+			      		</when>
+			      		<when test="sel_seq eq '40'.toString()">
+			      			(distance <![CDATA[ >= ]]> 30 AND distance <![CDATA[ <= ]]> 40)
+			      		</when>
+			      		<when test="sel_seq eq '50'.toString()">
+			      			(distance <![CDATA[ >= ]]> 40 AND distance <![CDATA[ <= ]]> 50)
+			      		</when>
+			      		<when test="sel_seq eq '100'.toString()">
+			      			(distance <![CDATA[ >= ]]> 50 AND distance <![CDATA[ <= ]]> 100)
+			      		</when>
+			      		<otherwise>
+			      			1 = 1	
+			      		</otherwise>
+			      	</choose>
+			    </foreach>
+		    </if>
+		    ORDER BY ${sidx} ${sord}
+		    <if test="paging neq null">
+		      <choose>
+		        <when test="paging.pageNo gt 0">
+		    LIMIT ${paging.startPage}, ${paging.endPage}
+		        </when>
+		        <otherwise>
+		    LIMIT 0, ${paging.endPage}
+		        </otherwise>
+		      </choose>
+		    </if>
+  </select>
+
+  <select id="getWorkerView" parameterType="WorkerDTO" resultType="WorkerDTO">
+    /* 구직자 정보 조회 getWorkerView worker.xml */
+    SELECT 
+    	c.company_name
+    	, w.worker_seq
+		, w.company_seq
+		, fn_decrypt(w.worker_name) as worker_name
+		, w.worker_sex
+		, fn_decrypt(w.worker_phone) as worker_phone
+		, w.worker_addr
+		, w.worker_latlng
+		, w.worker_ilgaja_addr
+		, w.worker_ilgaja_latlng
+		, fn_decrypt(w.worker_jumin) as worker_jumin
+		, w.worker_pass
+		, w.login_key
+		, w.worker_job_code
+		, w.worker_job_name
+		, fn_decrypt(w.worker_tel1) as worker_tel1
+		, fn_decrypt(w.worker_tel2) as worker_tel2
+		, fn_decrypt(w.worker_tel3) as worker_tel3
+		, w.worker_barcode
+		, w.worker_memo
+		, w.worker_bank_code
+		, w.worker_bank_name
+		, fn_decrypt(w.worker_bank_account) as worker_bank_account
+		, fn_decrypt(w.worker_bank_owner) as worker_bank_owner
+		, w.worker_feature
+		, w.worker_blood_pressure
+		, w.worker_OSH_yn
+		, w.worker_myphoto_scan_yn
+		, w.worker_jumin_scan_yn
+		, w.worker_bankbook_scan_yn
+		, w.worker_job_scan_yn
+		, w.worker_OSH_scan_yn
+		, w.worker_certificate_scan_yn
+		, w.worker_rating
+		, w.worker_app_status
+		, w.worker_app_use_status
+		, w.worker_app_work_status
+		, w.worker_reserve_push_status
+		, w.worker_push_yn
+		, w.os_type
+		, w.app_last_date
+		, w.app_version
+		, w.push_token
+		, w.sms_auth
+		, w.use_yn
+		, w.owner_id
+		, w.a_seq
+		, w.complete_count
+		, w.ilbo_last_date
+		, w.reg_date
+		, w.reg_admin
+		, w.mod_date
+		, w.mod_admin
+		, w.term_date 
+    FROM worker w LEFT OUTER JOIN company c ON w.company_seq = c.company_seq
+    WHERE w.worker_seq = #{worker_seq}
+    ${where}
+    <if test="srh_company_seq   neq '' and srh_company_seq   neq null"> AND w.company_seq = #{srh_company_seq} </if>
+    <if test="srh_use_yn        neq '' and srh_use_yn        neq null"> AND w.use_yn = #{srh_use_yn} </if>
+    <if test="srh_worker_app_status neq '' and srh_worker_app_status neq null"> AND w.worker_app_status = #{srh_worker_app_status} </if>
+    
+  </select>
+
+	<insert id="setWorkerCell" parameterType="WorkerDTO" useGeneratedKeys="true" keyProperty="work_seq">
+		/* Worker 생성 setWorkerCell worker.xml */
+		INSERT INTO worker (
+			<if test="company_seq neq '' and company_seq neq null">  company_seq, </if>
+			<if test="owner_id neq '' and owner_id neq null"> owner_id, </if>
+			<if test="join_route neq '' and join_route neq null"> join_route, </if>  
+			reg_date, reg_admin, mod_admin, term_date
+		) VALUES (
+			<if test="company_seq neq '' and company_seq neq null">   #{company_seq}, </if>
+			<if test="owner_id neq '' and owner_id neq null"> #{owner_id}, </if>
+			<if test="join_route neq '' and join_route neq null"> #{join_route}, </if>
+			now(), #{reg_admin}, #{reg_admin}, now()
+		)
+	</insert>
+  
+    <insert id="insertWorker" parameterType="WorkerDTO" useGeneratedKeys="true" keyProperty="worker_seq">
+    /* Worker 웹에서 추가insert insertWorker worker.xml */
+    INSERT INTO worker (
+     <if test="company_seq              neq '' and company_seq              neq null">  company_seq, </if>
+     <if test="owner_id           neq '' and owner_id           neq null"> owner_id, </if>
+      worker_name, 
+      worker_jumin, 
+      worker_phone,
+     <if test="worker_pass           neq '' and worker_pass           neq null"> worker_pass, </if>
+      worker_job_name, 
+      <if test="worker_sex           neq '' and worker_sex				neq null"> worker_sex, </if>
+      worker_job_code, 
+      <if test="worker_addr           neq '' and worker_addr           neq null"> worker_addr, </if>
+      <if test="worker_feature           neq '' and worker_feature           neq null"> worker_feature, </if>
+      <if test="worker_OSH_yn           neq '' and worker_OSH_yn           neq null"> worker_OSH_yn, </if>
+      os_type ,
+      <if test="app_last_date           neq '' and app_last_date           neq null"> app_last_date, </if>
+      <if test="app_version           neq '' and app_version           neq null"> app_version, </if>
+      <if test="push_token           neq '' and push_token           neq null"> push_token, </if>
+      worker_app_status,
+      <if test="worker_app_use_status           neq '' and worker_app_use_status	neq null"> worker_app_use_status, </if>
+      <if test="worker_push_yn                    neq '' and worker_push_yn               neq null"> worker_push_yn, </if>
+      <if test="a_seq           neq '' and a_seq           neq null"> a_seq, </if>
+      reg_date, 
+      reg_admin, 
+      mod_admin,
+      term_date
+    ) VALUES (
+     <if test="company_seq              neq '' and company_seq              neq null">   #{company_seq}, </if>
+     <if test="owner_id           neq '' and owner_id           neq null"> #{owner_id}, </if>
+     fn_encrypt(#{worker_name}), 
+     fn_encrypt(#{worker_jumin}), 
+     fn_encrypt(#{worker_phone}), 
+     <if test="worker_pass           neq '' and worker_pass           neq null"> PASSWORD(#{worker_pass}), </if>
+     #{worker_job_name}, 
+     <if test="worker_sex           neq '' and worker_sex				neq null"> #{worker_sex}, </if>
+     #{worker_job_code}, 
+     <if test="worker_addr           neq '' and worker_addr           neq null"> #{worker_addr},  </if>
+     <if test="worker_feature           neq '' and worker_feature           neq null"> #{worker_feature}, </if>
+     <if test="worker_OSH_yn           neq '' and worker_OSH_yn           neq null">#{ worker_OSH_yn}, </if>
+     #{os_type}, 
+     <if test="app_last_date           neq '' and app_last_date           neq null"> now(), </if>
+     <if test="app_version           neq '' and app_version           neq null"> #{app_version}, </if>
+     <if test="push_token           neq '' and push_token           neq null"> #{push_token}, </if>
+     #{worker_app_status},
+     <if test="worker_app_use_status           neq '' and worker_app_use_status	neq null"> #{worker_app_use_status}, </if>
+     <if test="worker_push_yn                    neq '' and worker_push_yn               neq null"> #{worker_push_yn}, </if>
+     <if test="a_seq           neq '' and a_seq           neq null"> #{a_seq}, </if>
+      now(), 
+      #{reg_admin}, 
+      #{reg_admin},
+      now()
+    )
+  </insert>
+
+	<select id="selectWorkerCount" parameterType="WorkerDTO" resultType="int">
+    /* Worker 정보 조회 selectWorkerCount worker.xml */
+    SELECT count(*)    FROM worker     WHERE 1 = 1
+    	<if test="use_yn  		neq '' and use_yn  neq null"> AND use_yn  = #{use_yn          } </if>
+	    <if test="worker_phone neq '' and worker_phone neq null"> AND worker_phone = fn_encrypt(#{worker_phone}) </if>
+    
+  </select>
+
+
+  <select id="selectWorkerInfo" parameterType="WorkerDTO" resultType="WorkerDTO">
+    /* Worker 정보 조회 selectWorkerInfo worker.xml */
+    <if test="worker_phone neq '' and worker_phone neq null">
+    	WITH tbl_dummy AS (SELECT fn_encrypt(#{worker_phone }) AS phoneNo)
+    </if>
+    SELECT 
+		w.worker_seq
+		, w.company_seq
+		, fn_decrypt(w.worker_name) as worker_name
+		, w.worker_sex
+		, fn_decrypt(w.worker_phone) as worker_phone
+		, w.worker_addr
+		, w.worker_latlng
+		, w.worker_ilgaja_addr
+		, w.worker_ilgaja_latlng
+		, fn_decrypt(w.worker_jumin) as worker_jumin
+		, w.worker_pass
+		, w.login_key
+		, w.worker_job_code
+		, w.worker_job_name
+		, fn_decrypt(w.worker_tel1) as worker_tel1
+		, fn_decrypt(w.worker_tel2) as worker_tel2
+		, fn_decrypt(w.worker_tel3) as worker_tel3
+		, w.worker_barcode
+		, w.worker_memo
+		, w.worker_bank_code
+		, w.worker_bank_name
+		, fn_decrypt(w.worker_bank_account) as worker_bank_account
+		, fn_decrypt(w.worker_bank_owner) as worker_bank_owner
+		, w.worker_feature
+		, w.worker_blood_pressure
+		, w.worker_OSH_yn
+		, w.worker_myphoto_scan_yn
+		, w.worker_jumin_scan_yn
+		, w.worker_bankbook_scan_yn
+		, w.worker_job_scan_yn
+		, w.worker_OSH_scan_yn
+		, w.worker_certificate_scan_yn
+		, w.worker_rating
+		, w.worker_app_status
+		, w.worker_app_use_status
+		, w.worker_app_work_status
+		, w.worker_reserve_push_status
+		, w.worker_push_yn
+		, w.os_type
+		, w.app_last_date
+		, w.app_version
+		, w.push_token
+		, w.sms_auth
+		, w.use_yn
+		, w.owner_id
+		, w.a_seq
+		, w.complete_count
+		, w.ilbo_last_date
+		, w.reg_date
+		, w.reg_admin
+		, w.mod_date
+		, w.mod_admin
+		, w.term_date 
+		, (SELECT company_name FROM company WHERE company_seq = w.company_seq) AS company_name
+		, (SELECT fn_decrypt(company_account) FROM company WHERE company_seq = w.company_seq) AS company_account
+		, (SELECT company_license_num FROM company WHERE company_seq = w.company_seq) AS company_license_num
+		, (SELECT fn_decrypt(company_phone) FROM company WHERE company_seq = w.company_seq) AS company_phone
+    	, worker_job_code
+    	, worker_job_name
+    FROM worker w
+    WHERE 1 = 1
+    <if test="use_yn  		neq '' and use_yn  neq null"> AND use_yn  = #{use_yn          } </if>
+    <if test="company_seq  neq '' and company_seq  neq null"> AND company_seq  = #{company_seq          } </if>
+    <if test="worker_phone neq '' and worker_phone neq null"> AND worker_phone = (SELECT phoneNo FROM tbl_dummy) </if>
+    <if test="worker_pass  neq '' and worker_pass  neq null"> AND worker_pass  = PASSWORD(#{worker_pass}) </if>
+    <if test="worker_seq   neq '' and worker_seq   neq null"> AND worker_seq   = #{worker_seq           } </if>
+    <if test="login_key    neq '' and login_key    neq null"> AND login_key    = #{login_key            } </if>
+  </select>
+
+
+	<update id="updateWorkerInfo" parameterType="WorkerDTO">
+		/* Worker 정보 수정 updateWorkerInfo worker.xml */
+		UPDATE worker SET
+			mod_date  = now()
+			<if test="company_seq		neq '' and company_seq           neq null"> , company_seq          = #{company_seq          } </if>
+			<if test="worker_name		neq null"> , worker_name                = fn_encrypt(#{worker_name}) </if>
+			<if test="worker_sex		neq '' and worker_sex           neq null"> , worker_sex          = #{worker_sex          } </if>
+			<if test="worker_phone		neq null"> , worker_phone               = fn_encrypt(#{worker_phone}) </if>
+			<choose>
+				<when test="worker_addr_replace           neq null">
+					, worker_addr           = #{worker_addr_replace          }
+				</when>
+				<otherwise>
+					<if test="worker_addr           neq null"> , worker_addr           = #{worker_addr          } </if>
+				</otherwise>
+			</choose>
+			<if test="worker_latlng              neq null"> , worker_latlng              = #{worker_latlng             } </if>
+			<if test="worker_ilgaja_addr         neq null"> , worker_ilgaja_addr         = #{worker_ilgaja_addr        } </if>
+			<if test="worker_ilgaja_latlng       neq null"> , worker_ilgaja_latlng       = #{worker_ilgaja_latlng      } </if>
+			<if test="worker_jumin               neq null"> , worker_jumin               =  fn_encrypt(REPLACE(#{worker_jumin}, '-', '')) </if>
+			<if test="worker_pass                neq '' and worker_pass           neq null"> , worker_pass           = PASSWORD(#{worker_pass}) </if>
+			<if test="login_key                  neq '' and login_key             neq null"> , login_key             = #{login_key            } </if> 
+			<if test="worker_job_code            neq null"> , worker_job_code            = #{worker_job_code           } </if>
+			<if test="worker_job_name            neq null"> , worker_job_name            = #{worker_job_name           } </if>
+			<if test="worker_tel1                neq null"> , worker_tel1                = fn_encrypt(#{worker_tel1}) </if>
+			<if test="worker_tel2                neq null"> , worker_tel2                = fn_encrypt(#{worker_tel2}) </if>
+			<if test="worker_tel3                neq null"> , worker_tel3                = fn_encrypt(#{worker_tel3}) </if>
+			<if test="worker_barcode             neq null"> , worker_barcode             = #{worker_barcode            } </if>
+			<if test="worker_memo                neq null"> , worker_memo                = #{worker_memo               } </if>
+			<if test="worker_bank_code           neq null"> , worker_bank_code           = #{worker_bank_code          } </if>
+			<if test="worker_bank_name           neq null"> , worker_bank_name           = #{worker_bank_name          } </if>
+			<if test="worker_bank_account        neq null"> , worker_bank_account        = fn_encrypt(#{worker_bank_account}) </if>
+			<if test="worker_bank_owner          neq null"> , worker_bank_owner          = fn_encrypt(#{worker_bank_owner}) </if>
+			<if test="worker_feature             neq null"> , worker_feature             = #{worker_feature            } </if>
+			<if test="worker_blood_pressure      neq null"> , worker_blood_pressure      = #{worker_blood_pressure     } </if>
+			<if test="worker_OSH_yn              neq null"> , worker_OSH_yn              = #{worker_OSH_yn             } </if>
+			<if test="worker_myphoto_scan_yn     neq null"> , worker_myphoto_scan_yn       = #{worker_myphoto_scan_yn      } </if>
+			<if test="worker_jumin_scan_yn       neq null"> , worker_jumin_scan_yn       = #{worker_jumin_scan_yn      } </if>
+			<if test="worker_bankbook_scan_yn    neq null"> , worker_bankbook_scan_yn    = #{worker_bankbook_scan_yn   } </if>
+			<if test="worker_OSH_scan_yn         neq null"> , worker_OSH_scan_yn         = #{worker_OSH_scan_yn        } </if>
+			<if test="worker_job_scan_yn 		 neq null"> , worker_job_scan_yn 		 = #{worker_job_scan_yn } 		 </if>
+			<if test="worker_certificate_scan_yn neq null"> , worker_certificate_scan_yn = #{worker_certificate_scan_yn} </if>
+			<if test="worker_rating neq null"> , worker_rating= #{worker_rating} </if>
+			<if test="worker_app_status          neq '' and worker_app_status         neq null"> , worker_app_status         = #{worker_app_status        } </if>
+			<if test="worker_reserve_push_status neq '' and worker_reserve_push_status      neq null"> , worker_reserve_push_status      = #{worker_reserve_push_status     } </if>
+			<if test="worker_app_use_status      neq '' and worker_app_use_status        neq null"> , worker_app_use_status        = #{worker_app_use_status       } </if>
+			<if test="worker_push_yn             neq '' and worker_push_yn               neq null"> , worker_push_yn               = #{worker_push_yn              } </if>
+			<if test="admin_push_yn              neq '' and admin_push_yn               neq null"> , admin_push_yn               = #{admin_push_yn              } </if>
+			<if test="os_type                    neq '' and os_type               neq null"> , os_type               = #{os_type              } </if>
+			<if test="push_token                 neq '' and push_token            neq null"> , push_token            = #{push_token              } </if>
+			<if test="sms_auth                   neq '' and sms_auth              neq null"> , sms_auth              = #{sms_auth             } </if>
+			<if test="use_yn                     neq '' and use_yn                neq null"> , use_yn                = #{use_yn               } </if>
+			<if test="mod_admin                  neq null"> , mod_admin                  = #{mod_admin                 } </if>
+			<if test="app_version                neq '' and app_version                neq null"> , app_version                = #{app_version} </if>
+			<if test="app_last_date              neq '' and app_last_date                neq null"> , app_last_date		= now() </if>
+			<if test="term_date                  neq '' and term_date			neq null"> , term_date		= now() </if>
+			<if test="join_route neq '' and join_route neq null">, join_route = #{join_route}</if>
+    	WHERE 1 = 1
+			<choose>
+				<when test="worker_seq neq '' and worker_seq neq null">
+					AND worker_seq = #{worker_seq}
+				</when>
+				<otherwise>
+					AND login_key  = #{login_key}
+				</otherwise>
+			</choose>
+	</update>
+  
+  
+  
+  <update id="updateWorkerLogout" parameterType="WorkerDTO">
+    /* Worker APP 로그아웃  updateWorkerLogout worker.xml */
+
+    UPDATE worker SET
+        mod_date  = now()
+        , login_key = '' 
+     	, worker_app_status = '2'
+    	, app_last_date		= now()
+    WHERE 
+        login_key  = #{login_key}
+
+  </update>
+
+
+  <update id="updateSmsAuth" parameterType="WorkerDTO">
+    /* Worker 회원인증 SMS 수정 updateSmsAuth worker.xml */
+    UPDATE worker SET
+      mod_date  = now()
+      ,sms_auth  = #{sms_auth}
+      <if test="worker_reserve_push_status		neq '' and worker_reserve_push_status   neq null"> , worker_reserve_push_status      = #{worker_reserve_push_status     } </if>
+      <if test="worker_app_use_status            neq '' and worker_app_use_status        	neq null"> , worker_app_use_status        = #{worker_app_use_status       } </if>
+      <if test="worker_push_yn                    	neq '' and worker_push_yn               		neq null"> , worker_push_yn               = #{worker_push_yn              } </if>
+    
+    WHERE 1 = 1
+      AND worker_phone = fn_encrypt(#{worker_phone})
+  </update>
+
+
+  <update id="setWorkerPassword" parameterType="WorkerDTO">
+    /* Worker 비밀번호 수정 setWorkerPassword worker.xml */
+    UPDATE worker SET
+      worker_pass = PASSWORD(#{worker_pass})
+      , app_last_date = now()
+      <!-- , worker_app_use_status = '4' -->
+      , worker_app_status = '2'
+      , worker_push_yn = '1'
+      , mod_admin = 'WORKER'
+    WHERE 1 = 1
+      AND worker_phone = fn_encrypt(#{worker_phone})
+      AND sms_auth     = #{sms_auth}
+  </update>
+
+
+  <insert id="setWorkerConsulting" parameterType="WorkerDTO" useGeneratedKeys="true" keyProperty="worker_seq">
+    /* Worker 컨설팅 신청 setWorkerPassword worker.xml */
+    INSERT INTO worker (
+      	worker_name, worker_phone, worker_app_status, reg_date, reg_admin, mod_admin
+    ) VALUES (
+      	fn_encrypt(#{worker_name})
+      	, fn_encrypt(#{worker_phone})
+      	, 5, now(), #{reg_admin}, #{reg_admin}
+    )
+  </insert>
+
+<!--
+  <delete id="removeWorkerInfo" parameterType="WorkerDTO">
+    /* 구직자 정보 삭제 worker.removeWorkInfo */
+    DELETE FROM worker
+    WHERE worker_seq = #{worker_seq}
+  </delete>
+-->
+  <update id="removeWorkerInfo" parameterType="WorkerDTO">
+    /* 구직자 정보 삭제 work.removeWorkInfo */
+    UPDATE worker SET
+      use_yn = 0
+      <if test="reg_admin neq '' and reg_admin neq null"> , mod_admin = #{reg_admin} </if> 
+    WHERE worker_seq IN
+    <foreach collection="sel_worker_seq" item="sel_seq"  open="(" close=")" separator=", ">
+      #{sel_seq}
+    </foreach>
+  </update>
+
+  <select id="chkWorkerPhone" parameterType="WorkerDTO" resultType="int">
+    /* 같은 폰번호 체크  chkWorkerPhone worker.xml */
+    SELECT COUNT(1)
+    FROM worker
+    WHERE 1 = 1
+    AND del_yn = 0
+    <if test="company_seq  neq '' and company_seq  neq null"> AND company_seq  = #{company_seq} </if>
+    <if test="worker_phone neq '' and worker_phone neq null"> AND worker_phone = fn_encrypt(#{worker_phone}) </if>
+  </select> 
+
+  <select id="chkWorkerJumin" parameterType="WorkerDTO" resultType="int">
+    /* 같은 주민등록 번호 체크  chkWorkerJumin worker.xml */
+    <if test="worker_jumin neq '' and worker_jumin neq null">
+    	WITH tbl_dummy AS (SELECT fn_encrypt(#{worker_jumin }) AS jumin)
+    </if>
+    SELECT COUNT(1)
+    FROM worker
+    WHERE 1 = 1
+      AND IFNULL(worker_jumin, '') <![CDATA[ <> ]]> ''
+    <if test="company_seq  neq '' and company_seq  neq null"> AND company_seq  = #{company_seq}  </if>
+    <if test="worker_jumin neq '' and worker_jumin neq null"> AND worker_jumin = (SELECT jumin FROM tbl_dummy)</if>
+  </select>
+  
+  	<select id="locationMap" parameterType="WorkerDTO" resultType="WorkerDTO">
+		SELECT 
+		  w.worker_seq
+		, w.company_seq
+		, fn_decrypt(w.worker_name) as worker_name
+		, fn_decrypt(w.worker_phone) as worker_phone
+		, fn_decrypt(w.worker_jumin) as worker_jumin
+		, fn_decrypt(w.worker_bank_account) as worker_bank_account
+		, fn_decrypt(w.worker_bank_owner) as worker_bank_owner
+		, w.worker_sex
+		, w.worker_addr
+		, w.worker_latlng
+		, w.worker_ilgaja_addr
+		, w.worker_ilgaja_latlng
+		, w.worker_pass
+		, w.login_key
+		, w.worker_job_code
+		, w.worker_job_name
+		, fn_decrypt(w.worker_tel1) as worker_tel1
+		, fn_decrypt(w.worker_tel2) as worker_tel2
+		, fn_decrypt(w.worker_tel3) as worker_tel3
+		, w.worker_barcode
+		, w.worker_memo
+		, w.worker_bank_code
+		, w.worker_bank_name
+		, w.worker_feature
+		, w.worker_blood_pressure
+		, w.worker_OSH_yn
+		, w.worker_myphoto_scan_yn
+		, w.worker_jumin_scan_yn
+		, w.worker_bankbook_scan_yn
+		, w.worker_job_scan_yn
+		, w.worker_OSH_scan_yn
+		, w.worker_certificate_scan_yn
+		, w.worker_rating
+		, w.worker_app_status
+		, w.worker_app_use_status
+		, w.worker_app_work_status
+		, w.worker_reserve_push_status
+		, w.owner_id
+		, i.ilbo_seq, i.ilbo_date, i.ilbo_assign_type
+        , i.company_seq, i.employer_seq, i.work_seq, i.worker_seq
+        , i.ilbo_work_name, i.ilbo_work_arrival,i.ilbo_work_finish, i.ilbo_work_addr, i.ilbo_work_latlng,i.ilbo_work_addr_comment, i.ilbo_work_breakfast_yn, i.ilbo_work_age_min, i.ilbo_work_age, i.ilbo_work_blood_pressure
+        , fn_decrypt(i.ilbo_worker_name) as ilbo_worker_name
+        , fn_decrypt(i.ilbo_worker_phone) as ilbo_worker_phone
+        , fn_decrypt(i.ilbo_worker_bank_account) as ilbo_worker_bank_account
+        , fn_decrypt(i.ilbo_worker_bank_owner) as ilbo_worker_bank_owner
+        , fn_decrypt(i.ilbo_worker_jumin) as ilbo_worker_jumin
+        , i.ilbo_work_manager_fax 
+        , i.ilbo_worker_addr, i.ilbo_worker_latlng
+        , i.ilbo_worker_job_code, i.ilbo_worker_job_name, i.ilbo_worker_barcode, i.ilbo_worker_memo
+        , i.ilbo_worker_bank_code, i.ilbo_worker_bank_name, i. ilbo_worker_bankbook_scan_yn
+        , i.ilbo_worker_feature, i.ilbo_worker_blood_pressure, i.ilbo_worker_OSH_yn, i.ilbo_worker_jumin_scan_yn, i.ilbo_worker_OSH_scan_yn, i.ilbo_worker_app_status, i.ilbo_worker_reserve_push_status, i.ilbo_worker_app_use_status
+        , i.ilbo_status, i.output_status_code, i.output_status_name, i.ilbo_worker_status_code, i.ilbo_worker_status_name, i.employer_rating, i.manager_rating
+        , i.worker_owner,i.work_owner
+        , i.worker_company_seq,i.worker_company_name
+		
+		,  ROUND(
+		    (
+		      6371 * ACOS(
+		        COS(
+		          RADIANS(
+		            CAST(
+		              SUBSTRING_INDEX(#{work_lat}, ',', 1) AS DECIMAL (10, 6)
+		            )
+		          )
+		        ) * COS(
+		          RADIANS(
+		            CAST(
+		              SUBSTRING_INDEX(worker_ilgaja_latlng, ',', 1) AS DECIMAL (10, 6)
+		            )
+		          )
+		        ) * COS(
+		          RADIANS(
+		            CAST(
+		              SUBSTRING_INDEX(worker_ilgaja_latlng, ',', - 1) AS DECIMAL (10, 6)
+		            )
+		          ) - RADIANS(
+		            CAST(
+		              SUBSTRING_INDEX(#{work_lng }, ',', - 1) AS DECIMAL (10, 6)
+		            )
+		          )
+		        ) + SIN(
+		          RADIANS(
+		            CAST(
+		              SUBSTRING_INDEX(#{work_lat}, ',', 1) AS DECIMAL (10, 6)
+		            )
+		          )
+		        ) * SIN(
+		          RADIANS(
+		            CAST(
+		              SUBSTRING_INDEX(worker_ilgaja_latlng, ',', 1) AS DECIMAL (10, 6)
+		            )
+		          )
+		        )
+		      )
+		    ),
+		    2
+		  ) AS distance 
+		FROM
+			worker w LEFT OUTER JOIN (SELECT * FROM ilbo WHERE 1 = 1 AND ilbo_date = #{ilbo_date } GROUP BY worker_seq) AS i
+  			ON w.worker_seq = i.worker_seq
+		WHERE 1 = 1 
+		  AND worker_job_code LIKE CONCAT('%', #{worker_job_code }, '%') 
+		  <if test="adminLevel neq null and adminLevel neq '' and adminLevel neq '0'.toString()">
+		  	AND w.company_seq = #{company_seq }
+		  </if>
+		HAVING distance <![CDATA[ < ]]> #{radius }
+	</select>
+	
+	<select id="selectReceiveTokenInfo" parameterType="WorkerDTO" resultType="WorkerDTO">
+		/* worker.xml selectReceiveTokenInfo */
+		SELECT
+			worker_seq,
+			PUSH_TOKEN,
+			os_type,
+			app_version
+		FROM
+			WORKER
+		WHERE
+			1 = 1
+			AND worker_seq = #{worker_seq }
+			AND app_version >= 20
+			AND push_token IS NOT NULL
+			AND worker_push_yn = '1'
+			AND admin_push_yn = '1'
+			AND (worker_app_use_status = '1' OR worker_app_use_status = '5' OR worker_app_use_status = '4')
+			AND worker_app_status = '1'
+	</select>
+	
+	<select id="selectWaitApprovalCount" parameterType="WorkerDTO" resultType="WorkerDTO">
+		/* worker.xml selectWaitApprovalCount 지점별 구직자 승인대기 갯수조회 */
+		SELECT 
+		  w.company_seq,
+		  company_name,
+		  COUNT(CASE worker_app_use_status WHEN 4 THEN 1 END) AS wait_approval_count  
+		FROM
+		  (SELECT company_seq,company_name FROM company WHERE use_yn = 1 AND company_seq != 1) c
+		  LEFT JOIN worker w
+		  ON c.company_seq = w.company_seq
+		WHERE
+		  use_yn = 1
+		GROUP BY w.company_seq
+		ORDER BY wait_approval_count DESC 
+	</select>
+</mapper>

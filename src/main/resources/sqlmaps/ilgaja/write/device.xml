@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.DeviceMapper">
+	<select id="getAppVersion" parameterType="DeviceDTO" resultType="DeviceDTO"> 
+        /* getAppVersion 정보 조회 getAppVersion device.xml */  
+        SELECT
+            *
+        FROM 
+        	app_version 
+        WHERE 
+        	1=1
+        	<if test="app_type neq '' and app_type neq null">
+            	AND app_type = #{app_type}
+        	</if>
+        	<if test="os_type neq '' and os_type neq null">
+	            AND os_type = #{os_type}
+        	</if>
+        ORDER BY seq 
+        LIMIT 0,1   
+    </select>
+    
+	<select id="selectDeviceInfo" parameterType="DeviceDTO" resultType="DeviceDTO">	
+		/* Device 정보 조회 selectDeviceInfo device.xml */	
+		SELECT
+			*
+		FROM 
+			device_info
+		WHERE 
+			use_yn=1
+			<if test="device_id neq '' and device_id neq null">
+				AND device_id = #{device_id}
+			</if>
+			<if test="device_seq neq '' and device_seq neq null">
+				AND device_seq = #{device_seq}
+			</if>
+			<if test="worker_seq neq '' and worker_seq neq null">
+				AND worker_seq = #{worker_seq}
+			</if>
+			<if test="device_num neq '' and device_num neq null">
+				AND device_num = #{device_num}
+			</if>	
+	</select>
+	
+	<update id="updateDeviceInfo" parameterType="DeviceDTO">	
+		/* Device 정보 수정 updateDeviceInfo Device.xml */	
+		UPDATE 
+			device_info
+		SET
+			mod_date = NOW()
+            <if test="device_telecom neq '' and device_telecom neq null">
+				, device_telecom = #{device_telecom}
+            </if>
+            <if test="sdk_version neq '' and sdk_version neq null">
+              	, sdk_version = #{sdk_version}
+            </if>
+			<if test="device_num neq '' and device_num neq null">
+			  	, device_num = #{device_num}
+			</if>
+			<if test="worker_seq neq '' and worker_seq neq null">
+			  	, worker_seq = #{worker_seq}
+			</if>
+			<if test="employer_seq neq '' and employer_seq neq null">
+			  	, employer_seq = #{employer_seq}
+			</if>
+			<if test="app_type neq '' and app_type neq null">
+			  	, app_type = #{app_type}
+			</if>
+			<if test="os_type neq '' and os_type neq null">
+			  	, os_type = #{os_type}
+			</if>
+			<if test="app_version neq '' and app_version neq null">
+			  	, app_version = #{app_version}
+			</if>
+			<if test="os_version neq '' and os_version neq null">
+			  	, os_version = #{os_version}
+			</if>
+			<if test="device_brand neq '' and device_brand neq null">
+			  	, device_brand = #{device_brand}
+			</if>
+			<if test="device_name neq '' and device_name neq null">
+			  	, device_name = #{device_name}
+			</if>
+			<if test="device_id neq '' and device_id neq null">
+			  	, device_id = #{device_id}
+			</if>
+			<if test="device_token neq '' and device_token neq null">
+			  	, device_token = #{device_token}
+			</if>
+		WHERE 
+			1=1 	
+			<choose> 
+				<when test="device_seq neq '' and device_seq neq null">
+			   		AND device_seq = #{device_seq}
+			   	</when> 
+			   	<otherwise>
+			   		AND device_id = #{device_id}
+			   	</otherwise>
+		   	</choose>
+	</update>
+	
+	<insert id="insertDeviceInfo" parameterType="DeviceDTO" useGeneratedKeys="true" keyProperty="device_seq">
+		/* Device 등록 신청 setWorkerPassword device.xml */
+		INSERT INTO device_info ( 
+			device_num
+			, app_type
+			, os_type
+			, app_version
+			, os_version
+			, device_telecom
+			, device_brand
+			, device_name
+			, sdk_version
+			, device_id
+			, device_token
+			, reg_date
+		) VALUES ( 
+			#{device_num}
+			, #{app_type}
+			, #{os_type}
+			, #{app_version}
+			, #{os_version}
+			, #{device_telecom}
+			, #{device_brand}
+			, #{device_name}
+			, #{sdk_version}
+			, #{device_id}
+			, #{device_token}
+			, NOW()
+		)
+	</insert>
+</mapper>

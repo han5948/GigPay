@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.IlboWorkMapper">
+	<select id="selectOptionList" parameterType="IlboWorkOptionDTO" resultType="IlboWorkOptionDTO">
+		/* ilboWork.xml selectOptionList */
+		SELECT
+			option_seq
+			, option_type
+			, start_time
+			, end_time
+			, work_limit_count
+			, employer_limit_count
+			, complete_score
+			, re_score
+			, punk_score
+			, eva_score
+			, use_cnt
+			, use_yn
+			, reg_date
+			, reg_admin
+			, mod_date
+			, mod_admin
+		FROM
+			tbl_ilbo_work_option
+		ORDER BY option_type ASC
+	</select>
+	
+	<update id="updateOption" parameterType="IlboWorkOptionDTO">
+		/* ilboWork.xml updateOption */
+		UPDATE
+			tbl_ilbo_work_option
+		SET
+			start_time = #{start_time }
+			, end_time = #{end_time }
+			, work_limit_count = #{work_limit_count }
+			, employer_limit_count = #{employer_limit_count }
+			, complete_score = #{complete_score }
+			, re_score = #{re_score }
+			, punk_score = #{punk_score }
+			, eva_score = #{eva_score }
+			, use_cnt = #{use_cnt }
+			, use_yn = #{use_yn }
+			, mod_date = NOW()
+			, mod_admin = #{mod_admin }
+		WHERE
+			option_type = #{option_type }
+	</update>
+	
+	<insert id="insertOption" parameterType="IlboWorkOptionDTO">
+		INSERT INTO tbl_ilbo_work_option (
+		  	`option_type`,
+		  	`start_time`,
+		  	`end_time`,
+		  	`work_limit_count`,
+		  	`employer_limit_count`,
+		  	`complete_score`,
+		  	`re_score`,
+		  	`punk_score`,
+		  	`eva_score`,
+		  	`use_cnt`,
+		  	`use_yn`,
+		  	`reg_date`,
+		  	`reg_admin`,
+		  	`mod_date`,
+		  	`mod_admin`
+		) VALUES (
+		    #{option_type },
+		    #{start_time },
+		    #{end_time },
+		    #{work_limit_count },
+		    #{employer_limit_count },
+		    #{complete_score },
+		    #{re_score },
+		    #{punk_score },
+		    #{eva_score },
+		    #{use_cnt },
+		    #{use_yn },
+		    NOW(),
+		    #{mod_admin },
+		    NOW(),
+		    #{mod_admin }
+		) 
+	</insert>
+	
+	<select id="selectViewTime" resultType="ViewTimeDTO">
+		SELECT
+			view_time_seq
+			, start_view_time
+			, end_view_time
+			, use_yn
+			, del_yn
+			, reg_admin
+			, reg_date
+			, mod_admin
+			, mod_date
+		FROM
+			tbl_ars_view_time
+	</select>
+	
+	<select id="selectViewTimeCnt" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			tbl_ars_view_time
+	</select>
+	
+	<insert id="insertViewTime" parameterType="ViewTimeDTO">
+		INSERT INTO tbl_ars_view_time (
+			start_view_time
+			, end_view_time
+			, use_yn
+			, del_yn
+			, reg_admin
+			, reg_date
+			, mod_admin
+			, mod_date
+		) VALUES (
+			#{start_view_time }
+			, #{end_view_time }
+			, '1'
+			, '0'
+			, #{reg_admin }
+			, NOW()
+			, #{mod_admin }
+			, NOW()
+		)
+	</insert>
+	
+	<update id="updateViewTime" parameterType="ViewTimeDTO">
+		UPDATE 
+			tbl_ars_view_time
+		SET
+			start_view_time = #{start_view_time }
+			, end_view_time = #{end_view_time }
+			, mod_admin = #{mod_admin }
+			, mod_date = NOW()
+	</update>
+</mapper>

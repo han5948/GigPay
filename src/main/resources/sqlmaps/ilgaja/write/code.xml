@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.CodeMapper">
+  	<select id="getCodeTotalCnt" parameterType="CodeDTO" resultType="int">
+    	/* 코드 조회 code.getCodeTotalCnt */
+    	SELECT 
+    		COUNT(1)
+    	FROM 
+    		code
+    	WHERE 
+    		1 = 1
+    		${where}
+    		<if test="srh_use_yn neq '' and srh_use_yn neq null"> 
+    			AND use_yn = #{srh_use_yn} 
+    		</if>
+  	</select>
+
+  	<select id="getCodeList" parameterType="CodeDTO" resultType="CodeDTO">
+    	/* 코드 조회 code.getCodeList */
+   		SELECT
+			code_seq,
+			code_type,
+			code_value,
+			code_name,
+			code_color,
+			code_bgcolor,
+			code_rank,
+			code_group,
+			use_yn,
+			reg_date,
+			reg_admin,
+			mod_date,
+			mod_admin,
+			code_gender,
+			code_price,
+			app_code
+		FROM
+			code
+		WHERE
+			code_type = #{code_type }
+			AND del_yn = '0'
+			<if test="use_yn neq null and use_yn neq ''">
+				AND use_yn = #{use_yn}
+			</if>
+		ORDER BY code_rank ASC
+  	</select>
+
+  	<insert id="setCodeCell" parameterType="CodeDTO" useGeneratedKeys="true" keyProperty="code_seq">
+    	/* 코드 생성 code.setCodeCell */
+    	INSERT INTO code ( 
+    		reg_date
+    		, reg_admin
+    		, mod_admin 
+    	) VALUES ( 
+    		now()
+    		, #{reg_admin}
+    		, #{reg_admin} 
+    	)
+  	</insert>
+
+  	<update id="setCodeInfo" parameterType="CodeDTO">
+    	/* 코드 수정 code.setCodeInfo */
+    	UPDATE 
+    		code 
+    	SET
+      		code_seq = #{code_seq}
+      		<if test="code_type neq null"> 
+      			, code_type = #{code_type } 
+      		</if>
+      		<if test="code_value neq null"> 
+      			, code_value = #{code_value } 
+      		</if>
+      		<if test="code_name neq null"> 
+      			, code_name = #{code_name } 
+      		</if>
+      		<if test="code_rank  neq null"> 
+      			, code_rank = #{code_rank } 
+      		</if>
+      		<if test="use_yn neq '' and use_yn neq null"> 
+      			, use_yn = #{use_yn} 
+      		</if>
+      		<if test="reg_admin neq '' and reg_admin neq null">
+				, mod_admin = #{reg_admin} 
+			</if>
+    	WHERE 
+    		code_seq = #{code_seq}
+  	</update>
+
+<!--
+  <delete id="removeCodeInfo" parameterType="CodeDTO">
+    /* 코드 삭제 code.removeCodeInfo */
+    DELETE FROM code
+    WHERE code_seq = #{code_seq}
+  </delete>
+-->
+  	<update id="removeCodeInfo" parameterType="CodeDTO">
+    	/* 코드 삭제 code.removeCodeInfo */
+    	UPDATE 
+    		code 
+    	SET
+      		use_yn = 0
+      		<if test="reg_admin neq '' and reg_admin neq null"> 
+      			, mod_admin = #{reg_admin} 
+      		</if> 
+    	WHERE 
+    		code_seq IN
+    		<foreach collection="sel_code_seq" item="sel_seq"  open="(" close=")" separator=", ">
+      			#{sel_seq}
+    		</foreach>
+  	</update>
+  
+  	<select id="getCodeInfo" parameterType="CodeDTO" resultType="CodeDTO">
+    	/* 코드 조회 code.getCodeList */
+    	SELECT 
+    		*
+    	FROM 
+    		code
+    	WHERE 
+    		1 = 1
+      		<if test="code_seq neq null"> 
+      			AND code_seq = #{code_seq } 
+      		</if>
+      		<if test="code_value neq null"> 
+      			AND code_value = #{code_value} 
+      		</if>
+    </select>
+    
+    <select id="selectCodeNameGroup" parameterType="java.util.ArrayList" resultType="String">
+    	/* 코드네임 배열로 code.selectCodeNameGroup */
+    	SELECT 
+    		GROUP_CONCAT(code_name) as codeName 
+    	FROM 
+    		code 
+    	WHERE 
+    		code_value IN
+    		<foreach collection="array" item="code_value"  open="(" close=")" separator=", ">
+      			#{code_value}
+    		</foreach>
+    </select>
+    
+	<insert id="insertCode" parameterType="CodeDTO">
+		<selectKey resultType="String" order="BEFORE" keyProperty="code_seq">
+			SELECT 
+				IFNULL(MAX(code_seq) + 1, 1) AS code_seq
+			FROM
+				code
+		</selectKey>
+		
+		INSERT INTO code (
+			code_seq,
+			code_type,
+			code_value,
+			code_name,
+			code_color,
+			code_bgcolor,
+			code_group,
+			code_rank,
+			use_yn,
+			del_yn,
+			reg_date,
+			reg_admin,
+			mod_date,
+			mod_admin
+			<if test="code_gender neq null and code_gender neq ''">
+				,code_gender
+			</if>
+			<if test="code_price neq null and code_price neq ''">
+				,code_price
+			</if>
+			<if test="app_code neq null and app_code neq ''">
+				,app_code
+			</if>
+		) 
+		VALUES
+		(
+			#{code_seq },
+			#{code_type },
+			UPPER(#{code_value }),
+			#{code_name },
+			#{code_color },
+			#{code_bgcolor },
+			#{code_group },
+			#{code_rank },
+			#{use_yn },
+			'0',
+			NOW(),
+			#{reg_admin },
+			NOW(),
+			#{reg_admin }
+			<if test="code_gender neq null and code_gender neq ''">
+				,#{code_gender }
+			</if>
+			<if test="code_price neq null and code_price neq ''">
+				,#{code_price }
+			</if>
+			<if test="app_code neq null and app_code neq ''">
+				,#{app_code }
+			</if>
+		)
+	</insert>
+	
+	<update id="updateCode" parameterType="CodeDTO">
+		/* code.xml updateCode */
+		UPDATE
+			code
+		SET
+			code_name = #{code_name },
+			code_value = UPPER(#{code_value }),
+			code_color = #{code_color },
+			code_bgcolor = #{code_bgcolor },
+			code_group = #{code_group },
+			code_rank = #{code_rank },
+			use_yn = #{use_yn },
+			code_type = #{code_type },
+			mod_date = NOW(),
+			mod_admin = #{reg_admin },
+			code_gender = #{code_gender },
+			code_price = #{code_price },
+			app_code = #{app_code }
+		WHERE
+			code_seq = #{code_seq }
+	</update>
+	
+	<update id="deleteCode" parameterType="CodeDTO">
+		/* code.xml deleteCode */
+		UPDATE
+			code
+		SET
+			del_yn = '1'
+		WHERE 
+			code_seq = #{code_seq }
+	</update>
+</mapper>

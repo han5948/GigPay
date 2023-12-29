@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.IlboWorkMapper">
+	<select id="selectJobLimitCount" resultType="JobLimitCountDTO" parameterType="String">
+		SELECT
+			limit_count_seq
+			, limit_count
+			, del_yn
+			, use_yn
+			, reg_admin
+			, reg_date
+			, mod_admin
+			, mod_date
+		FROM
+			tbl_job_limit_count
+		WHERE
+			limit_type = #{limit_type}	
+	</select>
+	
+	<update id="updateJobLimitCount" parameterType="JobLimitCountDTO">
+		UPDATE
+			tbl_job_limit_count
+		SET
+			limit_count = #{limit_count }
+			, mod_admin = #{mod_admin }
+			, mod_date = NOW()
+		WHERE
+			limit_type = #{limit_type}	
+	</update>
+
+</mapper>

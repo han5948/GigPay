@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.AutoSettingMapper">
+	<insert id="insertAutoSetting" parameterType="java.util.ArrayList">
+  		/* AI 배정 설정 변경 insertAutoSetting autoSetting.xml */
+        INSERT INTO tbl_auto_setting (
+  			setting_days
+  			, start_time
+  			, end_time
+  			, work_max_count
+  			, push_interval
+  			, worker_max_count
+  			, worker_push_max_count
+  			, contr_distance
+  			, non_contr_distance
+  			, pore_distance
+<!--   			, use_yn -->
+  			, reg_date
+  			, reg_admin
+  			, mod_date
+  			, mod_admin
+  		) VALUES 
+  			<foreach collection="list" item="autoSettingDTO" separator=",">
+	  			(
+		  			#{autoSettingDTO.setting_days }
+		  			, #{autoSettingDTO.start_time }
+		  			, #{autoSettingDTO.end_time }
+		  			, #{autoSettingDTO.work_max_count }
+		  			, #{autoSettingDTO.push_interval }
+		  			, #{autoSettingDTO.worker_max_count }
+		  			, #{autoSettingDTO.worker_push_max_count }
+		  			, #{autoSettingDTO.contr_distance }
+		  			, #{autoSettingDTO.non_contr_distance }
+		  			, #{autoSettingDTO.pore_distance }
+<!-- 		  			, #{autoSettingDTO.use_yn } -->
+		  			, NOW()
+		  			, #{autoSettingDTO.reg_admin }
+		  			, NOW()
+		  			, #{autoSettingDTO.reg_admin }
+	  			)
+  			</foreach>
+  		ON DUPLICATE KEY UPDATE 
+  			start_time = VALUES(start_time)
+  			, end_time = VALUES(end_time)
+  			, work_max_count = VALUES(work_max_count)
+  			, push_interval = VALUES(push_interval)
+  			, worker_max_count = VALUES(worker_max_count)
+  			, worker_push_max_count = VALUES(worker_push_max_count)
+  			, contr_distance = VALUES(contr_distance)
+  			, non_contr_distance = VALUES(non_contr_distance)
+  			, pore_distance = VALUES(pore_distance)
+<!--   			, use_yn = VALUES(use_yn) -->
+  			, mod_date = NOW()
+  			, mod_admin = VALUES(reg_admin)
+  	</insert>
+</mapper>

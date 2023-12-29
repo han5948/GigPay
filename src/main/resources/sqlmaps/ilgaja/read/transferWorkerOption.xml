@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.read.ReplicationTransferWorkerOptionMapper">
+	
+	<resultMap type="com.nemo.kr.dto.TransferWorkerOptionDTO" id="OptionMap">
+		<id property="transfer_seq" column="o.transfer_seq" />
+		<result property="option_rank" column="option_rank" />
+		<result property="company_seq" column="company_seq" />
+		<result property="company_name" column="company_name" />
+		<result property="gender" column="gender" />
+		<result property="job_kind" column="job_kind" />
+		<result property="job_code" column="job_code" />
+		<result property="job_name" column="job_name" />
+		<result property="osh_yn" column="osh_yn" />
+		<result property="use_yn" column="use_yn" />
+		<result property="reg_admin" column="reg_admin" />
+		<result property="reg_date" column="reg_date" />
+		<result property="mod_admin" column="mod_admin" />
+		<result property="mod_date" column="mod_date" />
+
+		<collection property="transferWorkerLocationList" column ="l.transfer_seq" ofType="com.nemo.kr.dto.TransferWorkerLocationDTO" javaType="java.util.ArrayList" resultMap="LocationList"/>
+	</resultMap>
+	
+	<resultMap id="LocationList" type="com.nemo.kr.dto.TransferWorkerLocationDTO">
+     	<id property="location_seq" column="location_seq" />
+     	<result property="transfer_seq" column="l.transfer_seq" />              
+        <result property="sido_code" column="sido_code" />
+        <result property="sido_name" column="sido_name" />
+        <result property="sigungu_code" column="sigungu_code" />
+        <result property="sigungu_name" column="sigungu_name" />
+        <result property="eupmyeondong_code" column="eupmyeondong_code" />
+        <result property="eupmyeondong_name" column="eupmyeondong_name" />
+    </resultMap>
+	
+	<select id="selectTransferWorkerOptionListCnt" parameterType="TransferWorkerOptionDTO" resultType="int">
+		/* selectTransferWorkerOptionListCnt 구직자이관옵션 갯수 read.transferWorkerOption.xml */
+		SELECT
+			COUNT(*)
+		FROM
+			tbl_transfer_worker_option o
+			LEFT JOIN company c
+			ON o.company_seq = c.company_seq
+		WHERE
+			1 = 1
+			<if test="srh_use_yn        neq '' and srh_use_yn        neq null"> AND o.use_yn = #{srh_use_yn} </if>	
+			${where}	
+	</select>
+	
+	<select id="selectTransferWorkerOptionList" parameterType="TransferWorkerOptionDTO" resultType="TransferWorkerOptionDTO">
+		/* selectTransferWorkerOptionList 구직자이관옵션목록 read.transferWorkerOption.xml */
+		SELECT
+			o.transfer_seq
+			, o.option_rank
+			, o.company_seq
+			, c.company_name
+			, o.gender
+			, o.job_kind
+			, o.job_code
+			, o.job_name
+			, o.osh_yn
+			, o.use_yn
+			, o.reg_admin
+			, o.reg_date
+			, o.mod_admin
+			, o.mod_date
+			, (SELECT COUNT(*) FROM tbl_transfer_worker_location WHERE transfer_seq = o.transfer_seq) AS location_cnt
+		FROM
+			tbl_transfer_worker_option o
+			LEFT JOIN company c
+			ON o.company_seq = c.company_seq
+		WHERE
+			1 = 1
+			<if test="srh_use_yn        neq '' and srh_use_yn        neq null"> AND o.use_yn = #{srh_use_yn} </if>
+			${where}
+		ORDER BY ${sidx} ${sord}
+	    <if test="paging neq null">
+			<choose>
+				<when test="paging.pageNo gt 0">
+					LIMIT ${paging.startPage}, ${paging.endPage}
+				</when>
+				<otherwise>
+					LIMIT 0, ${paging.endPage}
+				</otherwise>
+			</choose>
+		</if>
+	</select>
+    
+</mapper>

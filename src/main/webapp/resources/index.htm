@@ -1,0 +1,201 @@
+<HTML>
+<HEAD>
+<style>
+	.btnClose {
+	    border: 1px solid #5aa5da;
+	    color: #5aa5da;
+	    width: 90px;
+	    height: 28px;
+	    line-height: 28px;
+	    background-color: #fff;
+	    display: inline-block;
+	    font-family: "notokr-medium";
+	    font-size: 14px;
+	    text-align: center;
+	    vertical-align: middle;
+	    text-decoration: none;
+	    margin-top: 55px;
+    }
+</style>
+<TITLE>pushTest</TITLE>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<!-- manifest 참조추가 -->
+<link rel="manifest" href="manifest.json">
+
+<script  src="https://code.jquery.com/jquery-latest.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.17.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.17.2/firebase-messaging.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.17.2/firebase-analytics.js"></script>
+
+<script>
+	function fn_close() {
+		window.close();
+	}
+
+	var isNotificationSupported = 'Notification' in window;
+	if (isNotificationSupported)
+	{
+	    Notification.requestPermission().then(function (result)
+	    {
+	        if (result === 'granted')
+	        {
+	            addLog('[Notification] 허용: ' + result);
+	        }
+	        else
+	        {
+	        	addLog('[Notification] 차단: '+ result);
+	        }
+	    });
+	}
+
+
+	function initFirebase(serviceWorkRegistration)
+	{
+	  // Your web app's Firebase configuration
+	  var firebaseConfig = {
+	    apiKey: "AIzaSyAd7KOqe_JByjA6kpBC0o1B9yzWZEc3UrU",
+	    authDomain: "ilgajaw-8ec37.firebaseapp.com",
+	    databaseURL: "https://ilgajaw-8ec37.firebaseio.com",
+	    projectId: "ilgajaw-8ec37",
+	    storageBucket: "ilgajaw-8ec37.appspot.com",
+	    messagingSenderId: "681187843965",
+	    appId: "1:681187843965:web:366d2d2dce80e76d01b614",
+	    measurementId: "G-TC6KR1ST3D"
+	  };
+	  // Initialize Firebase
+	  firebase.initializeApp(firebaseConfig);
+	  firebase.analytics();
+	  
+	  //Messaging 서비스 활성화
+	    var messaging = firebase.messaging();
+	    messaging.useServiceWorker(serviceWorkRegistration);
+	    messaging.usePublicVapidKey("BKYOQMtg45-f2wz087A1qKkA5fu65RJSRTn0D3RhKunxvsQQ7EBtsb62wPLx4Fsj4a304SPAKgzATonN6a-q0Bg");
+
+	    
+	  //Instance ID Token 발급 요청
+	    messaging.getToken().then((currentToken) =>
+	        {
+	            if (currentToken)
+	            {
+	            	addLog('[InstanceID Token] 발행완료: '+ currentToken);
+	                sendTokenToServer(currentToken); //Token을 서버로 전송
+	            }
+	            else
+	            {
+	            	addLog('[InstanceID Token] 발행실패');
+	            	
+	                sendTokenToServer(null);
+	            }
+	        })
+	        .catch((err) =>
+	        {
+	        	addLog('[InstanceID Token] 발행오류: '+ err);
+	            sendTokenToServer(null);
+	        });
+	 
+	    //Instance ID Token 변경 시 호출되는 이벤트
+	    messaging.onTokenRefresh(() =>
+	    {
+	        messaging.getToken().then((refreshedToken) =>
+	        {
+	        	addLog('[InstanceID Token] 갱신완료'+ refreshedToken);
+	            sendTokenToServer(refreshedToken); //Token을 서버로 전송
+	        })
+	        .catch((err) =>
+	        {
+	        	addLog('[InstanceID Token] 갱신실패'+ err);
+	            sendTokenToServer(null);
+	        });
+	    });
+	 
+	    messaging.onMessage((payload) =>
+	    {
+	        //Push Message 수신 시 호출되는 이벤트
+	        addLog('[PushMessage] 수신: '+ payload);
+	    });
+	}
+	
+	//발급된 Instance ID Token을 서버에 전송
+	function sendTokenToServer(token){
+		
+		addLog('[InstanceID Token] 서버전송 시작');
+		var _data = {
+				token	: token,
+		};
+		
+		$.ajax({
+			type : "POST",
+			url : '/admin/setFcmToken',
+			data : _data,
+			async: true,
+			dataType : "json",		
+			/*contentType: "application/json",*/
+
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader("AJAX", true);
+					  
+			},
+			success : function(data) {
+				// 성공 시
+				 addLog('[InstanceID Token] 서버전송 응답(성공): '+ data.code);
+			},
+			error : function(data) {
+				addLog('[InstanceID Token] 서버전송 응답(실패): '+ data.code);
+			},
+			complete : function() {
+				addLog('[InstanceID Token] 서버전송 완료');
+			}
+		});
+
+		/* 
+	     return fetch('/admin/setFcmToken',
+	        {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json'
+	            },
+	            body: token
+	        })
+	        .then(function (response)
+	        {
+	            if (!response.ok)
+	                console.log('[InstanceID Token] 서버전송 실패: ', response);
+	            else
+	                console.log('[InstanceID Token] 서버전송 완료: ', response);
+	 
+	            return response.json();
+	        })
+	        .then(function (responseData)
+	        {
+	            if (!(responseData && responseData.Success))
+	                console.log('[InstanceID Token] 서버전송 응답(실패): ', responseData);
+	            else
+	                console.log('[InstanceID Token] 서버전송 응답(성공): ', responseData);
+	        });
+	  */
+	}
+	
+	function addLog(text){
+		
+		var log = $("#mLog").html();
+		
+		log += "<br/>"+text;
+		
+    	$("#mLog").html(log);
+	}
+
+
+	
+</script>
+<script type="text/javascript" src="/resources/service-worker.js" charset="utf-8"></script>
+</HEAD>
+
+<BODY>
+	
+	<span id="mLog"></span>
+	<div>
+		<a href="javascript:void(0);" onclick="fn_close()" class="btnClose" onclick="javascript:listForm();">닫기</a>
+	</div>
+</BODY>
+</HTML>

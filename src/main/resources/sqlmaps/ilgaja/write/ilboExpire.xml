@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.IlboExpireMapper">
+	<select id="selectList" parameterType="IlboDTO" resultType="IlboDTO">
+		SELECT
+			i.ilbo_seq
+			, i.ilbo_date
+			, i.company_seq
+			, i.worker_company_seq
+			, i.work_company_seq
+			, i.worker_seq
+			, i.manager_seq
+			, i.employer_seq
+			, i.work_seq
+			, i.ilbo_date
+			, i.company_name
+			, i.work_company_name
+			, i.worker_company_name
+			, i.worker_owner
+			, fn_decrypt(i.ilbo_worker_name) AS ilbo_worker_name
+			, i.ilbo_worker_feature
+			, i.output_status_code
+			, i.output_status_name
+			, i.ilbo_worker_sex
+			, fn_decrypt(i.ilbo_worker_phone) AS ilbo_worker_phone 
+			, i.ilbo_worker_addr
+			, i.ilbo_worker_latlng
+			, i.ilbo_worker_ilgaja_addr
+			, i.ilbo_worker_ilgaja_latlng
+			, fn_decrypt(i.ilbo_worker_jumin) AS ilbo_worker_jumin
+			, i.ilbo_worker_job_code
+			, i.ilbo_worker_job_name
+			, i.ilbo_worker_barcode
+			, i.ilbo_worker_memo
+			, i.ilbo_assign_type
+			, i.ilbo_worker_bank_code
+			, i.ilbo_worker_bank_name
+			, i.ilbo_worker_bank_account
+			, i.ilbo_worker_bank_owner
+			, i.ilbo_worker_blood_pressure
+			, i.ilbo_worker_OSH_scan_yn
+			, i.ilbo_worker_jumin_scan_yn
+			, i.ilbo_worker_OSH_scan_yn
+			, i.ilbo_worker_bankbook_scan_yn
+			, i.ilbo_worker_app_status
+			, i.ilbo_worker_app_use_status
+			, i.ilbo_worker_status_code
+			, i.ilbo_worker_status_name
+			, i.ilbo_work_order_name
+			, i.ilbo_work_order_code
+			, i.work_company_name
+			, i.work_owner
+			, fn_decrypt(i.manager_name) AS manager_name
+			, fn_decrypt(i.manager_phone) AS manager_phone
+			, i.ilbo_work_name
+			, i.ilbo_work_addr
+			, i.work_sido
+			, i.work_sigugun
+			, i.work_dongmyun
+			, i.work_rest
+			, i.ilbo_work_latlng
+			, i.ilbo_work_addr_comment 
+			, i.ilbo_work_order_name
+			, i.ilbo_work_order_code
+			, i.ilbo_work_arrival
+			, i.ilbo_work_finish
+			, i.ilbo_kind_name
+			, i.ilbo_kind_code
+			, i.ilbo_job_detail_name
+			, i.ilbo_job_detail_code
+			, i.ilbo_job_add_name
+			, i.ilbo_job_add_code
+			, i.ilbo_job_comment
+			, i.ilbo_chief_memo
+			, i.ilbo_work_age_min
+			, i.ilbo_work_age
+			, fn_decrypt(i.ilbo_work_manager_name) AS ilbo_work_manager_name
+			, i.ilbo_work_manager_fax
+			, fn_decrypt(i.ilbo_work_manager_phone) AS ilbo_work_manager_phone
+			, i.ilbo_work_manager_email
+			, i.ilbo_income_code
+			, i.ilbo_income_name
+			, i.ilbo_income_time
+			, i.ilbo_unit_price
+			, i.ilbo_fee
+			, i.share_fee
+			, i.counselor_fee
+			, i.ilbo_pay
+			, i.ilbo_pay_name
+			, i.ilbo_pay_time
+			, i.ilbo_income_memo	 
+			, i.employer_rating
+			, i.manager_rating
+			, i.use_yn
+			, i.reg_date
+			, i.reg_admin
+			, i.owner_id	 
+		FROM 
+			ilbo i
+			LEFT OUTER JOIN worker w
+				ON i.worker_seq = w.worker_seq
+		WHERE 
+			1 = 1
+			AND w.del_yn = '1'
+			AND i.use_yn = '1'
+			<if test="start_ilbo_date neq '' and start_ilbo_date neq null"> 
+				AND ilbo_date <![CDATA[ >= ]]> #{start_ilbo_date } 
+			</if>
+			<if test="end_ilbo_date	neq '' and end_ilbo_date neq null"> 
+				AND ilbo_date <![CDATA[ <= ]]> #{end_ilbo_date } 
+			</if>
+			<choose>
+				<when test="srh_type eq 'ilbo_worker_phone'.toString()">
+					AND fn_decrypt(ilbo_worker_phone) LIKE CONCAT('%', #{srh_text }, '%')	
+				</when>
+				<otherwise>
+					AND fn_decrypt(w.worker_name) LIKE CONCAT('%', #{srh_text }, '%')
+				</otherwise>
+			</choose>
+	</select>
+	
+	<select id="getIlboExpireTotalCnt" parameterType="IlboDTO" resultType="int">
+		SELECT
+			COUNT(ilbo_seq) AS CNT
+		FROM
+			ilbo i
+			LEFT OUTER JOIN worker w
+				ON i.worker_seq = w.worker_seq
+		WHERE 
+			1 = 1
+			AND w.del_yn = '1'
+			AND i.use_yn = '1'
+			<if test="start_ilbo_date neq '' and start_ilbo_date neq null"> 
+				AND ilbo_date <![CDATA[ >= ]]> #{start_ilbo_date } 
+			</if>
+			<if test="end_ilbo_date	neq '' and end_ilbo_date neq null"> 
+				AND ilbo_date <![CDATA[ <= ]]> #{end_ilbo_date } 
+			</if>
+			<choose>
+				<when test="srh_type eq 'ilbo_worker_phone'.toString()">
+					AND fn_decrypt(ilbo_worker_phone) LIKE CONCAT('%', #{srh_text }, '%')	
+				</when>
+				<otherwise>
+					AND fn_decrypt(w.worker_name) LIKE CONCAT('%', #{srh_text }, '%')
+				</otherwise>
+			</choose>
+	</select>
+	
+	<select id="selectEncryptPhone" parameterType="IlboDTO" resultType="String">
+		SELECT fn_encrypt(#{srh_text })
+	</select>
+</mapper>

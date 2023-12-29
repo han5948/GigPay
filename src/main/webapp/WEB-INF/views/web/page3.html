@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="ko">
+<head> 
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+<title>일가자인력</title>
+<link rel="icon" href="./images/ilgaja_logo_ico.ico" mce_href="/images/ilgaja_logo_ico.ico" type="image/x-icon">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="main.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+</head>
+<body>
+<!-- 팝업배경 -->
+	<div class="bgPopup" style="display:block;"></div>
+	<div class="popup" style="display:block;">
+		<!-- 일자리구함 팝업-->
+		<div class="workOffer" style="display:block;">
+			<div class="w_bgOffer"></div>
+			<div class="woHeader clear">
+				<p class="woHeadTxt"><strong>일자리구함</strong>(구직신청)</p>
+				<p class="woHeadImg"><img src="images/buttonIcon02.png" alt=""></p>
+			</div>
+			<div class="woContents clear">
+				<form action="jobOfferForm">
+					<div class="w_offerInfo01">
+						<div class="clear">
+							<label>이 름<span>*</span></label>
+							<input type="text" required="required">
+						</div>
+						<div class="clear">
+							<label>핸드폰번호<span>*</span></label>
+							<input type="text" required="required">
+						</div>
+						<div class="clear">
+							<label>생년월일<span>*</span></label>
+							<input type="text" required="required">
+						</div>
+						<div class="clear">
+							<label>현거주 주소<span>*</span></label>
+							<input type="text" required="required" class="address">
+						</div>
+						<div class="w_OIpop">
+							<div class="wOIpopCon">
+									<span class="arrow"><img src="images/arrowIcon2.png" alt=""></span>
+									<div class="sOItit">
+										<p><strong>전문분야</strong> (여러 개 선택 가능)</p>
+										<span><img src="images/subClose.png" alt="닫기"></span>	
+									</div>
+									<div class="sOIemp">
+										<div class="women clear">
+											<div class="empButton clear">
+												<p class="empTit">준공청소</p>
+												<p>신호수</p>
+												<p>잡부</p>
+												<p>공장</p>
+												<p>농사일</p>
+												<p>이사짐</p>
+												<p>조공</p>
+												<p>양중</p>
+												<p>자재정리</p>
+												<p>철거</p>
+												<p>하스리</p>
+												<p>커팅</p>
+												<p>그라인드</p>
+												<p>곰방</p>
+											</div>
+										</div>
+										<div class="man clear">
+											<div class="empButton clear">
+												<p class="empTit">내장목수</p>
+												<p>타일</p>
+												<p>미장</p>
+												<p>조적</p>
+												<p>메지</p>
+												<p>전기</p>
+												<p>설비</p>
+												<p>페인트</p>
+												<p>실리콘</p>
+												<p>형틀목수</p>
+												<p>철근</p>
+												<p>타설</p>
+												<p>용접</p>
+												<p>판넬</p>
+												<p>경량</p>
+												<p>도배</p>
+												<p>석공</p>
+												<p>비계</p>
+												<p>경계석</p>
+												<p>보도블럭</p>
+											</div>
+										</div>
+										<div class="tech clear">
+											<div class="empButton clear">
+												<p class="empTit">야간</p>
+												<p>철야</p>
+												<p>주말만</p>
+												<p>단시간만</p>
+											</div>
+										</div>
+										<div class="tech clear">
+											<div class="empButton">
+												<p class="empTit">장비보유</p>
+												<p>3인 트럭</p>
+												<p>5인 승용</p>
+												<p>7인 승합</p>
+												<p>9인 봉고</p>
+											</div>
+										</div>
+									</div>
+								</div>
+						</div>
+						<div class="clear">
+							<label>전문분야<span>*</span></label>
+							<input type="text" placeholder="다수 선택가능" required="required" class="popMenu" readonly onfocus="this.blur()">
+						</div>
+						
+						<div class="clear">
+							<label>경력 설명<span>*</span></label>
+							<input type="text" placeholder="예시) 잡부 2년, 농장일 3년" required="required">
+						</div>
+						<div class="clear">
+							<label>핸드폰 기종<span>*</span></label>
+							<span class="phone">
+								<label><input type="radio"> 안드로이드폰</label>
+								<label><input type="radio"> 아이폰</label>
+								<label><input type="radio"> 일반폰</label>
+							</span>
+						</div>
+					</div>
+					<div class="w_offerInfo02">
+						<div class="w_offerInfo04pop">
+							<p><strong>개인정보 수집 및 이용에 동의</strong></p>
+							<ol>
+								<li>1.수집/이용 목적 : 구직신청 등 구인자 요청 처리 및 결과 회신</li>
+								<li>2. 수집하는 항목 : 이름, 연락처, 생년월일, 주소, 경력, 신분증, 통장사본, 기초안전교육증</li>
+								<li>3. 보유/이용 기간 : 구직알선 서비스 종료 후 2년</li>
+								<li>4. 동의를 거부할 수 있으며, 거부시 이용이 제한될 수 있습니다.</li>
+								<span>닫기</span>
+							</ol>
+						</div>
+						<p class="comNotie">민간 유료 직업소개소의 <span>외국인 </span>고용알선은<br class="pcOn"><span>불법</span>으로 외국인은 구직등록이 <span>불가</span>합니다.</p>
+						<p class="agreeCheck">
+							<label><input type="checkbox"> 개인정보 수집 및 이용에 동의합니다.</label><span class="w_conView">내용보기</span>
+						</p>
+					</div>
+					<div class="jobOfferBtn">
+						<span class="apply">신청</span>
+						<span class="close">닫기</span>
+					</div>
+				</form>
+			</div>
+			<div class="joFooter">
+				<div class="appInfo">
+					<p class="appInfoTxt">구인신청 후 아래 앱을 설명하면 배정된 인력 정보를 미리 알 수 있습니다.</p>
+					<div class="appInfoIcon clear">
+						<p class="aInfoIconButton"><img src="images/btnImg2.png" alt=""></p>
+						<p class="aInfoIconApp">
+							<span><img src="images/appIcon02.png" alt=""> <span><a href="#">안드로이드</a></span></span>
+						</p>
+					</div>
+					<div class="jobFoot">
+						<img src="images/callIcon.png" alt="">
+						구직상담 : <strong>02.461.0432</strong>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

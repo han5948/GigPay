@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.OrderJsonMapper">
+	<insert id="insertOrderJson" parameterType="OrderJsonDTO" useGeneratedKeys="true" keyProperty="json_seq">
+		/* orderJson.xml insertOrderJson */
+		INSERT INTO tbl_order_json ( 
+			work_seq,  
+			work_date,
+			json_data,
+			reg_date
+		) VALUES ( 
+			#{work_seq }, 
+			#{work_date },
+			#{json_data },
+			now()
+		)
+	</insert>
+	
+	<select id="selectOrderJsonInfo" parameterType="String" resultType="OrderJsonDTO">
+		SELECT
+			json_seq,
+			work_seq,
+			work_date,
+			kind_code,
+			json_data,
+			reg_date
+		FROM
+			tbl_order_json
+		WHERE
+			json_seq = #{json_seq }
+	</select>
+	
+	<update id="updateOrderJson" parameterType="OrderJsonDTO">
+		UPDATE
+			tbl_order_json
+		SET
+			work_seq = #{work_seq },
+			work_date = #{work_date },
+			kind_code = #{kind_code },
+			json_data = #{json_data }
+		WHERE
+			json_seq = #{json_seq }
+	</update>
+</mapper>

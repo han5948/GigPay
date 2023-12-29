@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.EDocumentMapper">
+	<select id="selectEDocumentListCnt" parameterType="SignManagementDTO" resultType="int">
+		/* eDocument.xml selectEDocumentListCnt */
+		SELECT
+			COUNT(s.management_seq)
+		FROM
+			tbl_sign_management s
+			LEFT OUTER JOIN tbl_category c ON s.category_seq = c.category_seq
+			LEFT OUTER JOIN ilbo i ON s.ilbo_seq = i.ilbo_seq
+			LEFT OUTER JOIN company o ON i.worker_company_seq = o.company_seq
+			LEFT OUTER JOIN employer e ON i.employer_seq = e.employer_seq
+			LEFT OUTER JOIN manager m ON i.sign_manager_seq = m.manager_seq
+		WHERE
+			1 = 1
+			${where}
+			<if test="company_seq neq '' and company_seq neq null">
+				AND (i.company_seq = #{company_seq } OR i.worker_company_seq = #{company_seq } OR i.work_company_seq = #{company_seq })
+			</if>
+			<if test="start_reg_date  neq '' and start_reg_date neq null"> 
+				AND DATE_FORMAT(s.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_reg_date} 
+			</if>
+		    <if test="end_reg_date neq '' and end_reg_date neq null"> 
+		    	AND DATE_FORMAT(s.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_reg_date} 
+		    </if>
+		    <if test="srh_type neq '' and srh_type neq null">
+		    	AND c.category_seq = #{srh_type }
+		    </if>
+	</select>
+	
+	<select id="selectEDocumentList" parameterType="SignManagementDTO" resultType="SignManagementDTO">
+		/* eDocument.xml selectEDocumentList */
+		SELECT
+			s.management_seq
+			, i.ilbo_seq
+			, i.company_seq
+			, i.company_name
+			, i.ilbo_date
+			, i.worker_company_seq
+			, i.worker_company_name
+			, i.worker_company_name AS sign_company_name
+			, FN_DECRYPT(i.ilbo_worker_name) AS ilbo_worker_name
+			, FN_DECRYPT(i.ilbo_worker_phone) AS ilbo_worker_phone
+			, e.employer_name
+			, m.company_seq AS work_company_seq
+			, (SELECT company_name FROM company WHERE company_seq = m.company_seq) AS work_company_name
+			, FN_DECRYPT(m.manager_name) AS manager_name
+			, FN_DECRYPT(m.manager_phone) AS manager_phone
+			, s.category_seq
+			, c.category_name
+			, c.category_code
+			, s.doc_number
+			, s.company_sign_flag
+			, s.worker_sign_flag
+			, s.work_sign_flag
+			, s.use_yn
+			, s.del_yn
+			, s.reg_date
+			, s.reg_admin
+			, FN_DECRYPT(o.company_phone) AS company_phone
+			, FN_DECRYPT(o.company_owner) AS company_owner
+			, complete_date
+		FROM
+			tbl_sign_management s
+			LEFT OUTER JOIN tbl_category c ON s.category_seq = c.category_seq
+			LEFT OUTER JOIN ilbo i ON s.ilbo_seq = i.ilbo_seq
+			LEFT OUTER JOIN company o ON i.worker_company_seq = o.company_seq
+			LEFT OUTER JOIN employer e ON i.employer_seq = e.employer_seq
+			LEFT OUTER JOIN manager m ON i.sign_manager_seq = m.manager_seq
+		WHERE
+			1 = 1
+			${where}
+			<if test="company_seq neq '' and company_seq neq null">
+				AND (i.company_seq = #{company_seq } OR i.worker_company_seq = #{company_seq } OR i.work_company_seq = #{company_seq })
+			</if>
+			<if test="start_reg_date  neq '' and start_reg_date neq null"> 
+				AND DATE_FORMAT(s.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_reg_date} 
+			</if>
+		    <if test="end_reg_date neq '' and end_reg_date neq null"> 
+		    	AND DATE_FORMAT(s.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_reg_date} 
+		    </if>
+		    <if test="srh_type neq '' and srh_type neq null">
+		    	AND c.category_seq = #{srh_type }
+		    </if>
+		ORDER BY management_seq DESC
+		    <if test="paging neq null">
+		      <choose>
+		        <when test="paging.pageNo gt 0">
+		    LIMIT ${paging.startPage}, ${paging.endPage}
+		        </when>
+		        <otherwise>
+		    LIMIT 0, ${paging.endPage}
+		        </otherwise>
+		      </choose>
+		    </if>
+	</select>
+	
+	<select id="getHistoryList" parameterType="SignHistoryDTO" resultType="SignHistoryDTO">
+		/* eDocument.xml getHistoryList */
+		SELECT
+			h.history_seq
+			, management_seq
+			, history_type
+			, c.code_name AS history_type_name
+			, history_use_type
+			, c2.code_name AS history_use_type_name
+			, IFNULL(FN_DECRYPT(history_use_name), '') AS history_use_name
+			, IFNULL(FN_DECRYPT(history_use_phone), '') AS history_use_phone
+			, IFNULL(history_connect_type, '') AS history_connect_type
+			, IFNULL(history_use_device, '') AS history_use_deivce
+			, history_use_os
+			, IFNULL(c3.code_name, '') AS history_use_os_name
+			, IFNULL(history_use_ip, '') AS history_use_ip
+			, IFNULL(history_use_userAgent, '') AS history_use_userAgent
+			, IFNULL(history_use_latlng, '') AS history_use_latlng
+			, h.reg_date
+		FROM
+			tbl_sign_history h
+			LEFT OUTER JOIN code c ON h.history_type = c.code_value
+			LEFT OUTER JOIN code c2 ON h.history_use_type = c2.code_value
+			LEFT OUTER JOIN code c3 ON h.history_use_os = c3.code_value
+		WHERE
+			1 = 1
+			<if test="management_seq neq null and management_seq neq ''">
+				AND management_seq = #{management_seq }
+			</if>
+			<if test="code_value neq null and code_value eq 'ESH006'.toString()">
+				AND history_type = #{code_value }
+			</if>
+		ORDER BY history_seq DESC
+	</select>
+</mapper>

@@ -1,0 +1,19 @@
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3g.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-jsptaglibrary_2_0.xsd"
+	version="2.0">
+
+	<tlib-version>2.2.3</tlib-version>
+	<jsp-version>1.2</jsp-version>
+	<short-name>lab</short-name>
+	<uri>/lab</uri>
+	<display-name>"Lab Tags"</display-name>
+
+	<function>
+	      <name>decrypt</name>
+	      <function-class>com.nemo.kr.util.AES</function-class>
+	      <function-signature>java.lang.String decrypt(java.lang.String)</function-signature>
+	      <example>
+	            ${cfn:decrypt(value)}
+	       </example>
+	   </function>
+	   
+</taglib>

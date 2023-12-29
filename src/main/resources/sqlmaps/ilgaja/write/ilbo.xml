@@ -1,0 +1,2204 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.IlboMapper">
+    <resultMap id="ilboWorkerDTO" type="IlboDTO">        
+        <id property="ilbo_seq" column="ilbo_seq" />
+		<result property="ilbo_date" column="ilbo_date" />
+		<result property="ilbo_assign_type" column="ilbo_assign_type" />
+		<result property="company_seq" column="company_seq" />
+		<result property="company_name" column="company_name" />
+		<result property="employer_seq" column="employer_seq" />
+		<result property="employer_name" column="employer_name" />
+		<result property="work_seq" column="work_seq" />
+		<result property="worker_seq" column="worker_seq" />
+		<result property="order_work_seq" column="order_work_seq" />
+		<result property="ilbo_work_name" column="ilbo_work_name" />
+		<result property="ilbo_work_arrival" column="ilbo_work_arrival" />
+		<result property="ilbo_work_finish" column="ilbo_work_finish" />
+		<result property="ilbo_work_breaktime" column="ilbo_work_breaktime" />
+		<result property="ilbo_work_addr" column="ilbo_work_addr" />
+		<result property="ilbo_work_latlng" column="ilbo_work_latlng" />
+		<result property="ilbo_work_addr_comment" column="ilbo_work_addr_comment" />
+		<result property="ilbo_work_breakfast_yn" column="ilbo_work_breakfast_yn" />
+		<result property="ilbo_work_age_min" column="ilbo_work_age_min" />
+		<result property="ilbo_work_age" column="ilbo_work_age" />
+		<result property="ilbo_work_blood_pressure" column="ilbo_work_blood_pressure" />
+		<result property="ilbo_work_manager_name" column="ilbo_work_manager_name" />
+		<result property="ilbo_work_manager_fax" column="ilbo_work_manager_fax" />
+		<result property="ilbo_work_manager_phone" column="ilbo_work_manager_phone" />
+		<result property="ilbo_work_manager_email" column="ilbo_work_manager_email" />
+		<result property="ilbo_order_code" column="ilbo_order_code" />
+		<result property="ilbo_order_name" column="ilbo_order_name" />
+		<result property="ilbo_work_order_code" column="ilbo_work_order_code" />
+		<result property="ilbo_work_order_name" column="ilbo_work_order_name" />
+		<result property="ilbo_use_code" column="ilbo_use_code" />
+		<result property="ilbo_use_name" column="ilbo_use_name" />
+		<result property="ilbo_status_code" column="ilbo_status_code" />
+		<result property="ilbo_status_name" column="ilbo_status_name" />
+		<result property="ilbo_kind_code" column="ilbo_kind_code" />
+		<result property="ilbo_kind_name" column="ilbo_kind_name" />
+		<result property="ilbo_job_detail_code" column="ilbo_job_detail_code" />
+		<result property="ilbo_job_detail_name" column="ilbo_job_detail_name" />
+		<result property="ilbo_job_add_code" column="ilbo_job_add_code" />
+		<result property="ilbo_job_add_name" column="ilbo_job_add_name" />
+		<result property="ilbo_job_comment" column="ilbo_job_comment" />
+		<result property="ilbo_chief_memo" column="ilbo_chief_memo" />
+		<result property="ilbo_worker_name" column="ilbo_worker_name" />
+		<result property="ilbo_worker_sex" column="ilbo_worker_sex" />
+		<result property="ilbo_worker_phone" column="ilbo_worker_phone" />
+		<result property="ilbo_worker_addr" column="ilbo_worker_addr" />
+		<result property="ilbo_worker_latlng" column="ilbo_worker_latlng" />
+		<result property="ilbo_worker_ilgaja_addr" column="ilbo_worker_ilgaja_addr" />
+		<result property="ilbo_worker_ilgaja_latlng" column="ilbo_worker_ilgaja_latlng" />
+		<result property="ilbo_worker_jumin" column="ilbo_worker_jumin" />
+		<result property="ilbo_worker_job_code" column="ilbo_worker_job_code" />
+		<result property="ilbo_worker_job_name" column="ilbo_worker_job_name" />
+		<result property="ilbo_worker_barcode" column="ilbo_worker_barcode" />
+		<result property="ilbo_worker_memo" column="ilbo_worker_memo" />
+		<result property="ilbo_worker_bank_code" column="ilbo_worker_bank_code" />
+		<result property="ilbo_worker_bank_name" column="ilbo_worker_bank_name" />
+		<result property="ilbo_worker_bank_account" column="ilbo_worker_bank_account" />
+		<result property="ilbo_worker_bank_owner" column="ilbo_worker_bank_owner" />
+		<result property="ilbo_worker_feature" column="ilbo_worker_feature" />
+		<result property="ilbo_worker_blood_pressure" column="ilbo_worker_blood_pressure" />
+		<result property="ilbo_worker_OSH_yn" column="ilbo_worker_OSH_yn" />
+		<result property="ilbo_worker_jumin_scan_yn" column="ilbo_worker_jumin_scan_yn" />
+		<result property="ilbo_worker_bankbook_scan_yn" column="ilbo_worker_bankbook_scan_yn" />
+		<result property="ilbo_worker_OSH_scan_yn" column="ilbo_worker_OSH_scan_yn" />
+		<result property="ilbo_worker_certificate_scan_yn" column="ilbo_worker_certificate_scan_yn" />
+		<result property="ilbo_worker_app_status" column="ilbo_worker_app_status" />
+		<result property="ilbo_worker_reserve_push_status" column="ilbo_worker_reserve_push_status" />
+		<result property="ilbo_worker_app_use_status" column="ilbo_worker_app_use_status" />
+		<result property="ilbo_unit_price" column="ilbo_unit_price" />
+		<result property="ilbo_gongsu" column="ilbo_gongsu" />
+		<result property="ilbo_fee" column="ilbo_fee" />
+		<result property="share_fee" column="share_fee" />
+		<result property="ilbo_extra_pay" column="ilbo_extra_pay" />
+		<result property="counselor_fee" column="counselor_fee" />
+		<result property="ilbo_deduction" column="ilbo_deduction" />
+		<result property="ilbo_pay" column="ilbo_pay" />
+		<result property="ilbo_pay_code" column="ilbo_pay_code" />
+		<result property="ilbo_pay_name" column="ilbo_pay_name" />
+		<result property="ilbo_pay_time" column="ilbo_pay_time" />
+		<result property="ilbo_pay_memo" column="ilbo_pay_memo" />
+		<result property="ilbo_income_code" column="ilbo_income_code" />
+		<result property="ilbo_income_name" column="ilbo_income_name" />
+		<result property="ilbo_income_time" column="ilbo_income_time" />
+		<result property="ilbo_income_memo" column="ilbo_income_memo" />
+		<result property="ilbo_confirm" column="ilbo_confirm" />
+		<result property="ilbo_memo" column="ilbo_memo" />
+		<result property="ilbo_status" column="ilbo_status" />
+		<result property="output_status_code" column="output_status_code" />
+		<result property="output_status_name" column="output_status_name" />
+		<result property="ilbo_worker_status_code" column="ilbo_worker_status_code" />
+		<result property="ilbo_worker_status_name" column="ilbo_worker_status_name" />
+		<result property="employer_rating" column="employer_rating" />
+		<result property="use_yn" column="use_yn" />
+		<result property="reg_date" column="reg_date" />
+		<result property="reg_admin" column="reg_admin" />
+		<result property="owner_id" column="owner_id" />
+		<result property="mod_date" column="mod_date" />
+		<result property="mod_admin" column="mod_admin" />
+		<result property="mod_output_date" column="mod_output_date" />
+		<result property="worker_owner" column="worker_owner" />
+		<result property="work_owner" column="work_owner" />
+		<result property="worker_company_seq" column="worker_company_seq" />
+		<result property="worker_company_name" column="worker_company_name" />
+		<result property="evaluate_grade" column="evaluate_grade" />
+        
+        <collection property="otherWorkerList" column ="other_seq" ofType="OtherWorkerDTO" javaType="java.util.ArrayList" resultMap="otherWorkerList"/>
+    </resultMap>
+    
+     <resultMap id="otherWorkerList" type="OtherWorkerDTO">
+     	<id property="other_seq" column="other_seq" />              
+     	
+        <result property="other_worker_name"     column="other_worker_name" />
+        <result property="other_worker_phone"    column="other_worker_phone" />
+    </resultMap>
+
+	<select id="getIlboTotalCnt" parameterType="IlboDTO" resultType="int">
+	    /* 일보 정보 조회 ilbo.getIlboTotalCnt */
+	    SELECT 
+	    	COUNT(ilbo_seq) AS CNT 
+	    FROM 
+	    	ilbo i 
+	    	LEFT OUTER JOIN employer e on i.employer_seq = e.employer_seq
+	    WHERE 
+	    	1 = 1
+	      	${where}
+	    	<if test="srh_company_seq neq '' and srh_company_seq neq null"> 
+	    		AND (i.company_seq = #{srh_company_seq } OR i.work_company_seq = #{srh_company_seq } OR i.worker_company_seq =#{srh_company_seq })  
+	    	</if>
+	    	<if test="start_ilbo_date neq '' and start_ilbo_date neq null"> AND ilbo_date <![CDATA[ >= ]]> #{start_ilbo_date } </if>
+	    	<if test="end_ilbo_date neq '' and end_ilbo_date neq null"> AND ilbo_date <![CDATA[ <= ]]> #{end_ilbo_date} </if>
+	    	<if test="srh_ilbo_worker_reserve_push_status neq '' and srh_ilbo_worker_reserve_push_status neq null"> AND ilbo_worker_reserve_push_status = #{srh_ilbo_worker_reserve_push_status} </if>
+	    	<if test="srh_ilbo_worker_app_use_status neq '' and srh_ilbo_worker_app_use_status neq null"> AND ilbo_worker_app_use_status = #{srh_ilbo_worker_app_use_status} </if>
+	    	<if test="srh_ilbo_status neq '' and srh_ilbo_status neq null"> AND ilbo_status = #{srh_ilbo_status} </if>
+	    	<if test="srh_use_yn neq '' and srh_use_yn neq null"> AND i.use_yn = #{srh_use_yn} </if>
+	    	<if test="owner_id neq '' and owner_id neq null"> AND( worker_owner = #{owner_id} or work_owner = #{owner_id} or i.owner_id= #{owner_id})</if>
+	</select>
+ 
+  	<select id="getIlboList" parameterType="IlboDTO" resultType="IlboDTO">
+    	/* 일보정보 조회 ilbo.getIlboList */
+    	SELECT 
+			e.employer_name
+			, e.employer_feature AS ilbo_employer_feature
+            , i.ilbo_seq, i.ilbo_date, i.ilbo_assign_type
+            , i.company_seq
+            , i.company_name
+            , i.employer_seq
+            , i.work_seq
+            , i.worker_seq
+            , i.ilbo_work_name
+            , i.ilbo_work_arrival
+            , i.ilbo_work_finish
+            , i.ilbo_work_breaktime
+            , i.ilbo_work_addr
+            , i.ilbo_work_latlng
+            , i.ilbo_work_addr_comment
+            , i.ilbo_work_breakfast_yn
+            , i.ilbo_work_age_min
+            , i.ilbo_work_age
+            , i.ilbo_work_blood_pressure
+            , FN_DECRYPT(i.ilbo_work_manager_name) as ilbo_work_manager_name
+            , FN_DECRYPT(i.ilbo_work_manager_phone) as ilbo_work_manager_phone
+            , FN_DECRYPT(i.ilbo_work_manager_email) as ilbo_work_manager_email
+            , FN_DECRYPT(i.ilbo_worker_name) as ilbo_worker_name
+            , FN_DECRYPT(i.ilbo_worker_phone) as ilbo_worker_phone
+            , FN_DECRYPT(i.ilbo_worker_bank_account) as ilbo_worker_bank_account
+            , FN_DECRYPT(i.ilbo_worker_bank_owner) as ilbo_worker_bank_owner
+            , FN_DECRYPT(i.ilbo_worker_jumin) as ilbo_worker_jumin
+            , i.ilbo_work_manager_fax 
+            , IFNULL(i.ilbo_order_code, '999999') AS ilbo_order_code
+            , i.ilbo_order_name
+            , i.ilbo_work_order_code
+            , i.ilbo_work_order_name
+            , i.ilbo_use_code
+            , i.ilbo_use_name
+            , i.ilbo_status_code
+            , i.ilbo_status_name
+            , j.job_kind 
+            , i.ilbo_kind_code
+            , i.ilbo_kind_name
+            , i.ilbo_job_detail_code
+            , i.ilbo_job_detail_name
+            , i.ilbo_job_add_code
+            , i.ilbo_job_add_name
+            , i.ilbo_job_comment
+            , i.ilbo_chief_memo
+            , i.ilbo_worker_addr
+            , i.ilbo_worker_latlng
+            , i.ilbo_worker_job_code
+            , i.ilbo_worker_job_name
+            , i.ilbo_worker_barcode
+            , i.ilbo_worker_memo
+            , i.ilbo_worker_bank_code
+            , i.ilbo_worker_bank_name
+            , i. ilbo_worker_bankbook_scan_yn
+            , i.ilbo_worker_feature
+            , i.ilbo_worker_blood_pressure
+            , i.ilbo_worker_OSH_yn
+            , i.ilbo_worker_jumin_scan_yn
+            , i.ilbo_worker_OSH_scan_yn
+            , i.ilbo_worker_app_status
+            , i.ilbo_worker_reserve_push_status
+            , i.ilbo_worker_app_use_status
+            , i.ilbo_unit_price
+            , i.ilbo_gongsu 
+            <choose>
+				<when test="srh_company_seq neq '' and srh_company_seq neq null"> 
+					, (  
+						CASE
+					    	WHEN 
+					    		i.worker_company_seq = i.work_company_seq OR i.worker_company_seq != #{srh_company_seq} 
+					    	THEN 
+					    		ilbo_fee
+					    	WHEN 
+					    		i.work_company_seq = '0'     
+					    	THEN 
+					    		ilbo_fee 
+					    	ELSE 
+					    		share_fee      
+					    END
+					) AS ilbo_fee
+					, (  
+						CASE
+						    WHEN i.worker_company_seq = i.work_company_seq or i.worker_company_seq != #{srh_company_seq} THEN share_fee
+					    	WHEN i.work_company_seq = '0' THEN share_fee
+					    	ELSE ilbo_fee END
+					) AS share_fee
+		      	</when>
+		      	<otherwise>
+					, ilbo_fee,share_fee
+		      	</otherwise>
+		    </choose>
+            , i.ilbo_extra_pay, i.counselor_fee ,i.ilbo_deduction, i.ilbo_pay, i.ilbo_pay_code, i.ilbo_pay_name, DATE_FORMAT(i.ilbo_pay_time, '%m-%d %H:%i') AS ilbo_pay_time, i.ilbo_pay_memo
+            , i.ilbo_income_code, i.ilbo_income_name, DATE_FORMAT(i.ilbo_income_time, '%m-%d %H:%i') AS ilbo_income_time, i.ilbo_income_memo, i.ilbo_confirm, i.ilbo_memo
+            , i.ilbo_status, i.output_status_code, i.output_status_name, i.ilbo_worker_status_code, i.ilbo_worker_status_name, i.employer_rating, i.manager_rating
+            , i.use_yn, i.reg_date, i.reg_admin ,i.owner_id, i.mod_date, i.mod_admin,i.mod_output_date
+            , i.worker_owner,i.work_owner
+            , i.worker_company_seq, i.worker_company_name
+            , i.work_company_seq, i.work_company_name
+            , i.manager_seq
+            , FN_DECRYPT(i.manager_name) as manager_name
+            , FN_DECRYPT(i.manager_phone) as manager_phone
+            , m.visit_type
+            , IFNULL(w.day_count, 0) AS day_count 
+            , IFNULL(t.evaluate_grade, 0) as evaluate_grade
+            , t.evaluate_comment
+            , IFNULL(t.seq, 0) as seq
+            , IFNULL(a.counselor_rate, 0) as counselor_rate	<!-- 지점상담사 수익율 % 값 -->
+            , j.job_work_fee
+            , j.job_worker_fee
+            , i.fee_info, i.pay_info
+            , CASE
+    			WHEN
+    				lm.work_sign_flag = 1
+    			THEN 1
+    			WHEN
+    				lm.worker_sign_flag = 1
+    			THEN 2
+    			ELSE 0
+  			END AS labor_contract
+  			, rm.worker_sign_flag AS surrogate
+  			, lm.management_seq AS labor_management_seq
+  			, rm.management_seq AS receive_management_seq
+			, i.labor_contract_seq
+  			, (SELECT contract_name FROM tbl_contract WHERE contract_seq = i.labor_contract_seq) AS labor_contract_name
+			, i.receive_contract_seq
+			, (SELECT contract_name FROM tbl_contract WHERE contract_seq = i.receive_contract_seq) AS receive_contract_name
+			, i.ilbo_career_name
+			, i.ilbo_career_use_seq
+    	FROM 
+    		ilbo i 
+			LEFT OUTER JOIN employer e 
+				ON i.employer_seq = e.employer_seq
+			LEFT OUTER JOIN manager m 
+				ON i.manager_seq = m.manager_seq
+			LEFT OUTER JOIN work w 
+				ON i.work_seq = w.work_seq
+			LEFT OUTER JOIN tbl_evaluate t 
+				ON i.ilbo_seq = t.ilbo_seq
+			LEFT OUTER JOIN admin a 
+				ON i.work_owner = a.admin_id
+			LEFT OUTER JOIN tbl_job j 
+				ON i.ilbo_kind_code = j.job_seq
+			LEFT OUTER JOIN tbl_sign_management lm 
+				ON i.ilbo_seq = lm.ilbo_seq AND i.labor_contract_seq = lm.contract_seq
+  			LEFT OUTER JOIN tbl_sign_management rm 
+  				ON i.ilbo_seq = rm.ilbo_seq AND i.receive_contract_seq = rm.contract_seq  
+    	WHERE 
+    		1 = 1
+    		${where}
+    		<if test="srh_company_seq neq '' and srh_company_seq neq null"> 
+    			AND (i.company_seq = #{srh_company_seq} OR i.worker_company_seq =  #{srh_company_seq} OR i.work_company_seq = #{srh_company_seq})
+    		</if>
+    		<if test="start_ilbo_date neq '' and start_ilbo_date neq null"> 
+    			AND i.ilbo_date <![CDATA[ >= ]]> #{start_ilbo_date} 
+    		</if>
+    		<if test="end_ilbo_date neq '' and end_ilbo_date neq null"> 
+    			AND i.ilbo_date <![CDATA[ <= ]]> #{end_ilbo_date} 
+    		</if>
+    		<if test="srh_ilbo_worker_reserve_push_status neq '' and srh_ilbo_worker_reserve_push_status neq null"> 
+    			AND i.ilbo_worker_reserve_push_status = #{srh_ilbo_worker_reserve_push_status} 
+    		</if>
+    		<if test="srh_ilbo_worker_app_use_status neq '' and srh_ilbo_worker_app_use_status neq null"> 
+    			AND i.ilbo_worker_app_use_status   = #{srh_ilbo_worker_app_use_status} 
+    		</if>
+    		<if 	test="srh_ilbo_status neq '' and srh_ilbo_status neq null"> 
+    			AND i.ilbo_status = #{srh_ilbo_status} 
+    		</if>
+    		<if test="srh_use_yn neq '' and srh_use_yn neq null"> 
+    			AND i.use_yn = #{srh_use_yn} 
+    		</if>
+			<if test="owner_id neq '' and owner_id neq null"> 
+				AND(i.worker_owner = #{owner_id} OR i.work_owner = #{owner_id} OR i.owner_id= #{owner_id})
+			</if>
+		<choose>
+			<when test="search eq 'WORKER'.toString()">
+				GROUP BY
+					i.ilbo_kind_code
+			</when>
+			<otherwise>
+				GROUP BY 
+					i.ilbo_seq			
+			</otherwise>
+		</choose>
+    	ORDER BY 
+    		${sidx} ${sord}
+  	</select>
+ 
+  	<select id="getIlboExcelInfo" parameterType="IlboDTO" resultType="IlboDTO">
+    	/* 일보정보 Excel 다운로드 현정 정보 ilbo.getIlboExcelInfo */
+    	SELECT
+      		e.employer_seq
+      		, e.employer_name
+      		,
+    		<if test="srh_type eq 'i.employer_seq'">
+      				'' AS ilbo_work_seq
+      				, '전체현장' AS ilbo_work_name 
+    			FROM 
+    				employer e
+    			WHERE 
+    				e.employer_seq = #{srh_seq}
+    		</if>
+    		<if test="srh_type eq 'i.work_seq'">
+      				w.work_seq AS ilbo_work_seq
+      				, w.work_name AS ilbo_work_name 
+    			FROM 
+    				work w 
+    				LEFT OUTER JOIN employer e 
+    					ON w.employer_seq = e.employer_seq
+    			WHERE 
+    				w.work_seq = #{srh_seq}
+    		</if>
+  	</select>
+
+  	<select id="getIlboExcel" parameterType="IlboDTO" resultType="hashmap">
+    	/* 일보정보 Excel 다운로드 ilbo.getIlboExcel */
+    	SELECT
+      		b.company_seq
+      		, b.employer_seq
+      		, b.work_seq
+      		, b.worker_seq
+      		, e.employer_name
+      		, w1.work_name
+      		, FN_DECRYPT(w2.worker_name) as worker_name
+      		, FN_DECRYPT(w2.worker_jumin) as worker_jumin
+      		, FN_DECRYPT(w2.worker_phone) as worker_phone
+      		, w2.worker_addr
+      		, w2.worker_bank_name
+      		, FN_DECRYPT(w2.worker_bank_account) as worker_bank_account
+      		, FN_DECRYPT(w2.worker_bank_owner) as worker_bank_owner
+      		, ${sord} b.ilbo_unit_price
+      		, SUM(b.total_price) AS total_price
+      		, CONCAT(f1.file_path, f1.file_name) AS worker_jumin_img
+      		, CONCAT(f2.file_path, f2.file_name) AS worker_osh_img
+    	FROM (
+      		SELECT
+        		company_seq
+        		, employer_seq
+        		, work_seq
+        		, worker_seq
+        		, ${where}
+        		ilbo_unit_price
+        		, (SUM(cnt) * ilbo_unit_price) AS total_price
+      		FROM (
+        		SELECT
+          			DATE_FORMAT(i.ilbo_date, '%Y%m%d') AS ilbo_day,
+          			i.ilbo_seq
+          			, i.company_seq
+          			, i.employer_seq
+          			, i.work_seq
+          			, i.worker_seq
+          			, COUNT(i.ilbo_seq) AS cnt
+          			, ilbo_unit_price
+        		FROM 
+        			ilbo i
+        		WHERE 
+        			${srh_type} = #{srh_seq}
+	          		AND DATE_FORMAT(i.ilbo_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_ilbo_date}
+	          		AND DATE_FORMAT(i.ilbo_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_ilbo_date}
+	          		AND i.use_yn = 1
+	          		AND i.worker_seq <![CDATA[ > ]]> 0 
+	          		AND i.ilbo_unit_price IS NOT NULL 
+	          		AND ilbo_unit_price <![CDATA[ > ]]> 0
+	          		AND i.ilbo_fee <![CDATA[ > ]]> 0
+	          		AND output_status_code = '100015' 
+        		GROUP BY
+          			i.ilbo_date
+          			, i.ilbo_seq
+          			, i.company_seq
+          			, i.employer_seq
+          			, i.work_seq
+          			, i.worker_seq
+          			, i.ilbo_unit_price) a
+			GROUP BY 
+				ilbo_seq
+				, company_seq
+				, employer_seq
+				, work_seq
+				, worker_seq
+				, ilbo_unit_price
+				, ilbo_day
+    	) b 
+    	LEFT OUTER JOIN employer e 
+    		ON b.employer_seq = e.employer_seq
+        LEFT OUTER JOIN work w1 
+        	ON b.work_seq = w1.work_seq
+        LEFT OUTER JOIN worker w2 
+        	ON b.worker_seq = w2.worker_seq
+        LEFT OUTER JOIN file_info f1 
+        	ON b.worker_seq = f1.service_seq AND f1.service_type = 'WORKER' AND f1.service_code = 'JUMIN'
+        LEFT OUTER JOIN file_info f2 
+        	ON b.worker_seq = f2.service_seq AND f2.service_type = 'WORKER' AND f2.service_code = 'OSH'
+    	GROUP BY
+      		b.company_seq
+      		, b.employer_seq
+      		, b.work_seq
+      		, b.worker_seq
+      		, e.employer_name
+      		, w1.work_name
+      		, w2.worker_name
+      		, w2.worker_jumin
+      		, w2.worker_phone
+      		, w2.worker_addr
+      		, w2.worker_bank_name
+      		, w2.worker_bank_account
+      		, w2.worker_bank_owner
+      		, b.ilbo_unit_price
+      		, total_price
+      		, f1.file_path
+      		, f1.file_name
+      		, f2.file_path
+      		, f2.file_name
+  	</select>
+
+  	<insert id="setIlboCell" parameterType="IlboDTO" useGeneratedKeys="true" keyProperty="ilbo_seq">
+    	/* 일보 생성 ilbo.setIlboCell */
+    	INSERT INTO ilbo (
+      		ilbo_date
+      		<if test="company_seq neq '' and company_seq neq null">
+      			, company_seq
+      			, company_name 
+      		</if>
+      		<if test="work_company_seq neq '' and work_company_seq neq null">
+      			, work_company_seq
+      			, work_company_name 
+      		</if>
+      		<if test="worker_company_seq neq '' and worker_company_seq neq null">
+      			, worker_company_seq
+      			, worker_company_name 
+      		</if>
+      		, employer_seq
+      		, worker_seq
+      		, ilbo_order_code
+      		, ilbo_work_order_code
+      		, ilbo_work_order_name
+      		, ilbo_use_code
+      		, ilbo_status_code
+      		, work_seq
+      		, ilbo_work_name
+      		, ilbo_worker_name
+      		, ilbo_work_manager_phone
+      		, reg_date, reg_admin 
+      		<if test="owner_id neq '' and owner_id neq null">
+      			, owner_id
+      			, worker_owner
+      			, work_owner
+      		</if>  
+      		, mod_admin
+    	) VALUES (
+      		#{ilbo_date}
+      		<if test="company_seq neq '' and company_seq neq null">
+      			, #{company_seq}
+      			, #{company_name}  
+      		</if>
+      		<if test="work_company_seq neq '' and work_company_seq neq null">
+      			, #{work_company_seq}
+      			, #{work_company_name} 
+      		</if>
+      		<if test="worker_company_seq neq '' and worker_company_seq neq null">
+      			, #{worker_company_seq}
+      			, #{worker_company_name} 
+      		</if>
+      		, '0'
+      		, '0'
+      		, '500000'
+      		, 'ORD001'
+      		, '사무실'
+      		, NULL
+      		, NULL
+      		, '0'
+      		, '?'
+      		, '?'
+      		, '?'
+      		,   NOW()
+      		, #{reg_admin}
+      		<if test="owner_id neq '' and owner_id neq null">
+      			, #{owner_id}
+      			, 'company'
+      			, #{owner_id} 
+      		</if>
+      		, #{reg_admin}
+    		)
+	</insert>
+	
+  	<update id="setIlboWorkerReset" parameterType="IlboDTO">
+	    /* 일보에서 worker 정보 초기화 ilbo.setIlboWorkerReset  jjh */
+    	UPDATE   
+    		ilbo	
+    	SET
+	  		mod_date = NOW()
+	  		, ilbo_assign_type = 'O'
+	  		, worker_seq = 0
+	  		, ilbo_worker_name = '?'
+	  		, ilbo_worker_phone = null
+	  		, ilbo_worker_addr = null
+	  		, ilbo_worker_latlng = null
+	  		, ilbo_worker_ilgaja_addr = null
+	  		, ilbo_worker_ilgaja_latlng = null
+	  		, ilbo_worker_jumin = null
+	  		, ilbo_worker_job_name = null
+	  		, ilbo_worker_barcode = null
+	  		, ilbo_worker_memo = null
+	  		, ilbo_worker_bank_name = null
+	  		, ilbo_worker_bank_account = null
+	  		, ilbo_worker_bank_owner = null
+	  		, ilbo_worker_feature = null
+	  		, ilbo_worker_blood_pressure = 0
+	  		, ilbo_worker_OSH_yn = 0
+	  		, ilbo_worker_jumin_scan_yn = 0
+	  		, ilbo_worker_bankbook_scan_yn = 0
+	  		, ilbo_worker_OSH_scan_yn = 0
+	  		, ilbo_worker_app_status = 0
+	  		, ilbo_worker_reserve_push_status = null
+	  		, ilbo_worker_app_use_status = -1
+	  		, output_status_code = 0
+	  		, output_status_name = null
+	  		, ilbo_status = 0
+	  		, employer_rating = 0
+	  		, manager_rating = 0
+	  		, worker_owner = 'company'
+	  		, worker_company_seq = 0
+	  		, worker_company_name = null
+	  		, mod_admin = #{mod_admin}
+    	WHERE 
+     		<choose>
+          		<when test="sel_ilbo_seq neq '' and sel_ilbo_seq neq null">
+              		ilbo_seq IN
+              			<foreach collection="sel_ilbo_seq" item="sel_seq" open="(" close=")" separator=", ">
+                			#{sel_seq}
+              			</foreach>
+          		</when>
+          		<otherwise>
+              		ilbo_seq = #{ilbo_seq}
+          		</otherwise>
+        	</choose>
+  	</update>
+
+  	<update id="setIlboInfo" parameterType="IlboDTO">
+	    /* 일보정보 수정 ilbo.setIlboInfo  jjh 수정 */
+    	UPDATE 
+    		ilbo 
+    	SET
+      		mod_date = NOW()
+    		<if test="ilbo_date                     neq '' and ilbo_date                      neq null"> , ilbo_date                       = #{ilbo_date                      } </if>
+    		<if test="ilbo_assign_type          	neq '' and ilbo_assign_type           neq null"> , ilbo_assign_type            = #{ilbo_assign_type            } </if>
+    		<!-- company_seq 는 바뀌면 안되는것 같다. 최고관리자가 수정할때는 바뀌어야 됨...컨트롤러에서 처리--> 
+    		<if test="company_seq               	neq '' and company_seq				neq null">  , company_seq                     = #{company_seq }    </if>
+    		<if test="company_name               	neq '' and company_name				neq null">  , company_name              = #{company_name}    </if> 
+		      
+    		<if test="employer_seq neq null"> 
+    			, employer_seq = #{employer_seq }
+    			<if test="employer_seq neq '0'.toString()">
+    				<if test="cellname eq 'employer_name'.toString()">
+        				, sign_manager_seq = CASE WHEN (SELECT sign_manager_type FROM employer WHERE employer_seq = #{employer_seq }) = 'E' THEN (SELECT sign_manager_seq FROM employer WHERE employer_seq = #{employer_seq }) WHEN (SELECT sign_manager_type FROM employer WHERE employer_seq = #{employer_seq }) = 'O' THEN (SELECT manager_seq FROM ilbo WHERE ilbo_seq = #{ilbo_seq }) ELSE '0' END
+        			</if>
+    			</if>
+    		</if>
+    		<if test="work_seq neq null"> 
+    			, work_seq = #{work_seq } 
+    			<if test="cellname eq 'ilbo_work_name'.toString()">
+   					, labor_contract_seq = (SELECT labor_contract_seq FROM work WHERE work_seq = #{work_seq })
+	   				, receive_contract_seq = (SELECT receive_contract_seq FROM work WHERE work_seq = #{work_seq })
+   				</if>
+    		</if>
+    		<if test="worker_seq                  	neq null"> , worker_seq                      = #{worker_seq                     } </if>
+		
+    		<if test="ilbo_work_name            	neq null"> , ilbo_work_name                  = #{ilbo_work_name                 } </if>
+    		<if test="ilbo_work_arrival           	neq null"> , ilbo_work_arrival               = #{ilbo_work_arrival              } </if>
+    		<if test="ilbo_work_finish             	neq null"> , ilbo_work_finish                 = #{ilbo_work_finish              } </if>
+    		<if test="ilbo_work_breaktime neq null">
+    			, ilbo_work_breaktime = #{ilbo_work_breaktime }
+    		</if>
+    		<if test="ilbo_work_addr              	neq null"> , ilbo_work_addr                  = #{ilbo_work_addr                 } </if>
+    		<if test="work_sido              	neq null"> , work_sido                  		 = #{work_sido                 } </if>
+    		<if test="work_sigugun              	neq null"> , work_sigugun                    = #{work_sigugun                 } </if>
+    		<if test="work_dongmyun              	neq null"> , work_dongmyun                   = #{work_dongmyun                 } </if>
+    		<if test="work_rest              	neq null"> , work_rest                           = #{work_rest                 } </if>
+    		<if test="ilbo_work_addr_comment  		neq ''    and     ilbo_work_addr_comment neq null"> , ilbo_work_addr_comment          = #{ilbo_work_addr_comment                 } </if>
+    		<if test="ilbo_work_latlng              neq null"> , ilbo_work_latlng                = #{ilbo_work_latlng               } </if>
+    		<if test="ilbo_work_breakfast_yn    	neq null"> , ilbo_work_breakfast_yn          = #{ilbo_work_breakfast_yn         } </if>
+    		<if test="ilbo_work_age_min                 neq null"> , ilbo_work_age_min                   = #{ilbo_work_age_min                  } </if>
+    		<if test="ilbo_work_age                 neq null"> , ilbo_work_age                   = #{ilbo_work_age                  } </if>
+    		<if test="ilbo_work_blood_pressure   	neq null"> , ilbo_work_blood_pressure        = #{ilbo_work_blood_pressure       } </if>
+    		<if test="ilbo_work_manager_name  		neq null"> , ilbo_work_manager_name          = FN_ENCRYPT(#{ilbo_work_manager_name}) </if>
+    		<if test="ilbo_work_manager_fax      	neq null"> , ilbo_work_manager_fax           = #{ilbo_work_manager_fax          } </if>
+    		<if test="ilbo_work_manager_phone         neq null"> , ilbo_work_manager_phone         = FN_ENCRYPT(#{ilbo_work_manager_phone}) </if>
+    		<if test="ilbo_work_manager_email         neq null"> , ilbo_work_manager_email         = FN_ENCRYPT(#{ilbo_work_manager_email}) </if>
+		
+    		<if test="ilbo_order_code                 neq null"> , ilbo_order_code                 = #{ilbo_order_code                } </if>
+    		<if test="ilbo_order_name                 neq null"> , ilbo_order_name                 = #{ilbo_order_name                } </if>
+    		<if test="ilbo_work_order_code                 neq null"> , ilbo_work_order_code                 = #{ilbo_work_order_code                } </if>
+    		<if test="ilbo_work_order_name                 neq null"> , ilbo_work_order_name                 = #{ilbo_work_order_name                } </if>
+    		<if test="ilbo_use_code                 neq null"> , ilbo_use_code                 = #{ilbo_use_code                } </if>
+    		<if test="ilbo_use_name                 neq null"> , ilbo_use_name                 = #{ilbo_use_name                } </if>
+    		<if test="ilbo_status_code                 neq null"> , ilbo_status_code                 = #{ilbo_status_code                } </if>
+    		<if test="ilbo_status_name                 neq null"> , ilbo_status_name                 = #{ilbo_status_name                } </if>
+    		<if test="ilbo_kind_code                  neq null"> , ilbo_kind_code                  = #{ilbo_kind_code                 } </if>
+    		<if test="ilbo_kind_name                  neq null"> , ilbo_kind_name                  = #{ilbo_kind_name                 } </if>
+    		<if test="ilbo_job_detail_code                  neq null"> , ilbo_job_detail_code                  = #{ilbo_job_detail_code                 } </if>
+    		<if test="ilbo_job_detail_name                  neq null"> , ilbo_job_detail_name                  = #{ilbo_job_detail_name                 } </if>
+    		<if test="ilbo_job_add_code                  neq null"> , ilbo_job_add_code                  = #{ilbo_job_add_code                 } </if>
+    		<if test="ilbo_job_add_name                  neq null"> , ilbo_job_add_name                  = #{ilbo_job_add_name                 } </if>
+    		<if test="ilbo_job_comment                neq null"> , ilbo_job_comment                = #{ilbo_job_comment               } </if>
+    		<if test="ilbo_chief_memo                neq null"> , ilbo_chief_memo                = #{ilbo_chief_memo               } </if>
+    		<if test="ilbo_worker_name                neq null"> , ilbo_worker_name                = FN_ENCRYPT(#{ilbo_worker_name}) </if>
+    		<if test="ilbo_worker_phone               neq null"> , ilbo_worker_phone               = FN_ENCRYPT(#{ilbo_worker_phone}) </if>
+    		<if test="ilbo_worker_addr                neq null"> , ilbo_worker_addr                = #{ilbo_worker_addr               } </if>
+    		<if test="ilbo_worker_latlng              neq null"> , ilbo_worker_latlng              = #{ilbo_worker_latlng             } </if>
+    		<if test="ilbo_worker_ilgaja_addr         neq null"> , ilbo_worker_ilgaja_addr         = #{ilbo_worker_ilgaja_addr        } </if>
+    		<if test="ilbo_worker_ilgaja_latlng       neq null"> , ilbo_worker_ilgaja_latlng       = #{ilbo_worker_ilgaja_latlng      } </if>
+    		<if test="ilbo_worker_jumin               neq null"> , ilbo_worker_jumin               = FN_ENCRYPT(#{ilbo_worker_jumin}) </if>
+    		<if test="ilbo_worker_job_code            neq null"> , ilbo_worker_job_code            = #{ilbo_worker_job_code           } </if>
+    		<if test="ilbo_worker_job_name            neq null"> , ilbo_worker_job_name            = #{ilbo_worker_job_name           } </if>
+    		<if test="ilbo_worker_barcode             neq null"> , ilbo_worker_barcode             = #{ilbo_worker_barcode            } </if>
+    		<if test="ilbo_worker_memo                neq null"> , ilbo_worker_memo                = #{ilbo_worker_memo               } </if>
+    		<if test="ilbo_worker_bank_code           neq null"> , ilbo_worker_bank_code           = #{ilbo_worker_bank_code          } </if>
+    		<if test="ilbo_worker_bank_name           neq null"> , ilbo_worker_bank_name           = #{ilbo_worker_bank_name          } </if>
+    		<if test="ilbo_worker_bank_account        neq null"> , ilbo_worker_bank_account        = FN_ENCRYPT(#{ilbo_worker_bank_account}) </if>
+    		<if test="ilbo_worker_bank_owner          neq null"> , ilbo_worker_bank_owner          = FN_ENCRYPT(#{ilbo_worker_bank_owner}) </if>
+    		<if test="ilbo_worker_feature             neq null"> , ilbo_worker_feature             = #{ilbo_worker_feature            } </if>
+    		<if test="ilbo_worker_blood_pressure      neq null"> , ilbo_worker_blood_pressure      = #{ilbo_worker_blood_pressure     } </if>
+    		<if test="ilbo_worker_OSH_yn              neq null"> , ilbo_worker_OSH_yn              = #{ilbo_worker_OSH_yn             } </if>
+		
+    		<if test="ilbo_worker_jumin_scan_yn       neq null"> , ilbo_worker_jumin_scan_yn       = #{ilbo_worker_jumin_scan_yn      } </if>
+    		<if test="ilbo_worker_bankbook_scan_yn    neq null"> , ilbo_worker_bankbook_scan_yn    = #{ilbo_worker_bankbook_scan_yn   } </if>
+    		<if test="ilbo_worker_OSH_scan_yn         neq null"> , ilbo_worker_OSH_scan_yn         = #{ilbo_worker_OSH_scan_yn        } </if>
+    		<if test="ilbo_worker_certificate_scan_yn neq null"> , ilbo_worker_certificate_scan_yn = #{ilbo_worker_certificate_scan_yn} </if>
+		
+    		<if test="ilbo_worker_app_status              neq null"> , ilbo_worker_app_status              = #{ilbo_worker_app_status             } </if>
+		
+    		<if test="ilbo_worker_reserve_push_status                neq null"> , ilbo_worker_reserve_push_status                = #{ilbo_worker_reserve_push_status               } </if>
+    		<if test="ilbo_worker_app_use_status                  neq null"> , ilbo_worker_app_use_status                  = #{ilbo_worker_app_use_status                 } </if>
+		
+    		<if test="ilbo_unit_price                 neq null"> , ilbo_unit_price                 = #{ilbo_unit_price                } </if>
+    		<if test="ilbo_gongsu                     neq null"> , ilbo_gongsu                     = #{ilbo_gongsu                    } </if>
+    		<if test="ilbo_fee                        neq null"> , ilbo_fee                        = #{ilbo_fee                       } </if>
+    		<if test="share_fee           			neq '' and share_fee  			neq null"> , share_fee= #{share_fee}</if>
+    		<if test="ilbo_extra_pay                  neq null"> , ilbo_extra_pay                  = #{ilbo_extra_pay                 } </if>
+    		<if test="counselor_fee                  neq null"> , counselor_fee                  = #{counselor_fee                 } </if>
+    		<if test="ilbo_deduction                  neq null"> , ilbo_deduction                  = #{ilbo_deduction                 } </if>
+    		<if test="ilbo_pay                        neq null"> , ilbo_pay                        = #{ilbo_pay                       } </if>
+    		<if test="ilbo_pay_code                   neq null"> 
+         		<if test="code_group                   eq '1'.toString()">
+					, ilbo_pay_time                   = NOW()                              
+         		</if>
+         		<if test="code_group                   eq '0'.toString()"> 
+              		, ilbo_pay_time                   = null                              
+         		</if>
+      			, ilbo_pay_code                   = #{ilbo_pay_code                  } 
+    		</if>
+    		<if test="ilbo_pay_name                   neq null"> , ilbo_pay_name                   = #{ilbo_pay_name                  } </if>
+	    
+    	
+    		<if test="ilbo_pay_memo                   neq null"> , ilbo_pay_memo                   = #{ilbo_pay_memo                  } </if>
+    		<if test="ilbo_income_code                neq null">
+	     		<if test="code_group                   eq '1'.toString()">
+	        		, ilbo_income_time                   = NOW()                              
+	        		</if>
+	        		<if test="code_group                   eq '0'.toString()"> 
+	            		, ilbo_income_time                   = null                              
+	        		</if>
+	     		, ilbo_income_code                = #{ilbo_income_code               } 
+    		</if>
+    		<if test="ilbo_income_name                neq null"> , ilbo_income_name                = #{ilbo_income_name               } </if>
+    		<if test="ilbo_income_memo                neq null"> , ilbo_income_memo                = #{ilbo_income_memo               } </if>
+    		<if test="ilbo_confirm                    neq null"> , ilbo_confirm                    = #{ilbo_confirm                   } </if>
+    		<if test="ilbo_memo                       neq null"> , ilbo_memo                       = #{ilbo_memo                      } </if>
+		
+    		<if test="ilbo_status                     neq null"> , ilbo_status                     = #{ilbo_status                    } </if>
+    		<if test="output_status_code              neq null"> 
+        		, output_status_code              = #{output_status_code             } 
+        		<if test="output_status_code  lt  '100012'"> ,ilbo_status =0 </if>
+    		</if>
+    		<if test="output_status_name              neq null"> , output_status_name              = #{output_status_name             } </if>
+    		<if test="ilbo_worker_status_code              neq null"> 
+        		, ilbo_worker_status_code              = #{ilbo_worker_status_code             } 
+        		<if test="ilbo_worker_status_code  lt  '100012'"> ,ilbo_status =0 </if>
+    		</if>
+    		<if test="ilbo_worker_status_name              neq null"> , ilbo_worker_status_name              = #{ilbo_worker_status_name             } </if>
+    		<if test="employer_rating neq null"> 
+    			, employer_rating = #{employer_rating }
+    			, evaluate_mod_date = NOW() 
+    		</if>
+    		<if test="manager_rating neq null"> 
+    			, manager_rating = #{manager_rating } 
+    			, evaluate_mod_date = NOW()
+    		</if>
+    		<if test="use_yn                          neq '' and use_yn                          neq null"> , use_yn                       = #{use_yn                         } </if>
+    		<if test="mod_admin                       neq '' and mod_admin                       neq null"> , mod_admin                    = #{mod_admin                      } </if>
+    		<if test="mod_output_date                 neq '' and mod_output_date                 neq null"> , mod_output_date              = NOW()</if>
+    		<if test="worker_owner                  neq '' and worker_owner         neq null"> , worker_owner       = #{worker_owner}</if>
+    		<if test="work_owner                    neq '' and work_owner           neq null"> , work_owner        	= #{work_owner}</if>
+    		<if test="worker_company_seq            neq '' and worker_company_seq   neq null"> , worker_company_seq = #{worker_company_seq}</if>
+    		<if test="worker_company_name           neq '' and worker_company_name  neq null"> , worker_company_name= #{worker_company_name}</if>
+    		<if test="work_company_seq            neq '' and work_company_seq   neq null"> , work_company_seq = #{work_company_seq}</if>
+    		<if test="work_company_name           neq '' and work_company_name  neq null"> , work_company_name= #{work_company_name}</if>
+    		<if test="manager_seq				neq '' and manager_seq neq null">, manager_seq = #{manager_seq}</if>
+    		<if test="manager_name				neq '' and manager_name neq null">, manager_name = FN_ENCRYPT(#{manager_name})</if>
+    		<if test="manager_phone				neq '' and manager_phone neq null">, manager_phone = FN_ENCRYPT(#{manager_phone})</if>
+    		<if test="fee_info neq null">, fee_info = #{fee_info}</if>
+    		<if test="pay_info neq null">, pay_info = #{pay_info}</if>
+    		<if test="work_fee neq null">
+    			, work_fee = #{work_fee }
+    		</if>
+    		<if test="worker_fee neq null">
+    			, worker_fee = #{worker_fee }
+    		</if>
+    		<if test="employer_seq eq '0'.toString()">
+    			, ilbo_unit_price = '0'
+    			, ilbo_kind_code = null, ilbo_kind_name = null, ilbo_job_detail_code = null, ilbo_job_detail_name = null, ilbo_job_add_code = null, ilbo_job_add_name = null
+    			, ilbo_income_code = null, ilbo_income_name = null 
+    			, ilbo_pay_code = null, ilbo_pay_name = null, ilbo_pay_time = null
+    			, ilbo_work_order_code = null, ilbo_work_order_name = null
+    			, ilbo_use_code = null, ilbo_use_name = null
+    			, ilbo_status_code = null, ilbo_status_name = null
+    			, ilbo_work_finish = null, ilbo_work_breaktime = null, ilbo_income_time = null, ilbo_fee = 0, share_fee = 0, counselor_fee =0
+    			, ilbo_deduction = 0, ilbo_pay = 0
+    			, labor_contract_seq = 0
+    			, receive_contract_seq = 0
+    			, sign_manager_seq = 0
+    		</if>
+    		<if test="labor_contract_seq neq null and labor_contract_seq neq ''">
+    			, labor_contract_seq = #{labor_contract_seq }
+    		</if>
+    		<if test="receive_contract_seq neq null and receive_contract_seq neq ''">
+				, receive_contract_seq = #{receive_contract_seq }    
+    		</if>
+    		<if test="ilbo_career_name neq null and ilbo_career_name neq ''">
+    			, ilbo_career_name = #{ilbo_career_name }
+    		</if>
+    		<if test="ilbo_career_name neq null and ilbo_career_name neq '' and ilbo_career_use_seq neq ''">
+    			, ilbo_career_use_seq = #{ilbo_career_use_seq }
+    		</if>
+	    	<if test="deductible_sum neq null and deductible_sum neq '' or output_status_code eq '0'.toString()">
+	    		<choose>
+	    			<when test="output_status_code eq '0'.toString()">
+	    				, deductible_sum = 0
+	    			</when>
+	    			<otherwise>
+			    		, deductible_sum = #{deductible_sum }
+	    			</otherwise>
+	    		</choose>
+	    	</if>
+	    	<if test="parking_option neq null and parking_option neq ''">
+	    		, parking_option = #{parking_option}
+	    	</if>
+	    	<if test="employer_detail neq null">
+	    		, employer_detail = #{employer_detail}
+	    	</if>
+	    	<if test="work_day neq null and work_day neq ''">
+	    		, work_day = #{work_day}
+	    	</if>
+	    	<if test="ilbo_worker_add_memo neq null">
+	    		, ilbo_worker_add_memo = #{ilbo_worker_add_memo}
+	    	</if>
+    	WHERE 
+    		ilbo_seq = #{ilbo_seq}
+
+  </update>
+  
+  	<insert id="copyIlboCell" parameterType="IlboDTO" useGeneratedKeys="true" keyProperty="ilbo_seq">
+		/* 일보정보 복사 ilbo.copyIlboCell */
+    	INSERT INTO ilbo (
+      		ilbo_date
+      		<if test="ilbo_assign_type	neq	'' and ilbo_assign_type	neq null"> 
+      			, ilbo_assign_type 
+      		</if>
+      		, company_seq
+      		, company_name
+      		, employer_seq
+      		, work_seq
+      		, ilbo_work_name
+      		, ilbo_work_arrival
+      		, ilbo_work_finish
+      		, ilbo_work_addr
+      		, work_sido
+      		, work_sigugun
+      		, work_dongmyun
+      		, work_rest
+      		, ilbo_work_latlng
+      		, ilbo_work_addr_comment
+      		, ilbo_work_breakfast_yn
+      		, ilbo_work_age_min
+      		, ilbo_work_age
+      		, ilbo_work_blood_pressure 
+      		, ilbo_work_manager_name
+      		, ilbo_work_manager_fax
+      		, ilbo_work_manager_phone
+      		, ilbo_work_manager_email
+      		, ilbo_order_code
+      		, ilbo_order_name
+      		, ilbo_use_code
+      		, ilbo_use_name
+      		, ilbo_status_code
+      		, ilbo_status_name
+      		, ilbo_kind_code
+      		, ilbo_kind_name
+      		, ilbo_job_detail_code
+      		, ilbo_job_detail_name
+      		, ilbo_job_add_code
+      		, ilbo_job_add_name
+      		, ilbo_job_comment
+      		, ilbo_chief_memo
+      		, ilbo_memo
+      		, work_company_seq
+      		, work_company_name
+      		, manager_seq
+      		, manager_name
+      		, manager_phone
+    		<choose>
+      			<when test="copy_worker eq 'Y'.toString()">
+      	 			, worker_seq
+      	 			, ilbo_worker_name
+      	 			, ilbo_worker_sex
+      	 			, ilbo_worker_phone
+      	 			, ilbo_worker_addr
+      	 			, ilbo_worker_latlng
+      	 			, ilbo_worker_jumin
+         			, ilbo_worker_job_code
+         			, ilbo_worker_job_name
+         			, ilbo_worker_barcode
+         			, ilbo_worker_memo
+         			, ilbo_worker_bank_code
+         			, ilbo_worker_bank_name
+         			, ilbo_worker_bank_account
+         			, ilbo_worker_bank_owner
+         			, ilbo_worker_feature
+         			, ilbo_worker_blood_pressure
+         			, ilbo_worker_OSH_yn
+         			, ilbo_worker_jumin_scan_yn
+         			, ilbo_worker_bankbook_scan_yn
+         			, ilbo_worker_OSH_scan_yn
+         			, ilbo_worker_certificate_scan_yn
+         			, ilbo_worker_app_status
+         			, ilbo_worker_reserve_push_status
+         			, ilbo_worker_app_use_status
+        			<if test="ilbo_status   eq '3'.toString() ">  
+        				, output_status_code    
+        				, output_status_name 	
+        				, ilbo_status     
+        			</if>
+        			, ilbo_worker_status_code
+        			, ilbo_worker_status_name
+        			, worker_company_seq
+        			, worker_company_name
+        			, ilbo_worker_add_memo
+      			</when>
+      			<otherwise>
+        			, ilbo_worker_name
+        			, worker_company_seq
+        			, worker_company_name
+      			</otherwise>
+    		</choose>
+      		, ilbo_work_order_code 
+      		, ilbo_work_order_name
+      		, ilbo_pay_code
+      		, ilbo_pay_name
+      		, ilbo_income_code
+      		, ilbo_income_name
+      		, ilbo_unit_price
+      		, ilbo_gongsu
+      		, ilbo_fee
+      		, share_fee
+      		, ilbo_extra_pay
+      		, counselor_fee
+      		, ilbo_deduction
+      		, ilbo_pay
+      		, reg_date
+      		, reg_admin
+      		, owner_id
+      		, mod_admin
+      		, mod_output_date
+      		, worker_owner
+      		, work_owner
+      		, fee_info
+      		, pay_info
+      		, work_fee
+      		, worker_fee
+      		, labor_contract_seq
+      		, receive_contract_seq
+      		, sign_manager_seq
+      		, ilbo_career_name
+      		, ilbo_career_use_seq
+      		, ilbo_work_breaktime
+      		, work_day
+      		, parking_option
+      		, employer_detail
+    	) 
+    	
+    	SELECT 
+        	#{to_ilbo_date} 
+        	<if test="ilbo_assign_type	neq	'' and ilbo_assign_type	neq null"> 
+        		, #{ilbo_assign_type} 
+        	</if>
+        	, i.company_seq  
+      		, i.company_name
+        	, i.employer_seq
+        	, i.work_seq 
+        	, ilbo_work_name
+        	, ilbo_work_arrival
+        	, ilbo_work_finish
+        	, ilbo_work_addr
+        	, i.work_sido
+        	, i.work_sigugun
+        	, i.work_dongmyun
+        	, i.work_rest,ilbo_work_latlng  
+        	, ilbo_work_addr_comment   
+        	, ilbo_work_breakfast_yn   
+        	, ilbo_work_age_min
+        	, ilbo_work_age    
+        	, ilbo_work_blood_pressure 
+        	, ilbo_work_manager_name   
+        	, ilbo_work_manager_fax    
+        	, ilbo_work_manager_phone
+        	, ilbo_work_manager_email 
+        	, '0'  
+        	, '' 
+        	, 'USE001'
+        	, '미공개'
+        	, ilbo_status_code
+        	, ilbo_status_name
+        	, ilbo_kind_code
+        	, ilbo_kind_name
+        	, ilbo_job_detail_code
+        	, ilbo_job_detail_name
+        	, ilbo_job_add_code
+        	, ilbo_job_add_name
+        	, ilbo_job_comment
+        	, ilbo_chief_memo 
+        	, #{ilbo_memo}
+        	, m.company_seq
+        	, (SELECT company_name FROM company WHERE company_seq = m.company_seq)
+        	<!-- , work_company_seq, work_company_name -->
+        	, i.manager_seq
+        	, m.manager_name
+        	, m.manager_phone
+        	<!-- , i.manager_seq, i.manager_name, i.manager_phone -->
+        	<choose>
+		        <when test="copy_worker eq 'Y'.toString()">
+	       	  		, i.worker_seq   
+	       	  		, w.worker_name  
+	       	  		, w.worker_sex   
+	       	  		, w.worker_phone 
+	       	  		, w.worker_addr  
+	       	  		, w.worker_latlng    
+	       	  		, w.worker_jumin
+	           		, w.worker_job_code  
+	           		, w.worker_job_name
+	           		, w.worker_barcode
+	           		, i.ilbo_worker_memo  
+	           		, w.worker_bank_code 
+	           		, w.worker_bank_name 
+	           		, w.worker_bank_account  
+	           		, w.worker_bank_owner    
+	           		, w.worker_feature
+	          		, w.worker_blood_pressure    
+	          		, w.worker_OSH_yn    
+	          		, w.worker_jumin_scan_yn 
+	          		, w.worker_bankbook_scan_yn  
+	          		, w.worker_OSH_scan_yn   
+	          		, w.worker_certificate_scan_yn
+	          		, w.worker_app_status    
+	          		, w.worker_reserve_push_status   
+	          		, w.worker_app_use_status    
+	          		<if test="ilbo_status   eq '3'.toString()"> 
+	          			,#{output_status_code} 
+	          			,(select code_name FROM code WHERE code_value = #{output_status_code}) AS output_status_name 
+	          			, #{ilbo_status} 
+	          		</if>
+	          		, '0' 
+	          		, ''
+          			, w.company_seq
+          			, (SELECT company_name FROM company WHERE company_seq = w.company_seq)
+          			, CONCAT(
+          				(
+						    CASE
+						      WHEN worker_rating = 6
+						      THEN 'A'
+						      WHEN worker_rating = 5
+						      THEN 'B'
+						      WHEN worker_rating = 4
+						      THEN 'C'
+						      WHEN worker_rating = 3
+						      THEN 'D'
+						      WHEN worker_rating = 2
+						      THEN 'E'
+						      WHEN worker_rating = 1
+						      THEN 'F'
+						      ELSE '미평가'
+						    END
+					  	), '/', IF(worker_blood_pressure = 0, '정상', worker_blood_pressure), '/', IF(worker_ilgaja_addr != '' || worker_ilgaja_addr IS NOT NULL, worker_ilgaja_addr, '없음'))
+	        	</when>
+        		<otherwise>
+	          		, '?'
+          			, worker_company_seq
+          			, worker_company_name
+          		</otherwise>
+        	</choose>
+        	<choose>
+	     		<when test="ilbo_work_order_code neq '' and ilbo_work_order_code  neq null">
+	        		, #{ilbo_work_order_code}
+	        		, #{ilbo_work_order_name}
+	        	</when>
+	        	<otherwise>
+	        		,'ORD001'
+	        		, '사무실'
+	        	</otherwise>
+	     	</choose>
+	     	, CASE 
+	     		WHEN e.employer_pay_code IS NULL OR e.employer_pay_code = '0' OR e.employer_pay_code = ''
+	     		THEN
+		          	CASE
+		                WHEN ilbo_pay_code = '200001' 
+		                THEN '200005' 
+		                WHEN ilbo_pay_code = '200002' 
+		                THEN '200006' 
+		                WHEN ilbo_pay_code = '200003' 
+		                THEN '200007' 
+		                WHEN ilbo_pay_code = '200004' 
+		                THEN '200008' 
+		                ELSE ilbo_pay_code
+		            END
+		        ELSE
+		        	e.employer_pay_code 
+            END AS ilbo_pay_code
+			, CASE
+				WHEN e.employer_pay_name IS NULL OR e.employer_pay_name = ''
+				THEN
+            		CASE
+                		WHEN ilbo_pay_code = '200001' 
+                		THEN (SELECT code_name FROM code WHERE code_value = '200005') 
+                		WHEN ilbo_pay_code = '200002' 
+                		THEN (SELECT code_name FROM code WHERE code_value = '200006') 
+                		WHEN ilbo_pay_code = '200003' 
+                		THEN (SELECT code_name FROM code WHERE code_value = '200007') 
+                		WHEN ilbo_pay_code = '200004' 
+                		THEN (SELECT code_name FROM code WHERE code_value = '200008') 
+                		WHEN ISNULL(ilbo_pay_code) THEN NULL
+	                	ELSE ilbo_pay_name 
+	                END
+                ELSE
+                	e.employer_pay_name
+            END AS ilbo_pay_name  
+            , CASE
+            	WHEN e.employer_income_code IS NULL OR e.employer_income_code = '0' OR e.employer_income_code = ''
+            	THEN
+            		CASE
+		                WHEN ilbo_income_code = '300001' 
+		                THEN '300006' 
+		                WHEN ilbo_income_code = '300002' 
+		                THEN '300007' 
+		                WHEN ilbo_income_code = '300003' 
+		                THEN '300008' 
+		                WHEN ilbo_income_code = '300004' 
+		                THEN '300009' 
+		                WHEN ilbo_income_code = '300005' 
+		                THEN '300010' 
+		                ELSE ilbo_income_code 
+					END
+				ELSE
+					e.employer_income_code
+            END AS ilbo_income_code   
+            , CASE 
+            	WHEN e.employer_income_name IS NULL OR e.employer_income_name = ''
+            	THEN
+            		CASE
+		                WHEN ilbo_income_code = '300001' 
+		                THEN (SELECT code_name FROM code WHERE code_value = '300006') 
+		                WHEN ilbo_income_code = '300002' 
+		                THEN (SELECT code_name FROM code WHERE code_value = '300007') 
+		                WHEN ilbo_income_code = '300003' 
+		                THEN (SELECT code_name FROM code WHERE code_value = '300008') 
+		                WHEN ilbo_income_code = '300004' 
+		                THEN (SELECT code_name FROM code WHERE code_value = '300009') 
+		                WHEN ilbo_income_code = '300005' 
+		                THEN (SELECT code_name FROM code WHERE code_value = '300010')
+		                WHEN ISNULL(ilbo_income_code) THEN NULL 
+		                ELSE ilbo_income_name
+					END
+				ELSE
+					e.employer_income_name
+            END AS ilbo_income_name
+          	, ilbo_unit_price
+          	, ilbo_gongsu
+          	, #{ilbo_fee}
+          	, #{share_fee}
+          	, ilbo_extra_pay 
+          	, #{counselor_fee}
+          	, ilbo_deduction
+          	, #{ilbo_pay}    
+            , NOW()
+            , #{reg_admin}
+            , i.owner_id
+            , #{reg_admin}
+            , NOW()
+            , i.worker_owner
+            , i.work_owner
+          	, #{fee_info}
+          	, #{pay_info}
+          	, #{work_fee }
+          	, #{worker_fee }
+          	, i.labor_contract_seq
+          	, i.receive_contract_seq
+          	, i.sign_manager_seq
+          	, i.ilbo_career_name
+          	, i.ilbo_career_use_seq
+          	, i.ilbo_work_breaktime
+          	, i.work_day
+      		, i.parking_option
+      		, i.employer_detail
+     	FROM 
+     		ilbo i
+     		LEFT JOIN worker w ON i.worker_seq = w.worker_seq
+    		LEFT JOIN WORK wk ON i.work_seq = wk.work_seq
+    		LEFT JOIN manager m ON i.manager_seq = m.manager_seq
+    		LEFT OUTER JOIN employer e ON i.employer_seq = e.employer_seq
+		WHERE 
+			1 = 1
+        	<choose>
+          		<when test="sel_ilbo_seq neq '' and sel_ilbo_seq neq null">
+              		AND ilbo_seq IN
+              			<foreach collection="sel_ilbo_seq" item="sel_seq" open="(" close=")" separator=", ">
+                			#{sel_seq}
+              			</foreach>
+          		</when>
+          		<otherwise>
+              		<if test="ilbo_seq neq '' and ilbo_seq neq null">  
+              			AND ilbo_seq = #{ilbo_seq}   
+              		</if>
+          		</otherwise>
+        	</choose>
+  	</insert>
+
+  <insert id="setICopyWorkerCell" parameterType="IlboDTO" useGeneratedKeys="true" keyProperty="ilbo_seq">
+    /* 근로자만 복사 ilbo.setWorkerToIlbo */
+    
+    INSERT INTO ilbo (
+      ilbo_date
+      <if test="ilbo_assign_type	neq	'' and ilbo_assign_type	neq null"> , ilbo_assign_type </if>
+      , employer_seq,  ilbo_order_code, ilbo_work_order_code, ilbo_use_code, ilbo_status_code, work_seq, ilbo_work_name,  ilbo_work_manager_phone
+    <choose>
+      <when test="copy_worker eq 'Y'.toString()">
+      ,company_seq
+      ,worker_seq, ilbo_worker_name, ilbo_worker_sex, ilbo_worker_phone, ilbo_worker_addr, ilbo_worker_latlng
+      , ilbo_worker_jumin, ilbo_worker_job_code, ilbo_worker_job_name, ilbo_worker_barcode, ilbo_worker_memo,
+      ilbo_worker_bank_code, ilbo_worker_bank_name, ilbo_worker_bank_account, ilbo_worker_bank_owner,
+      ilbo_worker_feature, ilbo_worker_blood_pressure, ilbo_worker_OSH_yn,
+      ilbo_worker_jumin_scan_yn, ilbo_worker_bankbook_scan_yn, ilbo_worker_OSH_scan_yn, ilbo_worker_certificate_scan_yn,
+      ilbo_worker_app_status, ilbo_worker_reserve_push_status, ilbo_worker_app_use_status
+      
+      <!-- ilbo_confirm,  -->
+      <if test="ilbo_status   eq '3'.toString() ">  
+      		, output_status_code,    output_status_name
+      		, ilbo_worker_status_code, ilbo_worker_status_name
+      		, ilbo_status     </if>
+        
+      </when>
+      <otherwise>
+        , ilbo_worker_name
+      </otherwise>
+    </choose>
+      ,reg_date, reg_admin, mod_admin, worker_owner
+    ) 
+    SELECT
+      #{to_ilbo_date}
+      <if test="ilbo_assign_type	neq	'' and ilbo_assign_type	neq null"> , #{ilbo_assign_type} </if>
+      , '0',  '500000', NULL,NULL,NULL, '0', '?',  '?'
+    <choose>
+      <when test="copy_worker eq 'Y'.toString()">
+        ,#{company_seq}
+        ,worker_seq, ilbo_worker_name, ilbo_worker_sex, ilbo_worker_phone, ilbo_worker_addr, ilbo_worker_latlng, ilbo_worker_jumin
+        ,ilbo_worker_job_code, ilbo_worker_job_name, ilbo_worker_barcode, ilbo_worker_memo
+        ,ilbo_worker_bank_code, ilbo_worker_bank_name, ilbo_worker_bank_account, ilbo_worker_bank_owner
+        ,ilbo_worker_feature, ilbo_worker_blood_pressure, ilbo_worker_OSH_yn
+        ,ilbo_worker_jumin_scan_yn, ilbo_worker_bankbook_scan_yn, ilbo_worker_OSH_scan_yn, ilbo_worker_certificate_scan_yn
+        ,ilbo_worker_app_status, ilbo_worker_reserve_push_status, ilbo_worker_app_use_status
+        
+        <if test="ilbo_status   eq '3'.toString()"> , #{output_status_code} ,(select code_name from code where code_value = #{output_status_code}) AS  output_status_name , #{ilbo_worker_status_code} ,#{ilbo_worker_status_name}, #{ilbo_status} </if>
+  
+      </when>
+      <otherwise>
+         , '?'
+      </otherwise>
+    </choose>
+      ,NOW(), #{reg_admin},  #{reg_admin},worker_owner
+    FROM ilbo
+    WHERE 1=1
+     <if test="sel_ilbo_seq   neq '' and sel_ilbo_seq   neq null">  
+        AND ilbo_seq IN
+        <foreach collection="sel_ilbo_seq" item="sel_seq"  open="(" close=")" separator=", ">
+          #{sel_seq}
+        </foreach> 
+    </if>
+    <if test="ilbo_seq   neq '' and ilbo_seq   neq null">  AND ilbo_seq = #{ilbo_seq}   </if>
+  </insert>
+ 
+	<insert id="addWorkToIlboCell" parameterType="IlboDTO" useGeneratedKeys="true" keyProperty="ilbo_seq">
+    	/* 현장관리에서 일보로 등록 ilbo.addWorkToIlboCell */
+    	INSERT INTO ilbo (
+      		ilbo_date
+      		, company_seq
+      		, company_name
+      		, worker_company_seq
+      		, worker_company_name
+      		, work_company_seq
+      		, work_company_name
+      		, manager_seq
+      		, manager_name
+      		, manager_phone
+      		, work_seq
+      		, employer_seq
+      		, ilbo_work_name
+      		, ilbo_work_arrival
+      		, ilbo_work_finish
+      		, ilbo_work_addr
+      		, work_sido
+      		, work_sigugun
+      		, work_dongmyun
+      		, work_rest
+      		, ilbo_work_latlng
+      		, ilbo_work_addr_comment
+      		, ilbo_work_breakfast_yn
+      		, ilbo_work_age_min
+      		, ilbo_work_age
+      		, ilbo_work_blood_pressure
+      		, ilbo_job_comment
+      		, ilbo_worker_name
+      		, ilbo_work_manager_name
+      		, ilbo_work_manager_phone
+      		<if test="owner_id neq '' and owner_id neq null">
+      			, owner_id
+      			, work_owner 
+      		</if> 
+      		, reg_date
+      		, reg_admin
+      		, mod_admin
+      		, mod_output_date
+      		, labor_contract_seq
+      		, receive_contract_seq
+      		, sign_manager_seq
+     	) 
+    		SELECT
+      			#{to_ilbo_date}
+      			, #{company_seq}
+      			, #{company_name}
+      			, #{worker_company_seq}
+      			, #{worker_company_name}
+      			, #{work_company_seq}
+      			, #{work_company_name}
+      			, #{manager_seq}
+      			, FN_ENCRYPT(#{manager_name})
+      			, FN_ENCRYPT(#{manager_phone})
+      			, work_seq
+      			, employer_seq
+      			, work_name AS ilbo_work_name
+      			, work_arrival AS ilbo_work_arrival
+      			, work_finish AS ilbo_work_finish
+      			, work_addr AS ilbo_work_addr
+      			, work_sido
+      			, work_sigugun
+      			, work_dongmyun
+      			, work_rest
+      			, work_latlng AS ilbo_work_latlng
+      			, work_addr_comment AS ilbo_work_addr_comment
+      			, work_breakfast_yn AS ilbo_work_breakfast_yn
+      			, work_age_min AS ilbo_work_age_min
+      			, work_age AS ilbo_work_age
+      			, work_blood_pressure AS ilbo_work_blood_pressure
+      			, work_memo AS ilbo_job_comment
+      			, '?'
+				<!--       , FN_ENCRYPT(#{manager_name}) -->
+				<!--       , FN_ENCRYPT(#{manager_phone}) -->
+				, work_manager_name
+				, work_manager_phone
+      			<if test="owner_id neq '' and owner_id neq null"> 
+      				, #{owner_id}
+      				, #{owner_id} 
+      			</if>
+      			, NOW()
+      			, #{reg_admin}
+      			, #{reg_admin}
+      			, NOW()
+      			, labor_contract_seq
+      			, receive_contract_seq
+				, #{sign_manager_seq } 
+    		FROM 
+    			work
+    		WHERE 
+    			work_seq = #{work_seq}
+    
+    <!-- 
+    <foreach collection="sel_work_seq" item="sel_seq"  open="(" close=")" separator=", ">
+      #{sel_seq}
+    </foreach> 
+     -->
+	</insert>
+
+  <insert id="addWorkerToIlboCell" parameterType="IlboDTO" useGeneratedKeys="true" keyProperty="ilbo_seq">
+    /* 구직자관리에서 일보로 등록 ilbo.addWorkerToIlboCell */
+<!--
+    INSERT INTO ilbo (
+      ilbo_date, company_seq, employer_seq, work_seq,
+      ilbo_work_name, ilbo_work_arrival, ilbo_work_addr, ilbo_work_latlng, ilbo_work_breakfast_yn, ilbo_work_age, ilbo_work_blood_pressure,
+      ilbo_work_manager_name, ilbo_work_manager_fax, ilbo_work_manager_phone, ilbo_work_manager_email,
+      ilbo_job_comment,
+      ilbo_worker_name,
+      reg_date, reg_admin, mod_admin
+    ) 
+    SELECT
+      #{to_ilbo_date}, company_seq, employer_seq, work_seq,
+      work_name AS ilbo_work_name, work_arrival AS ilbo_work_arrival, work_addr AS ilbo_work_addr, work_latlng AS ilbo_work_latlng, work_breakfast_yn AS ilbo_work_breakfast_yn, work_age AS ilbo_work_age, work_blood_pressure AS ilbo_work_blood_pressure,
+      work_manager_name AS ilbo_work_manager_name, work_manager_fax AS ilbo_work_manager_fax, work_manager_phone AS ilbo_work_manager_phone, work_manager_email AS ilbo_work_manager_email,
+      work_memo AS ilbo_job_comment,
+      '?',
+      now(), #{reg_admin}, #{reg_admin}
+    FROM work
+    WHERE work_seq IN
+    <foreach collection="sel_work_seq" item="sel_seq"  open="(" close=")" separator=", ">
+      #{sel_seq}
+    </foreach>
+-->
+  </insert>
+
+<!--
+  <delete id="removeIlboInfo" parameterType="IlboDTO">
+    /* 일보정보 삭제 ilbo.removeIlboInfo */
+    DELETE FROM ilbo
+    WHERE ilbo_seq = #{ilbo_seq}
+  </delete>
+-->
+
+  <insert id="addOrderToIlboCell" parameterType="IlboDTO" useGeneratedKeys="true" keyProperty="ilbo_seq">
+    /* 오더관리에서 일보로 등록 ilbo.addOrderToIlboCell*/
+       INSERT INTO ilbo SET
+       		ilbo_date = #{ilbo_date}
+			, company_seq = #{company_seq}
+			, company_name = (select company_name from company where company_seq = #{company_seq})
+			, employer_seq = #{employer_seq}
+			, work_seq = #{work_seq}
+			, order_work_seq = #{order_work_seq}
+			, ilbo_order_code = '500000'
+			, ilbo_order_name = '순서'
+			, ilbo_work_order_code = #{ilbo_work_order_code}
+			, ilbo_work_order_name = #{ilbo_work_order_name}
+			<if test="ilbo_use_code neq '' and ilbo_use_code neq null">, ilbo_use_code = #{ilbo_use_code} </if>
+			<if test="ilbo_use_name neq '' and ilbo_use_name neq null">, ilbo_use_name = #{ilbo_use_name} </if>
+			<if test="ilbo_status_code neq '' and ilbo_status_code neq null">, ilbo_status_code = #{ilbo_status_code }</if>
+			<if test="ilbo_status_name neq '' and ilbo_status_name neq null">, ilbo_status_name = #{ilbo_status_name }</if>
+			, ilbo_work_name = #{ilbo_work_name}
+			, ilbo_work_arrival = #{ilbo_work_arrival}                  
+			, ilbo_work_finish = #{ilbo_work_finish}
+			, ilbo_work_breaktime = #{ilbo_work_breaktime }
+			, ilbo_work_addr = #{ilbo_work_addr}
+			, work_sido = #{work_sido }
+			, work_sigugun = #{work_sigugun }
+			, work_dongmyun = #{work_dongmyun }
+			, work_rest = #{work_rest }
+			, ilbo_work_latlng = #{ilbo_work_latlng}
+			<if test="ilbo_work_age_min neq '' and ilbo_work_age_min neq null">, ilbo_work_age_min = #{ilbo_work_age_min} </if>
+			, ilbo_work_age = #{ilbo_work_age}
+			, ilbo_work_blood_pressure = #{ilbo_work_blood_pressure}
+			<if test="ilbo_work_breakfast_yn neq '' and ilbo_work_breakfast_yn neq null">, ilbo_work_breakfast_yn = #{ilbo_work_breakfast_yn} </if>
+			, ilbo_work_manager_name = FN_ENCRYPT(#{ilbo_work_manager_name})
+			, ilbo_work_manager_phone = FN_ENCRYPT(#{ilbo_work_manager_phone})
+			, ilbo_job_comment = #{ilbo_job_comment}
+			, ilbo_kind_code = #{ilbo_kind_code}
+			, ilbo_kind_name = #{ilbo_kind_name}
+			, ilbo_job_detail_code = #{ilbo_job_detail_code}
+			, ilbo_job_detail_name = #{ilbo_job_detail_name}
+			, ilbo_job_add_code = #{ilbo_job_add_code}
+			, ilbo_job_add_name = #{ilbo_job_add_name}
+			, ilbo_unit_price = #{ilbo_unit_price}
+			, ilbo_fee = #{ilbo_fee}
+			  <if test="share_fee neq '' and share_fee neq null"> ,share_fee = #{share_fee} </if>
+			, ilbo_pay = #{ilbo_pay}
+			, ilbo_income_code = #{ilbo_income_code}
+			, ilbo_income_name = #{ilbo_income_name}
+			, ilbo_pay_code = #{ilbo_pay_code}
+			, ilbo_pay_name = #{ilbo_pay_name}
+			, ilbo_worker_name = '?'
+			<if test="output_status_code neq '' and output_status_code neq null"> ,output_status_code = #{output_status_code}  </if>
+			<if test="output_status_name neq '' and output_status_name neq null"> ,output_status_name = #{output_status_name}  </if>
+			<if test="ilbo_worker_status_code neq '' and ilbo_worker_status_code neq null"> ,ilbo_worker_status_code = #{ilbo_worker_status_code}  </if>
+			<if test="ilbo_worker_status_name neq '' and ilbo_worker_status_name neq null"> ,ilbo_worker_status_name = #{ilbo_worker_status_name}  </if>
+			<if test="owner_id neq '' and owner_id neq null">
+				, owner_id = #{owner_id} 
+			</if>
+			<if test="work_owner neq '' and work_owner neq null">
+				, work_owner = #{work_owner }
+			</if>
+			, reg_date = NOW()
+			, reg_admin = #{reg_admin}
+			, mod_admin = #{reg_admin}
+			<if test="worker_company_seq neq '' and worker_company_seq neq null">, worker_company_seq = #{worker_company_seq}</if>
+			<if test="worker_company_name neq '' and worker_company_name neq null">, worker_company_name = #{worker_company_name}</if>
+			, manager_seq = #{manager_seq}
+			, manager_name = FN_ENCRYPT(#{manager_name})
+			, manager_phone = FN_ENCRYPT(#{manager_phone})
+			, work_company_seq = #{work_company_seq}
+			, work_company_name = (select company_name from company where company_seq = #{work_company_seq})
+			, fee_info = #{fee_info}
+			, pay_info = #{pay_info}
+			, work_fee = #{work_fee }
+			, worker_fee = #{worker_fee }
+			, labor_contract_seq = #{labor_contract_seq }
+			, receive_contract_seq = #{receive_contract_seq }
+			, sign_manager_seq = #{sign_manager_seq }
+			, ilbo_career_name = #{ilbo_career_name }
+			, ilbo_career_use_seq = #{ilbo_career_use_seq }
+			, counselor_fee = #{counselor_fee }
+      		<if test="work_day neq null and work_day neq ''">
+      			, work_day = #{work_day}
+      		</if>
+      		<if test="parking_option neq null and parking_option neq ''">
+      			, parking_option = #{parking_option}
+      		</if>
+      		<if test="employer_detail neq null and employer_detail neq ''">
+      			, employer_detail = #{employer_detail}
+      		</if>
+  </insert>
+ 
+  <update id="removeIlboInfo" parameterType="IlboDTO">
+    /* 일보정보 삭제 ilbo.removeIlboInfo */
+    UPDATE ilbo SET
+      use_yn = 0
+<!--       , deductible_sum = 0 -->
+      <if test="reg_admin neq '' and reg_admin neq null"> , mod_admin = #{reg_admin} </if> 
+    WHERE 1=1
+	<choose>
+		<when test="sel_ilbo_seq   neq '' and sel_ilbo_seq   neq null">
+			AND ilbo_seq IN
+			<foreach collection="sel_ilbo_seq" item="sel_seq" open="(" 	close=")" separator=", ">
+				#{sel_seq}
+			</foreach>
+		</when>
+		<otherwise>
+			AND ilbo_seq = #{ilbo_seq}
+		</otherwise>
+	</choose>
+  </update>
+
+  <select id="selectIlboInfo" parameterType="IlboDTO" resultType="IlboDTO">
+    /* ilbo_seq 정보 조회 selectIlboInfo ilbo.xml */
+    SELECT 
+		i.ilbo_seq
+		, FN_DECRYPT(i.ilbo_work_manager_name) as ilbo_work_manager_name
+		, FN_DECRYPT(i.ilbo_work_manager_phone) as ilbo_work_manager_phone
+		, FN_DECRYPT(i.ilbo_work_manager_email) as ilbo_work_manager_email
+		, FN_DECRYPT(i.ilbo_worker_name) as ilbo_worker_name
+		, FN_DECRYPT(i.ilbo_worker_phone) as ilbo_worker_phone
+		, FN_DECRYPT(i.ilbo_worker_jumin) as ilbo_worker_jumin
+		, FN_DECRYPT(i.ilbo_worker_bank_account) as ilbo_worker_bank_account
+		, FN_DECRYPT(i.ilbo_worker_bank_owner) as ilbo_worker_bank_owner
+		, i.ilbo_date, i.ilbo_assign_type, i.company_seq, i.employer_seq, i.work_seq, i.worker_seq, i.order_work_seq, i.ilbo_work_name, i.ilbo_work_arrival, i.ilbo_work_finish, i.ilbo_work_breaktime, i.ilbo_work_addr, i.ilbo_work_latlng, i.ilbo_work_addr_comment, i.ilbo_work_breakfast_yn, i.ilbo_work_age_min, i.ilbo_work_age, i.ilbo_work_blood_pressure, i.ilbo_work_manager_fax
+		, i.ilbo_order_code, i.ilbo_order_name, i.ilbo_work_order_code, i.ilbo_work_order_name, i.ilbo_status_code, i.ilbo_status_name, i.ilbo_use_code, i.ilbo_use_name
+		, i.ilbo_kind_code, i.ilbo_kind_name, i.ilbo_job_detail_code, i.ilbo_job_detail_name, i.ilbo_job_add_code, i.ilbo_job_add_name
+		, i.ilbo_job_comment, i.ilbo_chief_memo
+		, i.ilbo_worker_sex, i.ilbo_worker_addr, i.ilbo_worker_latlng, i.ilbo_worker_ilgaja_addr, i.ilbo_worker_ilgaja_latlng, i.ilbo_worker_status_code, i.ilbo_worker_status_name, i.ilbo_worker_job_code, i.ilbo_worker_job_name, i.ilbo_worker_barcode, i.ilbo_worker_memo, i.ilbo_worker_bank_code, i.ilbo_worker_bank_name, i.ilbo_worker_feature, i.ilbo_worker_blood_pressure
+		, i.ilbo_worker_OSH_yn, i.ilbo_worker_jumin_scan_yn, i.ilbo_worker_bankbook_scan_yn, i.ilbo_worker_OSH_scan_yn, i.ilbo_worker_certificate_scan_yn, i.ilbo_worker_app_status, i.ilbo_worker_reserve_push_status, i.ilbo_worker_app_use_status
+		, i.ilbo_unit_price, i.ilbo_gongsu, i.ilbo_fee, i.share_fee, i.ilbo_extra_pay, i.ilbo_deduction, i.counselor_fee, i.ilbo_pay
+		, i.ilbo_pay_code, i.ilbo_pay_name, i.ilbo_pay_time, i.ilbo_pay_memo, i.ilbo_income_code, i.ilbo_income_name, i.ilbo_income_time, i.ilbo_income_memo
+		, i.ilbo_confirm, i.ilbo_memo, i.ilbo_status, i.output_status_code, i.output_status_name
+		, i.employer_rating, i.manager_rating
+		, i.use_yn, i.reg_date, i.reg_admin, i.owner_id, i.mod_date, i.mod_admin, i.mod_output_date, i.worker_owner, i.work_owner
+		, i.worker_company_seq, i.worker_company_name
+		, i.work_company_seq, i.work_company_name 
+    	, (SELECT company_name FROM company WHERE company_seq = i.company_seq)  AS  company_name
+    	, (SELECT employer_name FROM employer WHERE employer_seq = i.employer_seq)  AS  employer_name
+    	, (SELECT manager_seq FROM work WHERE work_seq = i.work_seq)  AS  manager_seq
+    	, (SELECT FN_DECRYPT(manager_name) FROM work WHERE work_seq = i.work_seq)  AS  manager_name
+    	, (SELECT FN_DECRYPT(manager_phone) FROM work WHERE work_seq = i.work_seq)  AS  manager_phone
+    	, e.payment
+    	, e.limit_count AS limitCount
+    	, (CASE WHEN i.work_sigugun IS NULL OR i.work_sigugun = '' THEN CONCAT(i.work_sido, ' ', i.work_dongmyun) ELSE CONCAT(i.work_sigugun, ' ', i.work_dongmyun) END) AS work_skip_addr
+    	, i.labor_contract_seq
+    	, i.receive_contract_seq
+    FROM 
+    	ilbo i 
+		LEFT OUTER JOIN employer e ON i.employer_seq = e.employer_seq    	
+    WHERE 
+    	1 = 1
+    	<if test="ilbo_seq neq '' and ilbo_seq neq null"> AND ilbo_seq = #{ilbo_seq} </if>
+    	<if test="sel_ilbo_seq neq '' and sel_ilbo_seq neq null">
+    	 	AND ilbo_seq IN 
+    	 	<foreach collection="sel_ilbo_seq" item="sel_seq" open="("	close=")" separator=", ">
+				#{sel_seq}
+		 	</foreach> 
+    	</if>
+    	<if test="ilbo_date neq '' and ilbo_date neq null"> AND ilbo_date= #{ilbo_date} </if>
+    	<if test="output_status_code neq '' and output_status_code neq null"> AND output_status_code = #{output_status_code} </if>
+    	<if test="ilbo_worker_status_code neq '' and ilbo_worker_status_code neq null"> AND ilbo_worker_status_code = #{ilbo_worker_status_code} </if>
+    	<if test="worker_seq neq '' and worker_seq neq null"> AND worker_seq = #{worker_seq}  order by ilbo_seq desc limit 0,1 </if> <!-- ApiBranchController /getCrmInfo 에서만 호출된다. -->
+  	</select>
+  
+  
+   <update id="setIlboOutputStatus" parameterType="IlboDTO">
+    /* 수동푸쉬 ilbo.setIlboOutputStatus api 에서 setOutputCode 메소드에서 같이 사용됨 jjh 수정 */
+    UPDATE ilbo SET
+      mod_date = NOW(), mod_output_date=NOW()
+     
+    <if test="output_status_code   neq null and output_status_code   neq ''">
+           <if test="output_status_code   eq '100012' ">    , ilbo_status = 1 </if>
+        , output_status_code    = #{output_status_code   } 
+    </if>
+    <if test="output_status_name   neq null and output_status_name   neq ''"> , output_status_name    = #{output_status_name   } </if>
+    <if test="ilbo_worker_status_code   neq null and ilbo_worker_status_code   neq ''">
+           <if test="ilbo_worker_status_code   eq '100012' ">    , ilbo_status = 1 </if>
+        , ilbo_worker_status_code    = #{ilbo_worker_status_code   } 
+    </if>
+    <if test="ilbo_worker_status_name   neq null and ilbo_worker_status_name   neq ''"> , ilbo_worker_status_name    = #{ilbo_worker_status_name   } </if>
+    WHERE 
+    1=1
+    <choose>
+    	<when test="sel_ilbo_seq neq null">
+    		AND ilbo_seq IN
+		      <foreach collection="sel_ilbo_seq" item="sel_seq"  open="(" close=")" separator=", ">
+		        #{sel_seq}
+		      </foreach>
+    	</when>	
+		<otherwise>
+			AND ilbo_seq = #{ilbo_seq}
+		</otherwise>    	
+    </choose>
+  </update>
+  
+  <insert id="insertIlboWorker" parameterType="IlboDTO" useGeneratedKeys="true" keyProperty="ilbo_seq">
+	/* 구인자APP 에서 일가자 신청 -ilgaja APP에서 요청 ilbo.insertIlboWorker */
+
+	INSERT INTO ilbo (
+		ilbo_date,
+		ilbo_assign_type,
+		company_seq,
+		worker_seq,
+		ilbo_worker_name,
+		ilbo_worker_phone,
+		ilbo_worker_addr,
+		ilbo_worker_latlng,
+		ilbo_worker_ilgaja_addr,
+		ilbo_worker_ilgaja_latlng,
+		ilbo_worker_jumin,
+		ilbo_worker_job_code,
+		ilbo_worker_job_name,
+		ilbo_worker_barcode,
+		ilbo_worker_memo,
+		ilbo_worker_bank_code,
+		ilbo_worker_bank_name,
+		ilbo_worker_bank_account,
+		ilbo_worker_bank_owner,
+		ilbo_worker_bankbook_scan_yn,
+		ilbo_worker_feature,
+		ilbo_worker_blood_pressure,
+		ilbo_worker_OSH_yn,
+		ilbo_worker_jumin_scan_yn,
+		ilbo_worker_OSH_scan_yn,
+		ilbo_worker_app_status,
+		ilbo_worker_reserve_push_status,
+		ilbo_worker_app_use_status,
+		output_status_code,
+		output_status_name,
+		ilbo_worker_status_code,
+		ilbo_worker_status_name,
+		ilbo_status,
+		employer_seq,ilbo_order_code, ilbo_work_order_code, ilbo_use_code, ilbo_status_code, work_seq,ilbo_work_name,ilbo_work_manager_phone,
+		<if test="worker_company_seq   neq '' and worker_company_seq   neq null"> worker_company_seq,   </if>
+		<if test="worker_company_name   neq '' and worker_company_name   neq null"> worker_company_name,   </if>
+		<if test="work_company_seq   neq '' and work_company_seq   neq null"> work_company_seq,   </if>
+		<if test="work_company_name   neq '' and work_company_name   neq null"> work_company_name,   </if>
+		reg_date, 
+		reg_admin,
+		mod_admin,
+		mod_output_date
+	)VALUES(
+		#{ilbo_date},
+		#{ilbo_assign_type},
+		#{company_seq},
+		#{worker_seq},
+		FN_ENCRYPT(#{ilbo_worker_name}),
+		FN_ENCRYPT(#{ilbo_worker_phone}),
+		#{ilbo_worker_addr},
+		#{ilbo_worker_latlng},
+		#{ilbo_worker_ilgaja_addr},
+		#{ilbo_worker_ilgaja_latlng},
+		FN_ENCRYPT(#{ilbo_worker_jumin}),
+		#{ilbo_worker_job_code},
+		#{ilbo_worker_job_name},
+		#{ilbo_worker_barcode},
+		#{ilbo_worker_memo},
+		#{ilbo_worker_bank_code},
+		#{ilbo_worker_bank_name},
+		FN_ENCRYPT(#{ilbo_worker_bank_account}),
+		FN_ENCRYPT(#{ilbo_worker_bank_owner}),
+		#{ilbo_worker_bankbook_scan_yn},
+		#{ilbo_worker_feature},
+		#{ilbo_worker_blood_pressure},
+		#{ilbo_worker_OSH_yn},
+		#{ilbo_worker_jumin_scan_yn},
+		#{ilbo_worker_OSH_scan_yn},
+		#{ilbo_worker_app_status},
+		#{ilbo_worker_reserve_push_status},
+		#{ilbo_worker_app_use_status},
+		#{output_status_code},
+		#{output_status_name},
+		#{ilbo_worker_status_code},
+		#{ilbo_worker_status_name},
+		#{ilbo_status},
+		'0','500000',NULL,'USE001','0','0', '?', '?',
+		<if test="worker_company_seq   neq '' and worker_company_seq   neq null"> #{worker_company_seq},   </if>
+		<if test="worker_company_name   neq '' and worker_company_name   neq null"> #{worker_company_name},   </if>
+		<if test="work_company_seq   neq '' and work_company_seq   neq null"> #{work_company_seq},   </if>
+		<if test="work_company_name   neq '' and work_company_name   neq null"> #{work_company_name},   </if>
+		NOW(),
+		'worker', 
+		'worker',
+		NOW()
+	)
+   
+  </insert>
+
+	  <select id="selectSmsInfo" parameterType="IlboDTO" resultType="IlboDTO">
+	  	/* ilbo.xml selectSmsInfo */
+		SELECT c.company_name, e.employer_name, e.employer_feature AS ilbo_employer_feature,
+            
+            i.ilbo_seq
+			, FN_DECRYPT(i.ilbo_work_manager_name) as ilbo_work_manager_name
+			, FN_DECRYPT(i.ilbo_work_manager_phone) as ilbo_work_manager_phone
+			, FN_DECRYPT(i.ilbo_work_manager_email) as ilbo_work_manager_email
+			, FN_DECRYPT(i.ilbo_worker_name) as ilbo_worker_name
+			, FN_DECRYPT(i.ilbo_worker_phone) as ilbo_worker_phone
+			, FN_DECRYPT(i.ilbo_worker_jumin) as ilbo_worker_jumin
+			, FN_DECRYPT(i.ilbo_worker_bank_account) as ilbo_worker_bank_account
+			, FN_DECRYPT(i.ilbo_worker_bank_owner) as ilbo_worker_bank_owner
+			, i.ilbo_date, i.ilbo_assign_type, i.company_seq, i.employer_seq, i.work_seq, i.worker_seq, i.order_work_seq, i.ilbo_work_name, i.ilbo_work_arrival, i.ilbo_work_finish, i.ilbo_work_addr, i.ilbo_work_latlng, i.ilbo_work_addr_comment, i.ilbo_work_breakfast_yn, i.ilbo_work_age_min, i.ilbo_work_age, i.ilbo_work_blood_pressure, i.ilbo_work_manager_fax
+			, i. IFNULL(i.ilbo_order_code, '999999') AS ilbo_order_code, i.ilbo_order_name, i.ilbo_work_order_code, i.ilbo_work_order_name, i.ilbo_status_code, i.ilbo_status_name, i.ilbo_use_code, i.ilbo_use_name
+			, i.ilbo_kind_code, i.ilbo_kind_name, i.ilbo_job_detail_code, i.ilbo_job_detail_name, i.ilbo_job_add_code, i.ilbo_job_add_name
+			, i.ilbo_job_comment, i.ilbo_chief_memo
+			, i.ilbo_worker_sex, i.ilbo_worker_addr, i.ilbo_worker_latlng, i.ilbo_worker_ilgaja_addr, i.ilbo_worker_ilgaja_latlng, i.ilbo_worker_status_code, i.ilbo_worker_status_name, i.ilbo_worker_job_code, i.ilbo_worker_job_name, i.ilbo_worker_barcode, i.ilbo_worker_memo, i.ilbo_worker_bank_code, i.ilbo_worker_bank_name, i.ilbo_worker_feature, i.ilbo_worker_blood_pressure
+			, i.ilbo_worker_OSH_yn, i.ilbo_worker_jumin_scan_yn, i.ilbo_worker_bankbook_scan_yn, i.ilbo_worker_OSH_scan_yn, i.ilbo_worker_certificate_scan_yn, i.ilbo_worker_app_status, i.ilbo_worker_reserve_push_status, i.ilbo_worker_app_use_status
+			, i.ilbo_unit_price, i.ilbo_gongsu, i.ilbo_fee, i.share_fee, i.ilbo_extra_pay, i.ilbo_deduction, i.counselor_fee, i.ilbo_pay
+			, i.ilbo_pay_code, i.ilbo_pay_name, DATE_FORMAT(i.ilbo_pay_time, '%m-%d %H:%i') AS ilbo_pay_time, i.ilbo_pay_memo, i.ilbo_income_code, i.ilbo_income_name, DATE_FORMAT(i.ilbo_income_time, '%m-%d %H:%i') AS ilbo_income_time, i.ilbo_income_memo
+			, i.ilbo_confirm, i.ilbo_memo, i.ilbo_status, i.output_status_code, i.output_status_name
+			, i.employer_rating, i.manager_rating
+			, i.use_yn, i.reg_date, i.reg_admin, i.owner_id, i.mod_date, i.mod_admin, i.mod_output_date, i.worker_owner, i.work_owner
+			, i.worker_company_seq, i.worker_company_name 
+			, i.work_company_seq, i.work_company_name
+
+            , m.visit_type
+            , IFNULL(w.day_count, 0) AS day_count 
+            , t.evaluate_grade
+            , t.evaluate_comment
+            , t.seq
+            , FN_DECRYPT(w.manager_name) as manager_name
+            , FN_DECRYPT(w.manager_phone) as manager_phone
+            
+	    FROM ilbo i LEFT OUTER JOIN company c ON i.company_seq = c.company_seq
+	                LEFT OUTER JOIN employer e ON i.employer_seq = e.employer_seq
+	                LEFT OUTER JOIN work w ON i.work_seq = w.work_seq
+	                LEFT OUTER JOIN manager m ON w.manager_seq = m.manager_seq
+	                LEFT OUTER JOIN tbl_evaluate t ON i.ilbo_seq = t.ilbo_seq
+	    WHERE 1 = 1
+    		AND i.ilbo_seq = #{ilbo_seq}
+	</select>
+	
+	<select id="selectCode" parameterType="IlboDTO" resultType="CodeLogDTO">
+		/* ilbo.xml selectCode */
+		  SELECT 
+			  * 
+			FROM
+			  (SELECT 
+			    * 
+			  FROM
+			    tbl_code_log 
+			  WHERE (ilbo_seq, reg_date) IN 
+			    (SELECT 
+			      ilbo_seq,
+			      MAX(reg_date) AS reg_date 
+			    FROM
+			      tbl_code_log WHERE code_type = '100'
+			    GROUP BY ilbo_seq) 
+			  ORDER BY reg_date DESC) t 
+			GROUP BY t.ilbo_seq HAVING ilbo_seq = #{ilbo_seq}
+	</select>
+	
+	<insert id="insertIlbo" parameterType="IlboDTO" useGeneratedKeys="true" keyProperty="ilbo_seq">
+		/* ilbo.xml insertIlbo */
+		INSERT INTO ilbo (
+			ilbo_date,
+			company_seq,
+			employer_seq,
+			work_seq,
+			ilbo_work_name,
+			ilbo_work_arrival,
+			ilbo_work_finish,
+			ilbo_work_addr,
+			ilbo_work_latlng,
+			ilbo_work_breakfast_yn,
+			ilbo_work_age_min,
+			ilbo_work_age,
+			ilbo_work_blood_pressure,
+			ilbo_work_manager_name,
+			ilbo_work_manager_phone,
+			ilbo_worker_name,
+			reg_admin,
+			reg_date,
+			mod_admin,
+			mod_date,
+			work_owner
+		) VALUES (
+			#{ilbo_date },
+			#{company_seq },
+			#{employer_seq },
+			#{work_seq },
+			#{ilbo_work_name },
+			#{ilbo_work_arrival },
+			#{ilbo_work_finish },
+			#{ilbo_work_addr },
+			#{ilbo_work_latlng },
+			#{ilbo_work_breakfast_yn },
+			#{ilbo_work_age_min },
+			#{ilbo_work_age },
+			#{ilbo_work_blood_pressure },
+			FN_ENCRYPT(#{ilbo_work_manager_name}),
+			FN_ENCRYPT(#{ilbo_work_manager_phone}),
+			FN_ENCRYPT(#{ilbo_worker_name}),
+			#{reg_admin },
+			NOW(),
+			#{reg_admin },
+			NOW(),
+			#{work_owner }
+		) 	
+	</insert>
+	
+	<select id="selectCompanionList" parameterType="IlboDTO" resultType="IlboDTO">
+		/* 동반자 리스트 ilbo.xml selectCompanionList */
+		SELECT
+			i.ilbo_seq
+			, i.worker_company_name
+			, FN_DECRYPT(i.ilbo_worker_name) as ilbo_worker_name
+			, FN_DECRYPT(i.ilbo_worker_phone) as ilbo_worker_phone
+			, i.output_status_name
+			
+		FROM
+			ilbo i
+		WHERE 
+			1 = 1
+			AND i.ilbo_date = #{ilbo_date }
+			AND i.employer_seq = #{employer_seq }
+			AND i.work_seq = #{work_seq }
+<!-- 			AND i.ilbo_kind_code = #{ilbo_kind_code } -->
+			<!-- 
+			AND i.ilbo_job_detail_code = #{ilbo_job_detail_code }
+			AND i.ilbo_job_add_code = #{ilbo_job_add_code }
+			 -->
+<!-- 			 AND i.ilbo_status_code != 'STA008' -->
+			AND i.use_yn = '1'
+<!-- 			AND i.worker_seq != '0' -->
+<!-- 			AND i.worker_seq != #{worker_seq } -->
+			AND i.ilbo_status_code NOT IN ('STA007', 'STA009', 'STA008')
+	</select>
+	
+	
+  	<select id="getSelectIlboList" parameterType="IlboDTO" resultType="IlboDTO">
+    	/* 선택한 일보리스트 ilbo.getSelectIlboList  jjh */
+    	SELECT 
+			i.ilbo_seq
+			, FN_DECRYPT(i.ilbo_work_manager_name) as ilbo_work_manager_name
+			, FN_DECRYPT(i.ilbo_work_manager_phone) as ilbo_work_manager_phone
+			, FN_DECRYPT(i.ilbo_work_manager_email) as ilbo_work_manager_email
+			, FN_DECRYPT(i.ilbo_worker_name) as ilbo_worker_name
+			, FN_DECRYPT(i.ilbo_worker_phone) as ilbo_worker_phone
+			, FN_DECRYPT(i.ilbo_worker_jumin) as ilbo_worker_jumin
+			, FN_DECRYPT(i.ilbo_worker_bank_account) as ilbo_worker_bank_account
+			, FN_DECRYPT(i.ilbo_worker_bank_owner) as ilbo_worker_bank_owner
+			, i.ilbo_date, i.ilbo_assign_type, i.company_seq, i.employer_seq, i.work_seq, i.worker_seq, i.order_work_seq, i.ilbo_work_name, i.ilbo_work_arrival, i.ilbo_work_finish, i.ilbo_work_breaktime, i.ilbo_work_addr, i.ilbo_work_latlng, i.ilbo_work_addr_comment, i.ilbo_work_breakfast_yn, i.ilbo_work_age_min, i.ilbo_work_age, i.ilbo_work_blood_pressure, i.ilbo_work_manager_fax
+			, i.ilbo_order_code, i.ilbo_order_name, i.ilbo_work_order_code, i.ilbo_work_order_name, i.ilbo_status_code, i.ilbo_status_name, i.ilbo_use_code, i.ilbo_use_name
+			, i.ilbo_kind_code, i.ilbo_kind_name, i.ilbo_job_detail_code, i.ilbo_job_detail_name, i.ilbo_job_add_code, i.ilbo_job_add_name
+			, i.ilbo_job_comment, i.ilbo_chief_memo
+			, i.ilbo_worker_sex, i.ilbo_worker_addr, i.ilbo_worker_latlng, i.ilbo_worker_ilgaja_addr, i.ilbo_worker_ilgaja_latlng, i.ilbo_worker_status_code, i.ilbo_worker_status_name, i.ilbo_worker_job_code, i.ilbo_worker_job_name, i.ilbo_worker_barcode, i.ilbo_worker_memo, i.ilbo_worker_bank_code, i.ilbo_worker_bank_name, i.ilbo_worker_feature, i.ilbo_worker_blood_pressure
+			, i.ilbo_worker_OSH_yn, i.ilbo_worker_jumin_scan_yn, i.ilbo_worker_bankbook_scan_yn, i.ilbo_worker_OSH_scan_yn, i.ilbo_worker_certificate_scan_yn, i.ilbo_worker_app_status, i.ilbo_worker_reserve_push_status, i.ilbo_worker_app_use_status
+			, i.ilbo_unit_price, i.ilbo_gongsu, i.ilbo_fee, i.share_fee, i.ilbo_extra_pay, i.ilbo_deduction, i.counselor_fee, i.ilbo_pay
+			, i.ilbo_pay_code, i.ilbo_pay_name, i.ilbo_pay_time, i.ilbo_pay_memo, i.ilbo_income_code, i.ilbo_income_name, i.ilbo_income_time, i.ilbo_income_memo
+			, i.ilbo_confirm, i.ilbo_memo, i.ilbo_status, i.output_status_code, i.output_status_name
+			, i.employer_rating, i.manager_rating
+			, i.use_yn, i.reg_date, i.reg_admin, i.owner_id, i.mod_date, i.mod_admin, i.mod_output_date, i.worker_owner, i.work_owner
+			, i.worker_company_seq, i.worker_company_name
+			, i.work_company_seq, i.work_company_name
+			, e.limit_count
+			, (SELECT work_limit_count FROM tbl_ilbo_work_option LIMIT 0, 1) AS work_limit_count
+			, (SELECT employer_limit_count FROM tbl_ilbo_work_option LIMIT 0, 1) AS employer_limit_count
+			, CASE
+    			WHEN e.limit_count = 1
+    			THEN
+    				(SELECT
+      					COUNT(*)
+    				FROM
+      					ilbo
+    				WHERE 
+    					worker_seq = i.worker_seq
+      					AND employer_seq = i.employer_seq
+      					AND ilbo_date <![CDATA[ <= ]]> i.ilbo_date 
+      					AND ilbo_date <![CDATA[ >= ]]> DATE_SUB(i.ilbo_date, INTERVAL 31 DAY)
+      					AND output_status_code IN ('100005', '100003', '100014', '100015'))
+    			WHEN e.limit_count = 2
+    			THEN
+    				(SELECT
+      					COUNT(*)
+    				FROM
+      					ilbo
+    				WHERE 
+    					worker_seq = i.worker_seq
+      					AND work_seq = i.work_seq
+      					AND ilbo_date <![CDATA[ <= ]]> i.ilbo_date 
+      					AND ilbo_date <![CDATA[ >= ]]> DATE_SUB(i.ilbo_date, INTERVAL 31 DAY)
+      					AND output_status_code IN ('100005', '100003', '100014', '100015'))
+    			ELSE 0
+  			END AS worker_limit_count
+    	FROM ilbo i
+    	LEFT OUTER JOIN employer e ON i.employer_seq = e.employer_seq
+    	WHERE 
+     	<choose>
+          	<when test="sel_ilbo_seq   neq '' and sel_ilbo_seq   neq null">
+              	i.ilbo_seq IN
+              	<foreach collection="sel_ilbo_seq" item="sel_seq"  open="(" close=")" separator=", ">
+	                #{sel_seq}
+              	</foreach>
+          	</when>
+          	<otherwise>
+              	i.ilbo_seq = #{ilbo_seq}
+          	</otherwise>
+        </choose>
+  	</select>
+  
+  	<select id="selectLimitList" parameterType="IlboDTO" resultType="IlboDTO">
+  		SELECT
+  		  ilbo_date,
+  		  work_seq,
+  		  worker_seq,
+  		  employer_seq
+  		FROM
+  		  ilbo
+  		WHERE
+  		  worker_seq = #{worker_seq }
+  		  AND output_status_code IN ('100005', '100003', '100014', '100015')
+  		  AND ilbo_date >= DATE_SUB(#{ilbo_date }, INTERVAL 31 DAY)
+  		  AND ilbo_date <![CDATA[ <= ]]> DATE_ADD(#{ilbo_date }, INTERVAL 31 DAY)
+  	</select>
+  
+    <select id="getOutputStatusSum" parameterType="IlboDTO" resultType="OutputDTO">
+    	/* 실시간 출역현황 ilbo.getOutputStatusSum  jjh */
+    	SELECT
+		 IFNULL(SUM(CASE WHEN output_status_code = '100002' THEN 1 WHEN output_status_code = '100020' THEN 1  ELSE 0 END), 0) AS readySum
+		 ,IFNULL(SUM(CASE WHEN output_status_code = '100005' THEN 1 ELSE 0 END), 0) AS reserveSum
+		 ,IFNULL(SUM(CASE WHEN output_status_code = '100003' THEN 1 ELSE 0 END), 0) AS startSum
+		 ,IFNULL(SUM(CASE WHEN output_status_code = '100014' THEN 1 ELSE 0 END), 0) AS arriveSum
+		 ,IFNULL(SUM(CASE WHEN output_status_code = '100015' THEN 1 ELSE 0 END), 0) AS complteSum
+		 ,IFNULL(SUM(CASE WHEN output_status_code = '100010' THEN 1 ELSE 0 END), 0) AS zzemSum
+		 ,IFNULL(SUM(CASE WHEN output_status_code = '100009' THEN 1 ELSE 0 END), 0) AS punkSum
+		 ,IFNULL(SUM(CASE WHEN output_status_code = '100008' THEN 1 ELSE 0 END), 0) AS daemaSum
+	FROM ilbo 
+	WHERE use_yn =1  
+		AND ilbo_date = #{ilbo_date} 
+		<if test="company_seq     neq '' 	and 	company_seq	neq null">AND worker_company_seq = #{company_seq}</if>
+
+  	</select>
+  
+   	<select id="getAssignWorkSum" parameterType="IlboDTO" resultType="StatusSumDTO">
+    	/* 실시간 배정현장 현황 ilbo.getAssignWorkSum  jjh */
+    	SELECT 
+			COUNT(ilbo_seq) AS assignWorkSum
+			, IFNULL(SUM(CASE WHEN ilbo_status_code ='STA008' THEN 1 ELSE 0 END), 0) AS assignCancelSum
+			, IFNULL(SUM(CASE WHEN ilbo_status_code ='STA007' THEN 1 ELSE 0 END), 0) AS assignPuseSum
+			, IFNULL(SUM(CASE WHEN ilbo_status_code ='STA009' THEN 1 ELSE 0 END), 0) AS assignMemoSum
+		FROM 
+			ilbo 
+		WHERE 
+			use_yn = 1
+			AND work_seq > 0
+			AND worker_seq > 0
+			AND ilbo_date = #{ilbo_date} 
+			<if test="company_seq neq '' and company_seq neq null">
+				AND worker_company_seq = #{company_seq}
+			</if>
+  	</select>
+  
+  	<select id="getNotAssignWorkSum" parameterType="IlboDTO" resultType="StatusSumDTO">
+    	/* 실시간 배정현장 현황 ilbo.getAssignWorkSum  jjh */
+    	SELECT 
+			COUNT(ilbo_seq) AS workSum
+			, IFNULL(SUM(CASE WHEN ilbo_status_code ='STA008' THEN 1 ELSE 0 END), 0) AS cancelSum
+			, IFNULL(SUM(CASE WHEN ilbo_status_code ='STA007' THEN 1 ELSE 0 END), 0) AS puseSum
+			, IFNULL(SUM(CASE WHEN ilbo_status_code ='STA009' THEN 1 ELSE 0 END), 0) AS memoSum
+		FROM 
+			ilbo 
+		WHERE 
+			use_yn = 1
+			AND work_seq > 0
+			AND worker_seq = 0
+			AND ilbo_date = #{ilbo_date} 
+			<if test="company_seq neq '' and company_seq neq null">
+				AND worker_company_seq = #{company_seq}
+			</if>
+  	</select>
+  	<select id="selectWebPushIlboInfo" parameterType="IlboDTO" resultType="IlboDTO">
+  	/* Web Push 클릭 후 휴대폰번호로 일보정보 가져오기  selectWebPushIlboInfo  */
+  	WITH tbl_dummy AS 
+    	(SELECT 
+    		FN_ENCRYPT(#{manager_phone }) AS managerPhone
+    	)
+  	SELECT
+  		ilbo_seq
+  		, i.work_seq
+  		, i.employer_seq
+  		, m.manager_type
+  	FROM
+  		ilbo i
+  		LEFT JOIN manager m
+  		ON i.manager_seq = m.manager_seq
+  	WHERE
+  		i.use_yn = 1
+  		AND (
+		    i.manager_phone = (SELECT managerPhone FROM tbl_dummy) 
+		    OR ilbo_work_manager_phone = (SELECT managerPhone FROM tbl_dummy)
+		)
+		AND ilbo_date <![CDATA[ >= ]]> DATE_ADD(NOW(), INTERVAL -3 MONTH)
+	ORDER BY ilbo_date DESC
+	LIMIT 0,1	
+  	</select>
+  	<select id="selectManagerPhoneInfo" parameterType="IlboDTO" resultType="IlboDTO">
+	  	/* Web Push 클릭 후 매니저 휴대폰번호로 일보정보 가져오기  selectManagerPhoneInfo  */
+	  	WITH tbl_dummy AS 
+	    	(SELECT 
+	    		FN_ENCRYPT(#{manager_phone }) AS managerPhone
+	    	)
+	  	SELECT
+	  		ilbo_seq
+	  		, work_seq
+	  		, ilbo_date
+	  	FROM
+	  		ilbo
+	  	WHERE
+	  		use_yn = 1
+			AND ilbo_date <![CDATA[ >= ]]> DATE_ADD(NOW(), INTERVAL -3 MONTH)
+			AND manager_phone = (SELECT managerPhone FROM tbl_dummy)
+		ORDER BY ilbo_date DESC
+		LIMIT 0,1	
+  	</select>
+  	<select id="selectWorkManagerPhoneInfo" parameterType="IlboDTO" resultType="IlboDTO">
+	  	/* Web Push 클릭 후 현장담당자 휴대폰번호로 일보정보 가져오기  selectWorkManagerPhoneInfo  */
+	  	WITH tbl_dummy AS 
+	    	(SELECT 
+	    		FN_ENCRYPT(#{manager_phone }) AS workManagerPhone
+	    	)
+	  	SELECT
+	  		ilbo_seq
+	  		, work_seq
+	  		, ilbo_date
+	  	FROM
+	  		ilbo
+	  	WHERE
+	  		use_yn = 1
+	  		AND ilbo_date <![CDATA[ >= ]]> DATE_ADD(NOW(), INTERVAL -3 MONTH)
+	  		AND ilbo_work_manager_phone = (SELECT workManagerPhone FROM tbl_dummy) 
+		ORDER BY ilbo_date DESC
+		LIMIT 0,1	
+  	</select>
+  	
+  	<select id="selectIlboResetList" parameterType="IlboDTO" resultType="IlboDTO">
+  		SELECT
+  			ilbo_seq
+  			, worker_seq
+  			, worker_company_seq
+  			, work_seq
+  			, work_company_seq
+  		FROM
+  			ilbo
+  		WHERE
+  			<choose>
+          		<when test="sel_ilbo_seq   neq '' and sel_ilbo_seq   neq null">
+              		ilbo_seq IN
+              		<foreach collection="sel_ilbo_seq" item="sel_seq"  open="(" close=")" separator=", ">
+                		#{sel_seq}
+              		</foreach>
+          		</when>
+          		
+          		<otherwise>
+              		ilbo_seq = #{ilbo_seq}
+          		</otherwise>
+        	</choose>
+  	</select>
+  	
+  	<select id="selectIlboPriceInfo" parameterType="IlboDTO" resultType="IlboDTO">
+  		SELECT
+  			ilbo_seq
+  			, worker_company_seq
+  			, work_company_seq
+  			, ilbo_unit_price
+  			, ilbo_fee
+  			, share_fee
+  			, ilbo_pay
+  			, counselor_fee
+  			, fee_info
+  			, pay_info
+  			, ilbo_kind_code
+  			, j.job_work_fee
+  			, j.job_worker_fee
+  			, IFNULL(
+    			(SELECT	counselor_rate FROM	admin WHERE admin_id = work_owner), 0
+  			) AS counselor_rate
+  		FROM
+  			ilbo i
+  			LEFT JOIN tbl_job j
+  			ON i.ilbo_kind_code = j.job_seq
+  		WHERE
+  			ilbo_seq = #{ilbo_seq}		
+  	</select>
+  	
+  	<select id="selectIlboSignInfo" parameterType="IlboDTO" resultType="IlboDTO">
+  		SELECT
+  			CASE
+    			WHEN
+    				lm.work_sign_flag = 1
+    			THEN 1
+    			WHEN
+    				lm.worker_sign_flag = 1
+    			THEN 2
+    			ELSE 0
+  			END AS labor_contract
+  		FROM
+  			ilbo i
+			LEFT OUTER JOIN tbl_sign_management lm ON i.ilbo_seq = lm.ilbo_seq AND i.labor_contract_seq = lm.contract_seq
+  		WHERE
+  			i.ilbo_seq = #{ilbo_seq }
+  	</select>
+  	
+  	<insert id="insertIlboDeduction" parameterType="IlboDeductionDTO">
+  		/* 공제액 상태값 변경 insertIlboDeduction ilbo.xml */
+        INSERT INTO tbl_ilbo_deduction_status (
+  			ilbo_seq
+  			, deduction_status
+  			, reg_date
+  			, reg_admin
+  			, mod_date
+  			, mod_admin
+  		) VALUES 
+  		<choose>
+  			<when test="sel_ilbo_seq neq null and sel_ilbo_seq neq ''">
+				<foreach item="item" index="index" separator="," collection="sel_ilbo_seq">
+		  			(
+			  			#{item }
+			  			, #{deduction_status }
+			  			, NOW()
+			  			, #{reg_admin }
+			  			, NOW()
+			  			, #{reg_admin }
+			  		)
+		  		</foreach>  			
+  			</when>
+  			<otherwise>
+  				(
+		  			#{ilbo_seq }
+		  			, #{deduction_status }
+		  			, NOW()
+		  			, #{reg_admin }
+		  			, NOW()
+		  			, #{reg_admin }
+		  		)
+  			</otherwise>
+  		</choose>
+  		ON DUPLICATE KEY UPDATE deduction_status = #{deduction_status }, mod_date = NOW(), mod_admin = #{reg_admin }
+  	</insert>
+  	
+  	<update id="updateIlboDeduction" parameterType="IlboDeductionDTO">
+  		UPDATE
+  			tbl_ilbo_deduction_status
+  		SET
+  			deduction_status = #{deduction_status }
+  		WHERE
+  			<choose>
+  				<when test="deduction_seq neq null and deduction_seq neq ''">
+  					deduction_seq = #{deduction_seq }		
+  				</when>
+  				<otherwise>
+  					ilbo_seq = #{ilbo_seq }
+  				</otherwise>
+  			</choose>
+  			
+  	</update>
+  	
+  	<insert id="insertDeductible" parameterType="IlboDeductibleDTO">
+  		/* 공제액 insertDeductible ilbo.xml */
+  		INSERT INTO tbl_ilbo_deductible (
+  			ilbo_seq
+  			, income_tax_price
+  			, local_tax_price
+  			, employer_insurance_price
+  			, national_pension_price
+  			, health_insurance_price
+  			, care_insurance_price
+  			, use_yn
+  			, reg_date
+  			, reg_admin
+  		) VALUES (
+			#{ilbo_seq }
+ 			, #{income_tax_price }
+ 			, #{local_tax_price }
+ 			, #{employer_insurance_price }
+ 			, #{national_pension_price }
+ 			, #{health_insurance_price }
+ 			, #{care_insurance_price }
+ 			, '1'
+ 			, NOW()
+ 			, #{reg_admin }
+  		) 
+  		ON DUPLICATE KEY 
+  			UPDATE 
+  				income_tax_price = #{income_tax_price }
+  				, local_tax_price = #{local_tax_price }
+  				, employer_insurance_price = #{employer_insurance_price }
+  				, national_pension_price = #{national_pension_price }
+  				, health_insurance_price = #{health_insurance_price }
+  				, care_insurance_price = #{care_insurance_price } 
+  	</insert> 
+  	
+  	<insert id="insertAutoIlboStatusLog" parameterType="IlboDTO">
+  		INSERT INTO tbl_auto_ilbo_log (
+  			ilbo_seq
+  			, auto_status
+  			, auto_status_name
+  			<if test="auto_send_worker_count neq null">
+  				, auto_send_worker_count
+  			</if>
+  			, reg_date
+  			, reg_admin
+  		) VALUES (
+  			#{ilbo_seq }
+  			, #{auto_status }
+  			, #{auto_status_name }
+  			<if test="auto_send_worker_count neq null">
+  				, #{auto_send_worker_count}
+  			</if>
+  			, NOW()
+  			, #{reg_admin }
+  		)
+  	</insert>
+  	
+  	<insert id="setAutoIlbo" parameterType="IlboDTO">
+  		INSERT INTO tbl_auto_ilbo (
+			ilbo_seq
+			, auto_status
+			, reg_date
+			, reg_admin  		
+  		) VALUES (
+  			#{ilbo_seq }
+  			, #{auto_status }
+  			, NOW()
+  			, #{reg_admin }
+  		) ON DUPLICATE KEY UPDATE 
+  			auto_status = #{auto_status }
+  	</insert>
+</mapper>
+
+

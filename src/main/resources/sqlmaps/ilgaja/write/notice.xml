@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.NoticeMapper">
+	<select id="selectListCnt" parameterType="NoticeDTO" resultType="int">
+	/* 게시판 리스트 개수 */
+	SELECT
+		COUNT(notice_seq) AS cnt
+	FROM 
+		tbl_notice
+	WHERE 
+		1 = 1
+		<if test="main_view_yn neq '' and main_view_yn neq null">
+			AND main_view_yn = #{main_view_yn}
+		</if>
+		<if test="main_start_date neq '' and main_start_date neq null">
+			AND main_start_date <![CDATA[ <= ]]> #{main_start_date}
+		</if>
+		<if test="main_end_date neq '' and main_end_date neq null">
+			AND main_end_date <![CDATA[ >= ]]> #{main_end_date}
+		</if>
+		AND del_yn = '0'
+		<if test="use_yn neq '' and use_yn neq null">
+			AND use_yn = #{use_yn}		
+		</if>
+		<if test="searchKey neq '' and searchKey neq null and searchValue neq '' and searchValue neq null">
+			AND ${searchKey } LIKE CONCAT('%', #{searchValue }, '%')
+		</if>
+		<if test="searchKey eq '' or searchKey eq null and searchValue neq '' and searchValue neq null">
+			AND (notice_title LIKE CONCAT('%', #{searchValue }, '%') 
+			OR notice_contents LIKE CONCAT('%', #{searchValue }, '%') 
+			OR notice_writer LIKE CONCAT('%', #{searchValue }, '%'))
+		</if>
+		<if test="startDate neq '' and startDate neq null">	
+			AND DATE_FORMAT(reg_date, "%Y-%m-%d") <![CDATA[>=]]>  #{startDate}	AND DATE_FORMAT(reg_date, "%Y-%m-%d") <![CDATA[<=]]>  #{endDate}	
+		</if>
+		<if test="auth_view neq '' and auth_view neq null and auth_view neq '0'.toString()">
+			AND (auth_view = #{auth_view } OR auth_view = '0')
+		</if>
+		<if test="notice_seq neq '' and notice_seq neq null">
+			AND notice_seq = #{notice_seq }
+		</if>
+		<if test="adminLevel eq null or adminLevel eq '' or adminLevel neq '0'.toString()">
+			<if test="auth_company_seq neq '' and auth_company_seq neq null">
+				AND (auth_company_seq = #{auth_company_seq } OR auth_company_seq = '0')
+			</if>
+		</if>
+	</select>
+	
+	<select id="selectList" parameterType="NoticeDTO" resultType="NoticeDTO">
+		/* 게시판 리스트 */
+		SELECT
+			A.notice_seq,
+			A.company_seq,
+			A.notice_title,
+			A.notice_contents,
+			A.notice_writer,
+			A.view_cnt,
+			A.reply_cnt,
+			A.use_yn,
+			A.del_yn,
+			A.main_view_yn,
+			A.main_start_date,
+			A.main_end_date,
+			A.reg_date,
+			A.reg_admin,
+			A.mod_date,
+			A.mod_admin,
+			A.auth_view,
+			A.auth_company_seq,
+			IFNULL(B.company_name, '전체') AS auth_company_name,
+			A.writer_auth
+		FROM
+			tbl_notice A
+			LEFT OUTER JOIN company B
+			ON A.auth_company_seq = B.company_seq
+		WHERE 
+			1 = 1
+			<if test="main_view_yn neq '' and main_view_yn neq null">
+				AND main_view_yn = #{main_view_yn}
+			</if>
+			<if test="main_start_date neq '' and main_start_date neq null">
+				AND main_start_date <![CDATA[ <= ]]> #{main_start_date}
+			</if>
+			<if test="main_end_date neq '' and main_end_date neq null">
+				AND main_end_date <![CDATA[ >= ]]> #{main_end_date}
+			</if>
+				AND A.del_yn = '0'		
+			<if test="use_yn neq '' and use_yn neq null">
+				AND A.use_yn = #{use_yn}		
+			</if>
+			<if test="searchKey neq '' and searchKey neq null and searchValue neq '' and searchValue neq null">
+				AND ${searchKey } LIKE CONCAT('%', #{searchValue }, '%')
+			</if>
+			<if test="searchKey eq '' or searchKey eq null and searchValue neq '' and searchValue neq null">
+				AND (A.notice_title LIKE CONCAT('%', #{searchValue }, '%') 
+				OR A.notice_contents LIKE CONCAT('%', #{searchValue }, '%') 
+				OR A.notice_writer LIKE CONCAT('%', #{searchValue }, '%'))
+			</if>
+			<if test="startDate neq '' and startDate neq null">	
+				AND DATE_FORMAT(A.reg_date, "%Y-%m-%d") <![CDATA[>=]]>  #{startDate}	AND DATE_FORMAT(A.reg_date, "%Y-%m-%d") <![CDATA[<=]]>  #{endDate}	
+			</if>
+			<if test="auth_view neq '' and auth_view neq null and auth_view neq '0'.toString()">
+				AND (A.auth_view = #{auth_view } OR A.auth_view = '0')
+			</if>
+			<if test="notice_seq neq '' and notice_seq neq null">
+				AND A.notice_seq = #{notice_seq }
+			</if>
+			
+			<if test="adminLevel eq null or adminLevel eq '' or adminLevel neq '0'.toString()">
+				<if test="auth_company_seq neq '' and auth_company_seq neq null">
+					AND (auth_company_seq = #{auth_company_seq } OR auth_company_seq = '0')
+				</if>
+			</if>	
+			
+<!-- 			<choose> -->
+<!-- 				<when test="auth_seq != null and auth_seq != ''"> -->
+<!-- 					AND (AUTH_COMPANY_SEQ = #{auth_seq } OR AUTH_COMPANY_SEQ = '0') -->
+<!-- 				</when> -->
+<!-- 				<otherwise> -->
+<!-- 					AND AUTH_COMPANY_SEQ = '0' -->
+<!-- 				</otherwise> -->
+<!-- 			</choose> -->
+		ORDER BY A.reg_date DESC
+		<if test="paging neq null">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+	</select>
+	
+	<insert id="insertNotice" parameterType="NoticeDTO" useGeneratedKeys="true" keyProperty="notice_seq">
+	/*insertNotice notice.xml*/
+		INSERT INTO tbl_notice SET 
+			reg_date = now()
+			, company_seq = #{company_seq}
+			<if test="notice_writer neq null and notice_writer neq ''">	, notice_writer = #{notice_writer}			</if>
+			, writer_auth  = #{adminLevel}
+			<if test="notice_title neq null and notice_title neq ''">		, notice_title = #{notice_title }			</if>
+			<if test="notice_contents neq null and notice_title neq ''">	, notice_contents = #{notice_contents}	</if>
+			, auth_company_seq  = #{auth_company_seq}
+			<if test="auth_view neq null and auth_view neq ''">, auth_view = #{auth_view}		</if>
+			<if test="main_view_yn neq null and main_view_yn neq ''">
+				, main_view_yn = #{main_view_yn}
+				, main_start_date = #{main_start_date}
+				, main_end_date = #{main_end_date}
+			</if>
+			, reg_admin = #{reg_admin}
+			, mod_admin =  #{reg_admin}
+			
+	</insert>
+	
+	<update id="updateViewCnt" parameterType="NoticeDTO">
+		UPDATE 
+			tbl_notice A
+		SET
+			view_cnt = (A.view_cnt + 1) 
+		WHERE 
+			notice_seq = #{notice_seq }
+	</update>
+	
+	<select id="selectInfo" parameterType="NoticeDTO" resultType="NoticeDTO">
+		SELECT
+			notice_seq,
+			notice_title,
+			notice_contents,
+			notice_writer,
+			writer_auth,
+			view_cnt,
+			reply_cnt,
+			use_yn,
+			del_yn,
+			main_view_yn,
+			main_start_date,
+			main_end_date,
+			reg_date,
+			reg_admin,
+			mod_date,
+			mod_admin,
+			auth_view,
+			auth_company_seq
+		FROM
+			tbl_notice
+		WHERE 
+			1 = 1
+			<if test="notice_seq neq '' and notice_seq neq null">
+				AND notice_seq = #{notice_seq }
+			</if>
+	</select>
+	
+	<update id="updateNotice" parameterType="NoticeDTO">
+		UPDATE 
+		 	tbl_notice 
+		SET
+		 	notice_title = #{notice_title },
+		 	notice_contents = #{notice_contents },
+			auth_view = #{auth_view },
+			auth_company_seq = #{auth_company_seq },
+			use_yn = #{use_yn },
+			<choose>
+				<when test="main_view_yn neq null and main_view_yn neq ''">
+					main_view_yn = #{main_view_yn },
+					main_start_date = #{main_start_date },
+					main_end_date = #{main_end_date },
+				</when>
+				<otherwise>
+					main_view_yn = '0',
+					main_start_date = NULL,
+					main_end_date = NULL,
+				</otherwise>
+			</choose>
+			mod_date = NOW(),
+			mod_admin = #{reg_admin } 
+		WHERE 
+			notice_seq = #{notice_seq } 
+	</update>
+	
+	<update id="deleteNotice" parameterType="NoticeDTO">
+		UPDATE 
+			tbl_notice
+		SET
+			del_yn = '1'
+		WHERE 
+			notice_seq = #{notice_seq }
+	</update>
+	
+	<select id="replyList" parameterType="NotiReplyDTO" resultType="NotiReplyDTO">
+		SELECT 
+			reply_seq,
+			notice_seq,
+			parent_seq,
+			depth,
+			reply_content,
+			reply_writer,
+			del_yn,
+			reg_date,
+			reg_admin,
+			reply_group
+		FROM
+			tbl_notice_reply 
+		WHERE 
+			notice_seq = #{notice_seq }
+			AND del_yn = '0'
+		ORDER BY reply_group ASC, depth ASC
+	</select>
+	
+	<insert id="insertReply"  parameterType="NotiReplyDTO" useGeneratedKeys="true" keyProperty="reply_seq">
+		INSERT INTO tbl_notice_reply (
+			notice_seq,
+			<if test="parent_seq neq null and parent_seq neq ''">
+				parent_seq,
+				depth,
+			</if>
+			reply_content,
+			reply_writer,
+			del_yn,
+			reg_date,
+			reg_admin,
+			reply_group
+		) 
+		VALUES
+		(
+		    #{notice_seq },
+		    <if test="parent_seq neq null and parent_seq neq ''">
+		    	#{parent_seq },
+		  		#{depth },
+		  	</if>
+		    #{reply_content },
+		    #{reply_writer },
+		    '0',
+		    NOW(),
+		    #{reg_admin },
+		    <if test="reply_group neq null and reply_group neq ''">
+		    	#{reply_group }
+		    </if>
+		    <if test="reply_group eq null or reply_group eq ''">
+		    	(SELECT IFNULL(MAX(A.reply_group), 0) + 1 FROM tbl_notice_reply A WHERE A.notice_seq = #{notice_seq}) 
+		    </if>
+		) 
+	</insert>
+	
+	<update id="deleteReply" parameterType="NotiReplyDTO">
+		UPDATE 
+			tbl_notice_reply
+		SET
+			del_yn = '1'
+		WHERE 
+			reply_seq = #{reply_seq }
+	</update>
+	
+	<update id="deleteReplyChild" parameterType="NotiReplyDTO">
+		UPDATE
+			tbl_notice_reply
+		SET
+			del_yn = '1'
+		WHERE
+			parent_seq = #{reply_seq }			
+	</update>
+	
+	<select id="selectOneInfo" parameterType="NoticeDTO" resultType="NoticeDTO">
+		SELECT 
+		  * 
+		FROM
+		  tbl_notice 
+		WHERE main_view_yn = '1' 
+		  AND use_yn = '1'
+		  AND del_yn = '0'
+		  AND (auth_view = '1' OR auth_view = '0')
+		  AND (auth_company_seq = #{company_seq} OR auth_company_seq = '0')
+		 AND main_start_date <![CDATA[ <= ]]> DATE_FORMAT(NOW(), '%Y-%m-%d') 
+  		 AND main_end_date <![CDATA[ >= ]]> DATE_FORMAT(NOW(), '%Y-%m-%d') 
+		  <if test="notice_seq neq null and notice_seq neq ''">AND notice_seq  <![CDATA[ > ]]> #{notice_seq}</if>
+		ORDER BY notice_seq DESC 
+		LIMIT 0 , 1
+	</select>
+	
+</mapper>

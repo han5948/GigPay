@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.InquiryMapper">
+	<select id="selectInquiryListCnt" parameterType="InquiryDTO" resultType="int">
+		/* inquiry.xml selectInquiryList */
+		SELECT
+			COUNT(inquiry_seq) AS cnt
+		FROM
+			tbl_inquiry
+		WHERE
+			1 = 1
+			AND use_yn = '1'
+			AND del_yn = '0'
+		ORDER BY inquiry_seq DESC
+	</select>
+	
+	<select id="selectInquiryList" parameterType="InquiryDTO" resultType="InquiryDTO">
+		/* inquiry.xml selectInquiryList */
+		SELECT
+			inquiry_seq
+			, company_name
+			, work_manager_name
+			, work_manager_phone
+			, work_manager_mail
+			, inquiry_content
+			, inquiry_memo
+			, use_yn
+			, del_yn
+			, reg_date
+			, reg_admin
+			, mod_date
+			, mod_admin
+		FROM
+			tbl_inquiry
+		WHERE
+			1 = 1
+			AND use_yn = '1'
+			AND del_yn = '0'
+		ORDER BY inquiry_seq DESC
+		<if test="paging neq null">
+			LIMIT ${paging.startPage }, ${paging.endPage }
+		</if>
+	</select>
+	
+	<update id="updateInquiry" parameterType="InquiryDTO">
+		UPDATE 
+			tbl_inquiry
+		SET
+			inquiry_memo = #{inquiry_memo }
+			, mod_date = NOW()
+			, mod_admin = #{reg_admin }
+		WHERE
+			inquiry_seq = #{inquiry_seq }
+	</update>
+	
+	<update id="deleteInquiry" parameterType="InquiryDTO">
+		UPDATE 
+			tbl_inquiry
+		SET
+			del_yn = '1'
+			, use_yn = '0'
+			, mod_date = NOW()
+			, mod_admin = #{reg_admin }
+		WHERE
+			inquiry_seq IN
+			<foreach collection="arr_inquiry_seq" item="code" open="(" close=")" separator=", ">
+				#{code }
+			</foreach>
+	</update>
+</mapper>

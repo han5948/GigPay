@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Geocoding service</title>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+<meta charset="utf-8">
+<script type="text/javascript"
+	src="/resources/cms/grid/js/jquery-1.11.0.min.js" charset="utf-8"></script>
+<style>
+/* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+#map {
+	height: 100%;
+}
+/* Optional: Makes the sample page fill the window. */
+html,body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+#floating-panel {
+	position: absolute;
+	top: 10px;
+	left: 25%;
+	z-index: 5;
+	background-color: #fff;
+	padding: 5px;
+	border: 1px solid #999;
+	text-align: center;
+	font-family: 'Roboto', 'sans-serif';
+	line-height: 30px;
+	padding-left: 10px;
+}
+</style>
+</head>
+<body>
+	<div id="floating-panel">
+		<input id="sAddr" type="textbox" value=""> 
+        <input id="btnAddr" type="button" value="주소로검색">  
+        <input id="btnMarker" type="button" value="마커로검색"> 
+        <input id="submit" type="button"			value="적용하기"> 
+        <input id="btnPrint" type="button" value="프린트" >
+	</div>
+	<div id="map"></div>
+	<script>
+
+	function gmapPrint() {
+	    var content = window.document.getElementById("map"); // get you map details
+	    var newWindow = window.open(); // open a new window
+	    newWindow.document.write(content.innerHTML); // write the map into the new window
+	    newWindow.print(); // print the new window
+	}
+	
+    
+    $.urlParam = function(name){
+        var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+        if (results==null){
+           return null;
+        }
+        else{
+           return results[1] || 0;
+        }
+    }
+
+      var mode = $.urlParam('mode');
+      var worker_seq = $.urlParam('worker_seq');
+      var employer_seq = $.urlParam('employer_seq');
+      var work_seq = $.urlParam('work_seq');
+      var ilgaja_addr = $.urlParam('ilgaja_addr');
+      
+	  var map;
+	  var myLatlng;
+	  if($.urlParam('lat') != ""){
+		  myLatlng ={lat:Number($.urlParam('lat')) , lng:Number($.urlParam('lng'))};  
+	  }else{
+		  myLatlng ={lat:37.566535 , lng:126.97796919999996};  
+	  }
+	  
+	  
+	  var marker;
+	  var cLatlng;
+	  var cAddr;
+	  var info = false;
+	  var infowindow;
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 18,
+          center: myLatlng
+        });
+        
+		var geocoder = new google.maps.Geocoder();
+		infowindow = new google.maps.InfoWindow;
+
+        document.getElementById('btnMarker').addEventListener('click', function() {
+          //geocodeAddress(geocoder, map);
+		  geocodeLatLng(geocoder, map, infowindow);
+
+        });
+
+        document.getElementById('btnAddr').addEventListener('click', function() {
+          geocodeAddress(geocoder, map,infowindow);
+		  
+
+        });
+        
+        document.getElementById('submit').addEventListener('click', function() {
+        	chkUpdate(employer_seq, work_seq,cAddr,cLatlng,ilgaja_addr)
+  		  
+
+        });
+        
+        document.getElementById('btnPrint').addEventListener('click', function() {
+        	gmapPrint()
+          
+
+        });
+        
+        
+
+
+		//center가 바뀔때.
+		google.maps.event.addListener(map,'center_changed',function(){
+			setTimeout(center_changed_event,100);
+			});
+
+
+		google.maps.event.addListener(map,'dragstart',function(){
+			setTimeout(dragstart_event,100);
+			});
+
+
+		
+		setMarker(myLatlng);
+
+      }
+
+      
+    //상태변경
+      function chkUpdate(employer_seq, work_seq,cAddr,cLatlng,ilgaja_addr) {
+    	
+    	  var tmpSplit = cLatlng.split(",");
+    		 
+    		
+    		 if(tmpSplit.length != 2){
+    			alert("좌표을 다시 지정 하세요.");
+    			return false;
+    		 }
+    		 
+    	var cUrl;	 
+        var str;
+        
+        if(mode == "WORK"){
+        	cUrl = "/admin/setWorkInfo";
+        	str = '{"employer_seq": '+ employer_seq +', "work_seq": '+ work_seq +', "work_addr": "'+ cAddr +'", "work_latlng":"'+ cLatlng +'"}';
+        }else if(mode == "WORKER"){//WORKER
+        	cUrl = "/admin/setWorkerInfo";
+        	
+        	if(ilgaja_addr == "null" || ilgaja_addr == ""){
+        		str = '{"worker_seq": '+ worker_seq +', "worker_addr": "'+ cAddr +'", "worker_latlng":"'+ cLatlng  +'", "worker_ilgaja_addr": "'+ cAddr +'", "worker_ilgaja_latlng":"'+ cLatlng +'"}';
+        	}else{
+        		str = '{"worker_seq": '+ worker_seq +', "worker_addr": "'+ cAddr +'", "worker_latlng":"'+ cLatlng + '"}';
+        	}
+        }else if(mode == "ILGAJA"){
+        	cUrl = "/admin/setWorkerInfo";
+        	str = '{"worker_seq": '+ worker_seq +', "worker_ilgaja_addr": "'+ cAddr +'", "worker_ilgaja_latlng":"'+ cLatlng + '"}';
+        	
+        }
+        
+        console.log(str);
+        
+        var params = jQuery.parseJSON(str);
+
+        $.ajax({
+             type: "POST",
+              url: cUrl,
+             data: params,
+         dataType: 'json',
+          success: function(data) {
+        	  			opener.parent.mapResponse();
+        	  			self.close();
+                 
+                   },
+      // beforeSend:showRequest,
+            error: function(e) {
+                     alert(e.responseText);
+                   }
+        });
+      }
+    
+    
+      function dragstart_event(){
+
+  		if(info){
+  			infowindow.close();
+  		}
+  		
+  	  }
+      
+	  function center_changed_event(){
+
+		
+		var data = map.getCenter();
+
+		cLatlng = data.lat() + "," + data.lng();
+		myLatlng ={lat:data.lat() , lng:data.lng()};
+
+		 marker.setPosition(myLatlng);
+	  }
+
+	  function setMarker(latlng){
+		if(marker != null){
+			marker.setMap(null);
+		}
+		marker = new google.maps.Marker({
+			position: latlng,
+			title:"등록지점"
+		});
+
+		// To add the marker to the map, call setMap();
+		marker.setMap(map);
+
+	  }
+
+	  
+
+     function geocodeLatLng(geocoder, map, infowindow) {
+        
+        geocoder.geocode({'location': myLatlng}, function(results, status) {
+          if (status === 'OK') {
+            if (results[1]) {
+              cAddr = results[0].formatted_address;
+              cAddr = cAddr.replace("대한민국 ", "");
+              
+              infowindow.setContent( cAddr + "<br><br>" + cLatlng);
+              infowindow.open(map, marker);
+    		  map.setZoom(18);
+    		  
+			  info = true;
+            } else {
+              window.alert('No results found');
+            }
+          } else {
+            window.alert('Geocoder failed due to: ' + status);
+          }
+        });
+      }
+
+
+      function geocodeAddress(geocoder, resultsMap , infowindow) {
+		
+        var address = document.getElementById('sAddr').value;
+
+        geocoder.geocode({'address': address}, function(results, status) {
+          if (status === 'OK') {
+            resultsMap.setCenter(results[0].geometry.location);
+			resultsMap.setZoom(18);
+			cAddr = results[0].formatted_address;
+			cAddr = cAddr.replace("대한민국 ", "");
+			
+			infowindow.setContent( cAddr + "  ::  " + cLatlng);
+            infowindow.open(resultsMap, marker);
+			info = true;
+          } else {
+            alert('Geocode was not successful for the following reason: ' + status);
+          }
+        });
+      }
+    </script>
+	<script async defer
+		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDIGIb1b7omca5Ixvh4L_GcN2pN5KW2T3Q&callback=initMap">
+    </script>
+</body>
+</html>

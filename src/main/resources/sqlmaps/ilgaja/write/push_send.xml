@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.PushSendMapper">
+
+ 
+
+  <select id="selectPushSendInfo" parameterType="PushSendDTO" resultType="PushSendDTO">
+    /* push 정보 조회 selectPushInfo push.xml */
+    SELECT *
+    FROM push_send
+    WHERE 1 = 1
+    <if test="send_seq neq ''  and send_seq  neq null"> AND send_seq  = #{send_seq} </if>
+    
+  </select>
+ 
+
+
+	<update id="updatePushSend" parameterType="PushSendDTO">
+    /* 푸쉬 정보 수정 updatePush */
+    UPDATE push_send SET
+    mod_date = now()
+    <if test="push_confirm neq ''  and push_confirm  neq null"> ,push_confirm  = #{push_confirm} </if>
+    <if test="send_result   neq ''  and send_result     neq null"> ,send_result  = #{send_result} </if>
+    
+    <if test="fcm_result   neq ''  and fcm_result     neq null"> ,fcm_result  = #{fcm_result} </if>
+    <if test="fcm_success   neq ''  and fcm_success     neq null"> ,fcm_success  = #{fcm_success} </if>
+    <if test="fcm_message   neq ''  and fcm_message     neq null"> ,fcm_message  = #{fcm_message} </if>
+    
+      
+    WHERE send_seq = #{send_seq}
+  </update>
+  <!-- 
+  <insert id="setIlboWPush" parameterType="java.util.Map">
+        insert into push_send (ilbo_seq, work_seq, worker_seq, send_time)
+        values
+       <foreach collection="list" item="item" separator=" , ">
+            ( 
+                #{item.ilbo_seq}
+                , (select work_seq from ilbo where ilbo_seq= #{item.ilbo_seq})
+                ,(select worker_seq from ilbo where ilbo_seq= #{item.ilbo_seq})
+                , now() 
+            )
+        </foreach> 
+   </insert> -->
+   
+   
+   <insert id="setIlboWPush" parameterType="PushSendDTO" useGeneratedKeys="true" keyProperty="send_seq">
+        insert into push_send (ilbo_seq, work_seq, worker_seq, send_time)
+        values
+            ( 
+                #{ilbo_seq}
+                ,(select work_seq from ilbo where ilbo_seq= #{ilbo_seq})
+                ,(select worker_seq from ilbo where ilbo_seq= #{ilbo_seq})
+                , now() 
+             
+            )
+        
+   </insert>
+   
+   <insert id="insertPushLog" parameterType="PushLogDTO" useGeneratedKeys="true" keyProperty="push_log_seq">
+   		/* push_send.xml insertPushLog */
+   		INSERT INTO tbl_push_log (
+   			push_type,
+   			total_cnt,
+   			contents_seq
+   		) VALUES (
+   			#{push_type },
+   			#{total_cnt },
+   			#{contents_seq }
+   		)
+   </insert>
+   
+   <update id="updatePushLog" parameterType="PushLogDTO">
+   		/* push_send.xml updatePushLog */
+   		UPDATE 
+   			tbl_push_log 
+   		SET
+   			success_cnt = success_cnt + #{success_cnt },
+   			fail_cnt = fail_cnt + #{fail_cnt },
+   			push_time = NOW(),
+   			status_code = #{status_code }
+   		WHERE 
+   			push_log_seq = #{push_log_seq }
+   </update>
+   
+   <insert id="insertReceivePushLog" parameterType="PushLogDTO" useGeneratedKeys="true" keyProperty="receive_push_log">
+   		/* push_send.xml insertReceivePushLog */
+   		INSERT INTO tbl_receive_push_log (
+   			push_log_seq,
+   			receive_seq,
+   			receive_type,
+   			push_result,
+   			result_msg
+   		) VALUES (
+   			#{push_log_seq },
+   			#{receive_seq },
+   			#{receive_type },
+   			#{push_result },
+   			#{result_msg }
+   		)
+   </insert>
+   
+   <insert id="insertPushLogList" parameterType="java.util.List">
+   		/* push_send.xml insertReceivePushLogList */
+   		INSERT INTO tbl_receive_push_log (
+   			push_log_seq,
+   			receive_seq,
+   			receive_type,
+   			push_result,
+   			result_msg
+   		) VALUES 
+   		<foreach collection="list" item="item" separator=" , ">
+	   		(
+	   			#{item.push_log_seq },
+	   			#{item.receive_seq },
+	   			#{item.receive_type },
+	   			#{item.push_result },
+	   			#{item.result_msg }
+	   		)
+   		</foreach>
+   		
+   		
+   </insert>
+</mapper>

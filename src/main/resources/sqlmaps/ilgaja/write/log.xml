@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.LogMapper">
+	<insert id="insertCodeLog" parameterType="CodeLogDTO" useGeneratedKeys="true" keyProperty="log_seq">
+	    /* code로그남기기 insertCodeLog log.xml */
+	    INSERT INTO tbl_code_log SET
+	    	reg_date = NOW()
+			<if test="ilbo_seq neq '' and ilbo_seq neq null"> 
+				, ilbo_seq = #{ilbo_seq } 
+			</if>
+			<if test="code_type	neq '' and code_type neq null"> 
+				, code_type = #{code_type }  
+			</if>
+			<if test="code_value neq '' and code_value neq null"> 
+				, code_value = #{code_value } 
+			</if>
+			<if test="code_name	neq '' and code_name neq null"> 
+				, code_name = #{code_name } 
+			</if>
+			<if test="log_text neq '' and log_text neq null"> 
+				, log_text = #{log_text }  
+			</if>
+			<if test="log_user_type neq '' and log_user_type neq null"> 
+				, log_user_type = #{log_user_type } 	 
+			</if>
+			, worker_seq = #{worker_seq }
+    		, worker_company_seq = #{worker_company_seq }
+    		, work_seq = #{work_seq }
+    		, work_company_seq = #{work_company_seq }
+			<if test="reg_admin neq '' and reg_admin neq null"> 
+				, reg_admin = #{reg_admin } 
+			</if>
+  	</insert>
+  	
+  	<select id="getCodeLogList" parameterType="CodeLogDTO" resultType="CodeLogDTO">
+	    /* 코드로그 조회 code.getCodeLogList */
+	    SELECT 
+	    	*
+	    FROM 
+	    	tbl_code_log
+	    WHERE 
+	    	1 = 1
+	   		<if test="ilbo_seq neq '' and ilbo_seq neq null"> 
+	   			AND ilbo_seq = #{ilbo_seq } 
+	   		</if>
+	   		<if test="code_type	neq '' and code_type neq null"> 
+	   			AND code_type = #{code_type } 
+	   		</if>
+	    ORDER BY 
+	    	log_seq 
+	   	<if test="paging neq null">
+			<choose>
+	        	<when test="paging.pageNo gt 0">
+	    			LIMIT ${paging.startPage}, ${paging.endPage}
+	        	</when>
+	        	<otherwise>
+		    		LIMIT 0, ${paging.endPage}
+	        	</otherwise>
+	      	</choose>
+		</if>
+  	</select>
+  	
+  	<insert id="insertPriceLog" parameterType="PriceLogDTO" useGeneratedKeys="true" keyProperty="log_seq">
+  		INSERT INTO tbl_price_log (
+			admin_seq
+			, ilbo_seq
+			, user_id
+			, cellName
+			, before_price
+			, after_price
+			, reg_date  		
+  		) VALUES (
+  			#{admin_seq }
+  			, #{ilbo_seq }
+  			, #{user_id}
+  			, #{cellName }
+  			, #{before_price }
+  			, #{after_price }
+  			, NOW()
+  		)
+  	</insert>
+  	
+  	<insert id="insertEmployerCodeLog" parameterType="CodeLogDTO" useGeneratedKeys="true" keyProperty="log_seq">
+  		INSERT INTO tbl_employer_code_log (
+  			employer_seq
+  			, code_type
+  			, code_value
+  			, code_name
+  			, reg_admin
+  			, reg_date
+  		) VALUES (
+  			#{employer_seq }
+  			, #{code_type }
+  			, #{code_value }
+  			, #{code_name }
+  			, #{reg_admin }
+  			, NOW()	
+  		)
+  	</insert>
+  	
+  	<select id="selectEmployerCodeLogList" parameterType="CodeLogDTO" resultType="CodeLogDTO">
+  		SELECT
+  			log_seq
+  			, employer_seq
+  			, code_type
+  			, code_value
+  			, code_name
+  			, reg_admin
+  			, reg_date
+  		FROM
+  			tbl_employer_code_log
+  		WHERE
+  			code_type = #{code_type }
+  			AND employer_seq = #{employer_seq }
+  	</select>
+  	
+  	<select id="selectPriceLogList" parameterType="PriceLogDTO" resultType="PriceLogDTO">
+  		/* selectPriceLogList 일보 금액수정 로그 log.xml */
+  		SELECT
+  			log_seq
+  			, admin_seq
+  			, manager_seq
+  			, user_id
+  			, ilbo_seq
+  			, cellName
+  			, before_price
+  			, after_price
+  			, DATE_FORMAT(reg_date, "%Y-%m-%d %h:%i:%s") AS reg_date
+  		FROM
+  			tbl_price_log
+  		WHERE
+  			ilbo_seq = #{ilbo_seq}	
+  	</select>
+</mapper>

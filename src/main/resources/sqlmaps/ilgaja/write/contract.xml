@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.ContractMapper">
+	<select id="selectCategoryListCnt" resultType="int">
+		SELECT
+			COUNT(1)
+		FROM
+			tbl_category
+		WHERE 
+			del_yn = '0'
+<!-- 			AND use_yn = '1' -->
+	</select>
+	
+	<select id="selectCategoryList" parameterType="CategoryDTO" resultType="CategoryDTO">
+		SELECT
+			*
+		FROM
+			tbl_category
+		WHERE
+			del_yn = '0'
+<!-- 			AND use_yn = '1' -->
+			<if test="category_name neq null and category_name neq ''">
+				AND category_name = #{category_name }
+			</if>
+			<if test="category_code neq null and category_code neq ''">
+				AND category_code = #{category_code }
+			</if>
+		ORDER BY category_seq DESC
+		<if test="paging neq null">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+	</select>
+	
+	<insert id="insertCategory" parameterType="CategoryDTO">
+		INSERT INTO tbl_category (
+			category_name,
+			category_code,
+			use_yn,
+			del_yn,
+			reg_admin,
+			reg_date,
+			mod_admin,
+			mod_date
+		) VALUES (
+		    #{category_name },
+		    UPPER(#{category_code }),
+		    #{use_yn },
+		    '0',
+		    #{reg_admin },
+		    NOW(),
+		    #{reg_admin },
+		    NOW()
+		)
+	</insert>
+	
+	<select id="selectCategoryInfo" parameterType="CategoryDTO" resultType="CategoryDTO">
+		SELECT
+			*
+		FROM	
+			tbl_category
+		WHERE
+			1 = 1
+			<if test="category_seq neq null and category_seq neq ''">
+				AND category_seq = #{category_seq }
+			</if>
+			<if test="category_name neq null and category_name neq ''">
+				AND category_name = #{category_name }
+			</if>
+			<if test="use_yn neq null and use_yn neq ''">
+				AND use_yn = #{use_yn }
+			</if>
+			<if test="del_yn neq null and del_yn neq ''">
+				AND del_yn = #{del_yn }
+			</if>
+			<if test="category_code neq null and category_code neq ''">
+				AND category_code = #{category_code }
+			</if>
+	</select>
+	
+	<update id="updateCategory" parameterType="CategoryDTO">
+		UPDATE
+			tbl_category
+		SET
+			mod_admin = #{mod_admin }
+			, mod_date = NOW()
+			<if test="category_name neq null and category_name neq ''">
+				, category_name = #{category_name }
+			</if>
+			<if test="category_code neq null and category_code neq ''">
+				, category_code = UPPER(#{category_code })
+			</if>
+			<if test="use_yn neq null and use_yn neq ''">
+				, use_yn = #{use_yn }
+			</if>
+			<if test="del_yn neq null and del_yn eq '1'.toString()">
+				, del_yn = '1'
+			</if>
+		WHERE
+			category_seq = #{category_seq }
+	</update>
+	
+	<select id="selectContractListCnt" parameterType="ContractDTO" resultType="int">
+		SELECT
+			COUNT(1)
+		FROM
+			tbl_contract c
+			LEFT OUTER JOIN tbl_contract_file f ON c.contract_seq = f.contract_seq
+		WHERE
+			category_seq = #{category_seq }
+			AND c.del_yn = '0'
+		<if test="paging neq null">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+	</select>
+	
+	<select id="selectContractList" parameterType="ContractDTO" resultType="ContractFileDTO">
+		SELECT
+			c.*
+			, f.*
+		FROM	
+			tbl_contract c
+			LEFT OUTER JOIN tbl_contract_file f ON c.contract_seq = f.contract_seq
+			LEFT OUTER JOIN tbl_category ca ON c.category_seq = ca.category_seq
+		WHERE
+			1 = 1
+			<if test="category_seq neq null and category_seq neq ''">
+				AND c.category_seq = #{category_seq }
+			</if>
+			AND c.del_yn = '0'
+			<if test="use_yn neq null and use_yn neq ''">
+				AND c.use_yn = '1'
+			</if>
+			<if test="contract_name neq null and contract_name neq ''">
+				AND c.contract_name = #{contract_name }
+			</if>
+			<if test="category_code neq null and category_code neq ''">
+				AND ca.category_code = #{category_code }
+			</if>
+		ORDER BY c.contract_seq DESC
+		<if test="paging neq null">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+	</select>
+	
+	<select id="selectContractInfo" parameterType="ContractDTO" resultType="ContractFileDTO">
+		SELECT
+			c.*
+			, f.*
+		FROM
+			tbl_contract c
+			LEFT OUTER JOIN tbl_contract_file f ON c.contract_seq = f.contract_seq
+		WHERE
+			c.contract_seq = #{contract_seq }
+		ORDER BY c.contract_seq DESC
+	</select>
+	
+	<insert id="insertContract" parameterType="ContractDTO" useGeneratedKeys="true" keyProperty="contract_seq">
+		INSERT INTO tbl_contract (
+			mod_date
+			, reg_date
+			, reg_admin
+			, mod_admin
+			, contract_name
+			, contract_type
+			, category_seq
+			<if test="jsonText neq null">
+				, jsonText
+			</if>
+			<if test="contract_default_use_yn neq null">
+			, contract_default_use_yn
+			</if>
+			, use_yn
+			, del_yn
+		) VALUES (
+			NOW()
+			, NOW()
+			, #{reg_admin }
+			, #{mod_admin }
+			, #{contract_name }
+			, #{contract_type }
+			, #{category_seq }
+			<if test="jsonText neq null">
+				, #{jsonText }
+			</if>
+			<if test="contract_default_use_yn neq null">
+				, #{contract_default_use_yn }
+			</if>
+			, #{use_yn }
+			, '0'
+		)
+	</insert>
+	
+	<insert id="insertContractFile" parameterType="ContractFileDTO">
+		INSERT INTO tbl_contract_file (
+			mod_date
+			, reg_date
+			, fileName
+			, fileUrl
+			, orgFileName
+			, contract_seq
+			, reg_admin
+			, mod_admin
+			, use_yn
+			, del_yn
+		) VALUES (
+			NOW()
+			, NOW()
+			, #{fileName }
+			, #{fileUrl }
+			, #{orgFileName }
+			, #{contract_seq }
+			, #{reg_admin }
+			, #{mod_admin }
+			, '1'
+			, '0'
+		)
+	</insert>
+	
+	<update id="updateContract" parameterType="ContractDTO">
+		UPDATE
+			tbl_contract
+		SET
+			mod_date = NOW()
+			, mod_admin = #{mod_admin }
+			<choose>
+				<when test="del_yn neq null and del_yn eq '1'.toString()">
+					, del_yn = '1'
+				</when>
+				<otherwise>
+					<if test="use_yn neq null and use_yn neq ''">
+						, use_yn = #{use_yn }
+					</if>
+					<if test="contract_name neq null and contract_name neq ''">
+						, contract_name = #{contract_name }
+					</if>
+					<if test="contract_default_use_yn neq null and contract_default_use_yn neq ''">
+						, contract_default_use_yn = #{contract_default_use_yn }
+					</if>
+					<if test="jsonText neq null and jsonText neq ''">
+						, jsonText = #{jsonText }
+					</if>
+				</otherwise>
+			</choose>
+		WHERE
+			contract_seq = #{contract_seq }
+	</update>
+	
+	<update id="updateContractFile" parameterType="ContractFileDTO">
+		UPDATE
+			tbl_contract_file
+		SET
+			mod_date = NOW()
+			, mod_admin = #{mod_admin }
+			<if test="fileUrl neq null and fileUrl neq ''">
+				, fileUrl = #{fileUrl }
+			</if>
+			<if test="fileName neq null and fileName neq ''">
+				, fileName = #{fileName }
+			</if>
+			<if test="orgFileName neq null and orgFileName neq ''">
+				, orgFileName = #{orgFileName }
+			</if>
+			<if test="use_yn neq null and use_yn neq ''">
+				, use_yn = #{use_yn }
+			</if>
+			<if test="del_yn neq null and del_yn eq '1'.toString()">
+				, del_yn = '1'
+			</if>
+		WHERE
+			contract_seq = #{contract_seq }
+	</update>
+	
+	<select id="selectContractUseCnt" parameterType="ContractDTO" resultType="int">
+		/* contract.xml selectContractUseCnt */
+		SELECT
+			COUNT(contract_seq) AS useCnt 
+		FROM
+			tbl_contract
+		WHERE
+			category_seq = #{category_seq }
+			AND use_yn = '1'
+			AND del_yn = '0'
+			AND contract_default_use_yn = '1'
+			<if test="contract_seq neq null and contract_seq neq ''">
+				AND contract_seq != #{contract_seq }
+			</if>
+	</select>
+	
+	<select id="selectContractDefaultList" resultType="ContractDTO">
+		SELECT
+			c.*,
+			ca.category_code AS category_code
+		FROM
+			tbl_contract c
+			LEFT OUTER JOIN tbl_category ca
+				ON c.category_seq = ca.category_seq
+		WHERE
+			contract_default_use_yn = '1'
+			AND c.use_yn = '1'
+			AND c.del_yn = '0'
+			AND (category_code = 'ELM' OR category_code = 'ERM')
+	</select>
+	
+	<update id="initializationDefaultUseYn" parameterType="ContractDTO">
+		UPDATE
+			tbl_contract
+		SET
+			mod_date = NOW()
+			, mod_admin = #{mod_admin }
+			, contract_default_use_yn = '0'
+		WHERE
+			category_seq = #{category_seq}
+			AND contract_default_use_yn = '1'	
+	</update>
+	
+	<select id="selectContractFileListCnt" parameterType="ContractDTO" resultType="int">
+		SELECT
+			COUNT(contract_file_seq) AS cnt
+		FROM
+			tbl_contract_file
+		WHERE
+			contract_seq = #{contract_seq }
+	</select>
+</mapper>

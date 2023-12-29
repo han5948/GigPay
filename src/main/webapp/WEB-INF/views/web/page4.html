@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+	<title>일가자인력</title>
+	<link rel="icon" href="./images/ilgaja_logo_ico.ico" mce_href="/images/ilgaja_logo_ico.ico" type="image/x-icon">
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="main.css">
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script type="text/javascript" src="js/main.js"></script>
+	<style>
+		.fileBox{position:relative;}
+	.fileBox label{position:absolute;right:0.6em;}
+	.fileBox label img{cursor:pointer;}
+	.filebox .fb img{cursor:pointer;}
+	.fileBox input[type="file"] {position: absolute; width:1px;height: 1px; padding: 0; margin: -1px; overflow: hidden; clip:rect(0,0,0,0); border: 0; }
+</style>
+</head>
+
+<body>
+	<!-- 팝업배경 -->
+	<div class="bgPopup" style="display:block;"></div>
+	<div class="popup" style="display:block;">
+		<!-- 일자리구함 팝업-->
+		<div class="checkOffer" style="display:block;">
+			<div class="c_bgPop"></div>
+			<div class="cHeader clear">
+				<p class="cHeadTxt"><strong>일가자</strong> 구직자등록 확인</p>
+				<p class="cHeadImg"><img src="images/icon.png" alt=""></p>
+			</div>
+			<div class="chContents">
+				<div class="offerInfo_pop chPop01">
+					<p><strong>개인정보 수집 및 이용에 동의</strong></p>
+					<ol>
+						<li>1.수집/이용 목적 : 구인신청 등 구인자 요청 처리 및 결과 회신</li>
+						<li>2. 수집하는 항목 : 회사명, 이름, 연락처</li>
+						<li>3. 보유/이용 기간 : 구직알선 서비스 종료 후 2년</li>
+						<li>4. 동의를 거부할 수 있으며, 거부시 이용이 제한될 수 있습니다.</li>
+						<span>닫기</span>
+					</ol>
+				</div>
+				<!-- 숨겨진 팝업 -->
+				<div class="offerInfo_pop" chPop02>
+					<p class="pcTxt">등록된 구직자가 아닙니다.<br>구직상담 후 이용 가능합니다.</p>
+						<span>확인</span>
+				</div>
+				<form action="jobOfferForm">
+					<div class="c_offerInfo01">
+						<div class="co_01 clear">
+							<label>내 폰번호<span>*</span></label>
+							<input type="text" required="required">
+							<span class="check">확인</span>
+						</div>
+					</div>
+					<div class="c_offerOpa">
+						<div class="cHeader clear" >
+							<p class="cHeadTxt2"><strong>"홍길동"</strong> 님 파일 보내기</p>
+						</div>
+						<div class="c_offerInfo02">
+							<div class="c_offerInfo01 clear">
+								<label>파일첨부</label>
+								<div class="fileBox">
+									<input type="text" placeholder="신분증(앞면)">
+									<input type="file" required="required" class="fileBtn" id="fb01">
+									<label for="fb01" style="width:auto;"><img src="images/clipIcon.png" alt=""></label>
+								</div>
+							</div>
+							<div class="c_offerInfo01 clear">
+								<label>파일첨부</label>
+								<div class="fileBox">
+									<input type="text" placeholder="통장사본">
+									<input type="file" required="required" class="fileBtn" id="fb01">
+									<label for="fb01" style="width:auto;"><img src="images/clipIcon.png" alt=""></label>
+								</div>
+							</div>
+							<div class="c_offerInfo01 clear">
+								<label>파일첨부</label>
+								<div class="fileBox">
+									<input type="text" placeholder="기초안전보건교육증">
+									<input type="file" required="required" class="fileBtn" id="fb01">
+									<label for="fb01" style="width:auto;"><img src="images/clipIcon.png" alt=""></label>
+								</div>
+							</div>
+							<div class="c_offerInfo01 clear">
+								<label><span class="sb">양식다운</span>&nbsp;<img src="images/downIcon.png" alt=""></label>
+								<div class="fileBox">
+									<input type="text" placeholder="구직신청서">
+									<input type="file" required="required" class="fileBtn" id="fb01">
+									<label for="fb01" style="width:auto;"><img src="images/clipIcon.png" alt=""></label>
+								</div>
+							</div>
+							<p class="checkBox">
+								<label><input type="checkbox"> 개인정보 수집 및 이용에 동의합니다.</label><span class="conView">내용보기</span>
+							</p>
+						</div>
+						<div class="cOfferBtn">
+							<span class="apply">등록</span>
+							<span class="close">취소</span>
+						</div>
+						<p class="txtL">구직신청 후 아래 앱을 설치하고 대기하면 상담할 지점에서 연락이 갑니다.</p>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

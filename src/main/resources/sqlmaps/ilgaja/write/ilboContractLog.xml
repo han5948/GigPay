@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.IlboContractLogMapper">
+	<insert id="insertLog" parameterType="IlboContractLogDTO" useGeneratedKeys="true" keyProperty="log_seq">
+		INSERT INTO tbl_ilbo_contract_log (
+			ilbo_seq
+			, before_contract_seq
+			, after_contract_seq
+			, reg_admin
+			, reg_date
+		) VALUES (
+			#{ilbo_seq }
+			, #{before_contract_seq }
+			, #{after_contract_seq }
+			, #{reg_admin }
+			, NOW()
+		)
+	</insert>
+</mapper>

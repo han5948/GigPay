@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.CompanySignLogMapper">
+	<insert id="insertCompanySignLog" parameterType="SignLogDTO">
+		INSERT INTO tbl_sign_log (
+			file_seq
+			, company_seq
+			, seq
+			, name
+			, phone
+			, type
+			, os_type
+			, ip
+			, latlng
+			, device_info
+			, user_agent
+			, use_yn
+			, del_yn
+			, reg_date
+			, reg_admin
+			, mod_date
+			, mod_admin
+		) VALUES (
+			#{file_seq }
+			, #{company_seq}
+			, #{seq }
+			, FN_ENCRYPT(#{name })
+			, FN_ENCRYPT(#{phone })
+			, #{type }
+			, #{os_type }
+			, #{ip }
+			, #{latlng }
+			, #{device_info }
+			, #{user_agent }
+			, "1"
+			, "0"
+			, NOW()
+			, #{reg_admin }
+			, NOW()
+			, #{reg_admin }
+		)
+	</insert>
+</mapper>

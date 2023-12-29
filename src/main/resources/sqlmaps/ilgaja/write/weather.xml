@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.WeatherMapper">
+
+	<select id="getWeather" parameterType="WeatherDTO" resultType="WeatherDTO">
+		/* 날씨 조회 getWeather weather.xml */
+		SELECT 
+			weather_seq,
+			base_date,
+			fcst_date,
+			fcst_time,
+			city_code,
+			pptn_pct,
+			pptn_form,
+			six_hours_pptn,
+			hours_pptn,
+			humidity,
+			six_hours_snowfall,
+			hours_snowfall,
+			sky_status,
+			three_hours_temp,
+			hours_temp,
+			(SELECT 	min_temp FROM tbl_weather_city WHERE city_code = #{city_code}   AND fcst_date = #{fcst_date} AND fcst_time = '0600') AS min_temp,
+			(SELECT 	high_temp FROM tbl_weather_city WHERE city_code = #{city_code}   AND fcst_date = #{fcst_date} AND fcst_time = '1500') AS high_temp,
+			wind_speed_ew,
+			wind_speed_sn,
+			wave,
+			wind_dir,
+			wind_speed,
+			version
+		FROM
+			tbl_weather_city 
+		WHERE
+			city_code = #{city_code}
+			AND fcst_date = #{fcst_date}
+			AND fcst_time = #{fcst_time}
+			AND version = #{version}
+  	</select>
+  
+</mapper>

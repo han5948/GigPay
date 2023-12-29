@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.read.ReplicationTransferWorkerLocationMapper">
+	
+	<select id="selectTransferWorkerLocationList" parameterType="TransferWorkerLocationDTO" resultType="TransferWorkerLocationDTO">
+		/* selectTransferWorkerLocationList 구직자이관 지역목록 read.transferWorkerLocation.xml */
+		SELECT
+			location_seq
+			, transfer_seq
+			, sido_code
+			, sido_name
+			, sigungu_code
+			, sigungu_name
+			, eupmyeondong_code
+			, eupmyeondong_name
+		FROM
+			tbl_transfer_worker_location
+		WHERE
+			transfer_seq = #{transfer_seq}
+		ORDER BY sido_code, sigungu_code, eupmyeondong_code
+	</select>
+    
+</mapper>

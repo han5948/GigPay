@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.TaxbillMapper">
+
+	<select id="selectTaxbillList" parameterType="TaxbillDTO" resultType="TaxbillDTO">
+    	/* 면세계산서 목록 가져오기 taxbill.xml */
+    	SELECT
+    		tax_seq
+    		, c.company_seq
+    		, c.business_name
+    		, c.company_num
+    		, c.company_name
+    		, FN_DECRYPT(c.company_owner) AS company_owner
+    		, c.company_addr
+    		, c.company_business
+    		, c.company_sector
+    		, FN_DECRYPT(c.company_email) AS company_email
+    		, e.employer_seq
+    		, e.employer_num
+    		, e.employer_name
+    		, FN_DECRYPT(e.employer_owner) AS employer_owner
+    		, e.employer_addr
+    		, e.employer_business
+    		, e.employer_sector
+    		, FN_DECRYPT(e.employer_email) AS employer_email
+    		, e.employer_corp_scan_yn
+    		, b.supply_price
+    		, b.tax_memo
+    		, b.write_date
+    		, b.subject
+    		, b.claim
+    		, b.tax_status
+    		, b.reg_date
+    		, b.reg_admin
+    		, b.mod_date
+    		, b.mod_admin
+    	FROM
+    		tbl_tax_bill b
+    		LEFT JOIN company c
+    		ON b.company_seq = c.company_seq
+    		LEFT JOIN employer e
+    		ON b.employer_seq = e.employer_seq
+    	WHERE
+    		1=1
+    		<if test="company_seq neq null and company_seq neq ''">
+    			AND b.company_seq = #{company_seq}
+    		</if>
+    		<if test="write_date neq null and write_date neq ''">
+    			AND b.write_date = #{write_date}
+    		</if>
+    		<if test="sel_seq_arr neq null">
+    			AND tax_seq IN
+   				<foreach collection="sel_seq_arr" open="(" close=")" separator="," item="item" index="i">
+					#{item }
+				</foreach>
+    		</if>
+    		${where}
+    	<if test="sidx neq null and sidx neq ''">
+    		ORDER BY ${sidx} ${sord}
+    	</if>	
+    	<if test="paging neq null">
+   			<choose>
+       			<when test="paging.pageNo gt 0">
+   					LIMIT ${paging.startPage}, ${paging.endPage}
+       			</when>
+       			<otherwise>
+   					LIMIT 0, ${paging.endPage}
+       			</otherwise>
+   			</choose>
+   		</if>	
+  	</select>
+
+  	<select id="selectTaxbillListCnt" parameterType="TaxbillDTO" resultType="int">
+    	/* 면세계산서 목록 갯수 가져오기 taxbill.xml */
+    	SELECT 
+    		COUNT(*)
+    	FROM 
+    		tbl_tax_bill b
+    		LEFT JOIN company c
+    		ON b.company_seq = c.company_seq
+    		LEFT JOIN employer e
+    		ON b.employer_seq = e.employer_seq
+    	WHERE 
+    		1 = 1
+    		<if test="company_seq neq null and company_seq neq ''">
+    			AND b.company_seq = #{company_seq}
+    		</if>
+    		<if test="write_date neq null and write_date neq ''">
+    			AND b.write_date = #{write_date}
+    		</if>
+    		${where}
+  	</select>
+
+  	<update id="updateTaxbill" parameterType="TaxbillDTO">
+   		UPDATE
+   			tbl_tax_bill
+   		SET
+   		<if test="tax_memo neq null and tax_memo neq ''">
+   			tax_memo = #{tax_memo },
+   		</if>
+   		<if test="tax_status neq null and tax_status neq ''">
+   			tax_status = #{tax_status},
+   		</if>
+   			mod_date = NOW(),
+   			mod_admin = #{reg_admin }
+   		WHERE
+   		<choose>
+   			<when test="tax_seq eq null">
+   				tax_seq IN
+   				<foreach collection="sel_seq_arr" open="(" close=")" separator="," item="item" index="i">
+					#{item }
+				</foreach>
+   			</when>
+   			<otherwise>
+   				tax_seq = #{tax_seq}	
+   			</otherwise>
+   		</choose>
+  	</update>
+
+  	
+</mapper>

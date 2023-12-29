@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.read.ReplicationWorkMapper">
+
+  	<select id="getWorkTotalCnt" parameterType="WorkDTO" resultType="int">
+  		/* 현장정보 조회 work.getWorkTotalCnt */
+    	SELECT 
+    		COUNT(1)
+    	FROM 
+    		work w 
+    		LEFT JOIN employer e ON w.employer_seq = e.employer_seq
+            LEFT JOIN company c ON w.company_seq = c.company_seq
+    	WHERE 
+    		1 = 1
+    		${where}
+    		<if test="srh_company_seq neq '' and srh_company_seq neq null"> AND w.company_seq = #{srh_company_seq} </if>
+    		<if test="start_reg_date neq '' and start_reg_date neq null"> AND DATE_FORMAT(w.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_reg_date} </if>
+    		<if test="end_reg_date neq '' and end_reg_date neq null"> AND DATE_FORMAT(w.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_reg_date} </if>
+    		<if test="srh_use_yn neq '' and srh_use_yn neq null"> AND w.use_yn = #{srh_use_yn} </if>
+    		<if test="owner_id neq '' and owner_id neq null"> AND w.owner_id = #{owner_id} </if>
+  	</select>
+
+  	<select id="getWorkList" parameterType="WorkDTO" resultType="WorkDTO">
+  		/* work.xml getWorkList */
+  		SELECT
+  			company_name
+			, employer_name
+			, work_seq
+			, company_seq
+			, employer_seq
+			, work_name
+			, work_arrival
+			, work_finish
+			, work_addr
+			, work_latlng
+			, work_addr_comment
+			, work_breakfast_yn
+			, work_age_min
+			, work_age
+			, work_blood_pressure
+			, manager_seq
+			, FN_DECRYPT(manager_name) as manager_name
+			, FN_DECRYPT(manager_phone) as manager_phone
+			, FN_DECRYPT(work_manager_name) as work_manager_name
+			, FN_DECRYPT(work_manager_phone) as work_manager_phone
+			, FN_DECRYPT(work_manager_email) as work_manager_email
+			, work_manager_fax
+			, work_memo
+			, work_comment
+			, is_worker_info
+			, use_yn
+			, owner_id
+			, complete_count
+			, ilbo_last_date
+			, reg_date
+			, reg_admin
+			, mod_date
+			, mod_admin 
+			, out_count
+			, total_out_count 
+			, day_count 
+			, wm_seq
+			, labor_contract_seq
+			, labor_contract_name
+			, receive_contract_seq
+			, receive_contract_name
+  		FROM
+			(SELECT 
+				c.company_name
+				, e.employer_name
+				, w.work_seq
+				, w.company_seq
+				, w.employer_seq
+				, w.work_name
+				, w.work_arrival
+				, w.work_finish
+				, w.work_addr
+				, w.work_latlng
+				, w.work_addr_comment
+				, w.work_breakfast_yn
+				, w.work_age_min
+				, w.work_age
+				, w.work_blood_pressure
+				, w.manager_seq
+				, (w.manager_name) as manager_name
+				, (w.manager_phone) as manager_phone
+				, (w.work_manager_name) as work_manager_name
+				, (w.work_manager_phone) as work_manager_phone
+				, (w.work_manager_email) as work_manager_email
+				, w.work_manager_fax
+				, w.work_memo
+				, w.work_comment
+				, w.is_worker_info
+				, w.use_yn
+				, w.owner_id
+				, w.complete_count
+				, w.ilbo_last_date
+				, w.reg_date
+				, w.reg_admin
+				, w.mod_date
+				, w.mod_admin 
+				, w.out_count
+				, w.total_out_count 
+				, w.day_count 
+				, IFNULL(wm.wm_seq, 0) AS wm_seq
+				, w.labor_contract_seq
+				, co.contract_name AS labor_contract_name
+				, w.receive_contract_seq
+				, co2.contract_name AS receive_contract_name
+			FROM		
+				WORK w 
+				LEFT JOIN employer e ON w.employer_seq = e.employer_seq 
+			    LEFT JOIN company c ON w.company_seq = c.company_seq
+			    LEFT JOIN tbl_relation_wm wm ON w.work_seq = wm.work_seq AND w.employer_seq = wm.employer_seq AND w.manager_seq = wm.manager_seq
+			    LEFT OUTER JOIN tbl_contract co ON w.labor_contract_seq = co.contract_seq
+			    LEFT OUTER JOIN tbl_contract co2 ON w.receive_contract_seq = co2.contract_seq
+			WHERE 
+				1 = 1
+		        ${where}
+			     <if test="company_seq neq '' and company_seq neq null"> AND w.company_seq = #{company_seq} </if>
+			     <if test="start_reg_date  neq '' and start_reg_date neq null"> AND DATE_FORMAT(w.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_reg_date} </if>
+			     <if test="end_reg_date neq '' and end_reg_date neq null"> AND DATE_FORMAT(w.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_reg_date} </if>
+			     <if test="srh_use_yn neq '' and srh_use_yn neq null"> AND w.use_yn = #{srh_use_yn} </if>
+			     <if test="owner_id neq '' and owner_id neq null"> AND w.owner_id = #{owner_id} </if>
+			ORDER BY ${sidx} ${sord}
+			<if test="paging != null">
+				<choose>
+			        <when test="paging.pageNo gt 0">
+			    		LIMIT ${paging.startPage}, ${paging.endPage}
+			        </when>
+			        <otherwise>
+			    		LIMIT 0, ${paging.endPage}
+			        </otherwise>
+			    </choose>
+			</if>) AS t
+  	</select>
+  
+  	<select id="getSelectInfo" parameterType="WorkDTO" resultType="WorkDTO">
+  		/* work.xml getSelectInfo */
+  		SELECT
+			w.work_seq
+			, w.company_seq
+			, w.employer_seq
+			, w.work_name
+			, w.work_arrival
+			, w.work_finish
+			, w.work_addr
+			, w.work_latlng
+			, w.work_addr_comment
+			, w.work_breakfast_yn
+			, w.work_age_min
+			, w.work_age
+			, w.work_blood_pressure
+			, FN_DECRYPT(w.work_manager_name) as work_manager_name
+			, w.work_manager_fax
+			, FN_DECRYPT(w.work_manager_phone) as work_manager_phone
+			, FN_DECRYPT(w.work_manager_email) as work_manager_email
+			, w.work_memo
+			, w.work_comment
+			, w.manager_seq
+			, FN_DECRYPT(w.manager_phone) as manager_phone
+			, FN_DECRYPT(w.manager_name) as manager_name
+			, w.is_worker_info
+			, w.use_yn
+			, w.owner_id
+			, w.complete_count
+			, w.ilbo_last_date
+			, w.reg_date
+			, w.reg_admin
+			, w.mod_date
+			, w.mod_admin 
+  			, e.employer_name 
+  			, w.labor_contract_seq
+  			, co.contract_name AS labor_contract_name
+  			, w.receive_contract_seq
+  			, co2.contract_name AS receive_contract_name
+  			, e.sign_manager_seq
+  			, e.sign_manager_type
+  			, w.work_sido
+  			, w.work_sigugun
+  			, w.work_dongmyun
+  			, w.work_rest
+  		FROM 
+  			work w 
+  			LEFT OUTER JOIN employer e on w.employer_seq = e.employer_seq 
+  			LEFT OUTER JOIN tbl_contract co ON w.labor_contract_seq = co.contract_seq
+  			LEFT OUTER JOIN tbl_contract co2 ON w.receive_contract_seq = co2.contract_seq
+  		WHERE
+  			w.work_seq = #{work_seq}
+  	</select>
+
+	<select id="selectWorkInfo" parameterType="WorkDTO" resultType="WorkDTO">
+		WITH tbl_dummy AS (SELECT 
+			<if test="manager_phone neq '' and manager_phone neq null">
+				FN_ENCRYPT(#{manager_phone }) AS phoneNo
+			</if>
+			<if test="work_manager_phone neq '' and work_manager_phone neq null">
+				FN_ENCRYPT(#{work_manager_phone }) AS work_manager_phone
+			</if>
+		)
+		SELECT
+			w.work_seq
+			, w.company_seq
+			, w.employer_seq
+			, w.work_name
+			, w.work_arrival
+			, w.work_finish
+			, w.work_addr
+			, w.work_latlng
+			, w.work_addr_comment
+			, w.work_breakfast_yn
+			, w.work_age_min
+			, w.work_age
+			, w.work_blood_pressure
+			, FN_DECRYPT(w.work_manager_name) as work_manager_name
+			, w.work_manager_fax
+			, FN_DECRYPT(w.work_manager_phone) as work_manager_phone
+			, FN_DECRYPT(w.work_manager_email) as work_manager_email
+			, w.work_memo
+			, w.work_comment
+			, w.manager_seq
+			, FN_DECRYPT(w.manager_phone) as manager_phone
+			, FN_DECRYPT(w.manager_name) as manager_name
+			, w.is_worker_info
+			, w.use_yn
+			, w.owner_id
+			, w.complete_count
+			, w.ilbo_last_date
+			, w.reg_date
+			, w.reg_admin
+			, w.mod_date
+			, w.mod_admin 
+			, w.labor_contract_seq
+			, co.contract_name AS labor_contract_name
+			, w.receive_contract_seq
+			, co2.contract_name AS receive_contract_name
+		FROM
+			work w
+			LEFT OUTER JOIN tbl_contract co ON w.labor_contract_seq = co.contract_seq
+			LEFT OUTER JOIN tbl_contract co2 ON w.receive_contract_seq = co2.contract_seq
+		WHERE
+			1 = 1
+			AND work_manager_phone = (SELECT work_manager_phone FROM tbl_dummy) 
+			OR manager_phone = (SELECT phoneNo FROM tbl_dummy)
+	</select>
+	
+	<select id="selectInList" parameterType="WorkDTO" resultType="WorkDTO">
+		/* 현장 리스트 in 절로 조회 work.xml selectInList */
+		SELECT
+			work_seq,
+			work_name
+		FROM
+			work
+		WHERE
+			work_seq IN
+			<foreach collection="sel_work_seq" item="work_seq" open="(" close=")" separator=", ">
+				#{work_seq }
+			</foreach>
+	</select>
+</mapper>

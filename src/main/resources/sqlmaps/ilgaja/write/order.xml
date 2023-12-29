@@ -1,0 +1,678 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.OrderMapper">
+	<select id="getOrderTotalCnt" parameterType="OrderDTO" resultType="int">
+		/* 오더정보 조회 work.getOrderTotalCnt */
+    		SELECT 
+    			COUNT(1)
+    		FROM 
+    			tbl_order o 
+    			LEFT JOIN employer e ON o.employer_seq = e.employer_seq
+    			LEFT JOIN company c ON o.company_seq = c.company_seq
+    		WHERE 
+    			1 = 1
+    			${where}
+    			<if test="srh_company_seq neq '' and srh_company_seq neq null"> AND o.company_seq = #{srh_company_seq} </if>
+    			<if test="start_reg_date neq '' and start_reg_date neq null"> AND DATE_FORMAT(o.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_reg_date}</if>
+    			<if test="end_reg_date   neq '' and end_reg_date   neq null"> AND DATE_FORMAT(o.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_reg_date} </if>
+    			<if test="srh_use_yn      neq '' and srh_use_yn      neq null"> AND o.use_yn = #{srh_use_yn} </if>
+    			<if test="order_state      neq '' and order_state      neq null"> AND o.order_state = #{order_state} </if>
+    			<if test="adminLevel neq null and adminLevel neq ''">
+					<choose>
+						<when test="adminLevel gt 0 and adminLevel lt 3">
+							<if test="company_seq neq null and company_seq neq ''">
+								AND o.order_company_seq = #{company_seq }
+							</if>		
+						</when>
+						<otherwise>
+							<if test="adminLevel neq '0'.toString() and adminLevel eq '3'.toString() and company_seq neq null and company_seq neq ''">
+								AND o.order_company_seq = #{company_seq }
+								AND o.owner_id = #{admin_id }
+							</if>
+						</otherwise>
+					</choose>
+				</if>
+  	</select>
+
+  	<select id="getOrderList" parameterType="OrderDTO" resultType="OrderDTO">
+  		/* 오더리스트 getOrderList order.xml */
+    	SELECT 
+			o.order_seq
+			, o.order_state
+			, o.order_date
+			, o.search_flag
+			, o.company_seq
+			, o.callcenter_memo
+			, o.employer_seq
+			, o.employer_name
+			, o.work_seq
+			, o.work_name
+			, o.owner_id
+			, o.work_arrival
+			, o.work_finish
+			, o.work_addr
+			, o.work_sido
+			, o.work_sigugun
+			, o.work_dongmyun
+			, o.work_rest
+			, o.work_latlng
+			, o.manager_seq
+			, FN_DECRYPT(o.manager_name) as manager_name
+			, FN_DECRYPT(o.manager_phone) as manager_phone
+			, FN_DECRYPT(o.work_manager_name) as work_manager_name
+			, FN_DECRYPT(o.work_manager_phone) as work_manager_phone
+			, o.work_day
+			, o.pay_type
+			, o.breakfast_yn
+			, o.work_age
+			, o.work_blood_pressure
+			, o.is_tax
+			, o.is_worker_info
+			, FN_DECRYPT(o.tax_name) as tax_name
+			, FN_DECRYPT(o.tax_phone) as tax_phone
+			, o.use_yn
+			, o.a_seq
+			, o.order_request
+			, o.reg_date
+			, o.reg_admin
+			, o.mod_date
+			, o.mod_admin 
+			, IFNULL( CONCAT(a.utm_source	,'|'	,IFNULL(a.n_keyword,' ')	,'|' 	,IFNULL(a.n_rank,' ') ,'|' ,a_os)	,'E') AS access_view
+			, c.company_name
+			, IFNULL(m.manager_type, 'N') AS manager_type
+			, (select sum(worker_count) FROM tbl_order_work WHERE use_yn = 1 AND order_seq = o.order_seq) as total_work
+			, o.order_company_seq
+			, c2.company_name AS order_company_name
+			, o.order_owner_id
+			, o.labor_contract_seq
+			, co.contract_name AS labor_contract_name
+			, o.receive_contract_seq
+			, co2.contract_name AS receive_contract_name
+		FROM
+			tbl_order o 
+			LEFT OUTER JOIN company c ON o.company_seq = c.company_seq
+			LEFT OUTER JOIN ( SELECT manager_seq, manager_phone,manager_type FROM manager  WHERE use_yn = '1' AND parent_company_seq = 0) m ON o.manager_phone = m.manager_phone
+			LEFT OUTER JOIN access_log a ON o.a_seq = a.a_seq
+			LEFT OUTER JOIN company c2 ON o.order_company_seq = c2.company_seq
+			LEFT OUTER JOIN tbl_contract co ON o.labor_contract_seq = co.contract_seq
+			LEFT OUTER JOIN tbl_contract co2 ON o.receive_contract_seq = co2.contract_seq
+		WHERE 
+			1 = 1
+	        ${where}
+			<if test="srh_company_seq neq '' and srh_company_seq neq null"> AND o.company_seq = #{srh_company_seq} </if>
+			<if test="start_reg_date neq '' and start_reg_date neq null"> AND DATE_FORMAT(o.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_reg_date}</if>
+			<if test="end_reg_date   neq '' and end_reg_date   neq null"> AND DATE_FORMAT(o.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_reg_date} </if>
+			<if test="srh_use_yn      neq '' and srh_use_yn      neq null"> AND o.use_yn = #{srh_use_yn} </if>
+			<if test="order_state      neq '' and order_state      neq null"> AND o.order_state = #{order_state} </if>
+			<if test="adminLevel neq null and adminLevel neq ''">
+				<choose>
+					<when test="adminLevel gt 0 and adminLevel lt 3">
+						<if test="company_seq neq null and company_seq neq ''">
+							AND o.order_company_seq = #{company_seq }
+						</if>		
+					</when>
+					<otherwise>
+						<if test="adminLevel neq '0'.toString() and adminLevel eq '3'.toString() and company_seq neq null and company_seq neq ''">
+							AND o.order_company_seq = #{company_seq }
+							AND o.owner_id = #{admin_id }
+						</if>
+					</otherwise>
+				</choose>
+			</if>
+		ORDER BY ${sidx} ${sord}
+		<if test="paging != null">
+			<choose>
+		        <when test="paging.pageNo gt 0">
+		    		LIMIT ${paging.startPage}, ${paging.endPage}
+		        </when>
+		        <otherwise>
+		    		LIMIT 0, ${paging.endPage}
+		        </otherwise>
+			</choose>
+		</if>
+  	</select>
+  
+   	<select id="getSelectInfo" parameterType="OrderDTO" resultType="OrderDTO">
+    	SELECT 
+			o.order_seq
+			, o.order_state
+			, o.order_date
+			, o.search_flag
+			, o.company_seq
+			, o.callcenter_memo
+			, o.employer_seq
+			, o.employer_name
+			, o.work_seq
+			, o.work_name
+			, o.work_arrival
+			, o.work_finish
+			, o.work_addr
+			, o.work_sido
+			, o.work_sigugun
+			, o.work_dongmyun
+			, o.work_rest
+			, o.work_latlng
+			, o.manager_seq
+			, FN_DECRYPT(o.manager_name) as manager_name
+			, FN_DECRYPT(o.manager_phone) as manager_phone
+			, FN_DECRYPT(o.work_manager_name) as work_manager_name
+			, FN_DECRYPT(o.work_manager_phone) as work_manager_phone
+			, o.work_day
+			, o.pay_type
+			, o.breakfast_yn
+			, o.work_age
+			, o.work_blood_pressure
+			, o.is_tax
+			, o.is_worker_info
+			, FN_DECRYPT(o.tax_name) as tax_name
+			, FN_DECRYPT(o.tax_phone) as tax_phone
+			, o.order_json_seq
+			, o.use_yn
+			, o.a_seq
+			, o.order_request
+			, o.reg_date
+			, o.reg_admin
+			, o.mod_date
+			, o.mod_admin 
+			, o.owner_id
+			, o.order_owner_id
+			, o.order_company_seq
+			, o.labor_contract_seq
+			, o.receive_contract_seq
+			, (
+				CASE
+					WHEN e.sign_manager_type = 'O'
+					THEN o.manager_seq
+					WHEN e.sign_manager_type = 'E'
+					THEN e.sign_manager_seq
+				END		
+			) AS sign_manager_seq
+		FROM
+			tbl_order o 
+			LEFT OUTER JOIN employer e ON o.employer_seq = e.employer_seq 
+		WHERE order_seq = #{order_seq}   
+  	</select>
+  
+  	<select id="getOrderWorkInfo" parameterType="OrderWorkDTO" resultType="OrderWorkDTO">
+    	SELECT 
+			*
+		FROM
+			tbl_order_work 
+		WHERE work_seq = #{work_seq}   
+  	</select>
+  
+  	<select id="getOrderWorkTotalCnt" parameterType="OrderWorkDTO" resultType="int">
+    	/* 오더정보 조회 work.getOrderTotalCnt */
+    	SELECT 
+    		COUNT(1)
+    	FROM 
+    		tbl_order_work o 
+    	WHERE 
+    		1 = 1 
+    		AND order_seq = #{order_seq}
+  	</select>
+
+  	<select id="getOrderWorkList" parameterType="OrderWorkDTO" resultType="OrderWorkDTO">
+    	SELECT 
+			*
+		FROM
+			tbl_order_work o
+		WHERE 
+			1 = 1
+	       	AND order_seq = #{order_seq}
+		ORDER BY  ${sidx} ${sord}
+			<if test="paging != null">
+				<choose>
+					<when test="paging.pageNo gt 0">
+		    			LIMIT ${paging.startPage}, ${paging.endPage}
+		        	</when>
+		        	<otherwise>
+		    			LIMIT 0, ${paging.endPage}
+		        	</otherwise>
+		      	</choose>
+			</if>
+  	</select>
+
+  	<insert id="setOrderCell" parameterType="OrderDTO" useGeneratedKeys="true" keyProperty="work_seq">
+    	/* 현장정보 생성 work.setOrderCell */
+    	INSERT INTO tbl_order (
+        	<if test="company_seq              neq '' and company_seq              neq null">  company_seq, </if>
+        	<if test="owner_id           neq '' and owner_id           neq null"> owner_id, </if>  
+        	reg_date
+        	, reg_admin
+        	, mod_admin
+    	) VALUES (
+        	<if test="company_seq              neq '' and company_seq              neq null">  #{company_seq},  </if>
+        	<if test="owner_id           neq '' and owner_id           neq null"> #{owner_id}, </if>
+        	NOW()
+        	, #{reg_admin}
+        	, #{reg_admin}
+    	)
+  	</insert>
+
+  	<update id="setOrderInfo" parameterType="OrderDTO">
+       /* 오더정보 수정 그리드에서 사용 tbl_order.setOrderInfo  jjh 수정 choose 방법 수정함 */
+       UPDATE 
+          tbl_order 
+       SET
+            mod_date = NOW()
+            <if test="mod_admin                neq null and mod_admin            neq '' "> , mod_admin      = #{mod_admin} </if>
+            <if test="order_date               neq null and order_date                 neq '' "> , order_date      = #{order_date} </if>
+            <if test="order_state              neq null and order_state                 neq '' "> , order_state      = #{order_state} </if>   
+         	<if test="company_seq              neq null"> , company_seq   = #{company_seq} </if>   
+         	<if test="employer_seq             neq null">, employer_seq   = #{employer_seq} </if>   
+         	<if test="employer_name            neq null"> , employer_name   = #{employer_name} </if>
+         	<if test="work_seq 				   neq null">, work_seq = #{work_seq} </if>   
+         	<if test="work_name                neq null"> , work_name      = #{work_name} </if>
+         	<if test="owner_id                 neq null"> , owner_id      = #{owner_id} </if>   
+         	<if test="work_arrival             neq null"> , work_arrival   = #{work_arrival} </if>   
+         	<if test="work_finish              neq null"> , work_finish      = #{work_finish} </if>   
+         	<if test="work_breaktime 		   neq null">, work_breaktime = #{work_breaktime } </if>
+         	<if test="work_addr                neq null and work_addr                 neq '' "> , work_addr      = #{work_addr} </if>
+         	<if test="work_sido                neq null and work_sido                    neq '' "> , work_sido      = #{work_sido} </if>
+         	<if test="work_sigugun             neq null and work_sigugun                 neq '' "> , work_sigugun   = #{work_sigugun} </if>
+         	<if test="work_dongmyun            neq null and work_dongmyun                neq '' "> , work_dongmyun   = #{work_dongmyun} </if>
+         	<if test="work_rest                neq null and work_rest                 neq '' "> , work_rest      = #{work_rest} </if>
+         	<if test="work_latlng             neq null and work_latlng                 neq '' "> , work_latlng   = #{work_latlng} </if>   
+         	<if test="work_day                neq null "> , work_day      = #{work_day} </if>   
+         	<if test="manager_seq          neq null "> , manager_seq   = #{manager_seq} </if>   
+         	<if test='manager_name          neq null and manager_name neq "?"'> , manager_name   = FN_ENCRYPT(#{manager_name}) </if>
+         	<if test="manager_phone         neq null "> , manager_phone   = FN_ENCRYPT(#{manager_phone}) </if>
+         	<if test="work_manager_name     neq null "> , work_manager_name   = FN_ENCRYPT(#{work_manager_name  })</if>
+         	<if test="work_manager_phone    neq null "> , work_manager_phone   = FN_ENCRYPT(#{work_manager_phone })</if>
+         	<if test="pay_type                 neq null "> , pay_type      = #{pay_type           }</if>
+         	<if test="breakfast_yn                 neq null "> , breakfast_yn      = #{breakfast_yn           }</if>
+         	<if test="work_age                 neq null "> , work_age      = #{work_age           }</if>
+         	<if test="work_blood_pressure   neq null "> , work_blood_pressure   = #{work_blood_pressure}</if>
+         	<if test="is_tax                      neq null "> , is_tax      = #{is_tax             }</if>
+         	<if test="is_worker_info             neq null "> , is_worker_info   = #{is_worker_info       }</if>
+            <if test="use_yn                    neq null and use_yn                    neq '' "> , use_yn         = #{use_yn} </if>
+            <if test="search_flag              neq null and search_flag                 neq '' "> , search_flag         = #{search_flag} </if>
+            <if test="callcenter_memo         neq null and callcenter_memo         neq '' "> , callcenter_memo   = #{callcenter_memo} </if>         
+            <if test="labor_contract_seq neq null and labor_contract_seq neq ''">
+               , labor_contract_seq = #{labor_contract_seq }
+            </if>
+            <if test="receive_contract_seq neq null and receive_contract_seq neq ''">
+               , receive_contract_seq = #{receive_contract_seq }
+            </if>
+            <if test="employer_search_yn neq null and employer_search_yn neq ''">, employer_search_yn = #{employer_search_yn}</if>
+            <if test="employer_name_exists neq null and employer_name_exists neq ''">
+            	, employer_name_exists = #{employer_name_exists}
+            </if>
+            <if test="employer_detail neq null">
+            	, employer_detail = #{employer_detail}
+            </if>
+            <if test="parking_option neq null and parking_option neq ''">
+            	, parking_option = #{parking_option}
+            </if>
+         WHERE 
+            order_seq = #{order_seq}
+    </update>
+  
+  	<update id="updateOrderInfo" parameterType="OrderDTO">
+       /* 오더정보 수정1 tbl_order.updateOrderInfo  */
+       UPDATE 
+          tbl_order 
+       SET
+            mod_date = NOW()
+            <if test="mod_admin                neq null and mod_admin            neq '' "> , mod_admin      = #{mod_admin} </if>
+            <if test="order_state             neq null and order_state                 neq '' "> , order_state      = #{order_state} </if>   
+         <if test="company_seq             neq null and company_seq                 neq '' "> , company_seq   = #{company_seq} </if>   
+         <if test="employer_seq          neq null and employer_seq              neq '' "> , employer_seq   = #{employer_seq} </if>   
+         <if test="employer_name          neq null and employer_name         neq '' "> , employer_name   = #{employer_name} </if>
+         <if test="work_seq neq null and work_seq neq '' "> 
+            , work_seq = #{work_seq} 
+<!--             , labor_contract_seq = CASE WHEN (SELECT labor_contract_seq FROM work WHERE work_seq = #{work_seq }) != '0' THEN (SELECT labor_contract_seq FROM work WHERE work_seq = #{work_seq }) ELSE '0' END  -->
+<!--               , receive_contract_seq =  CASE WHEN (SELECT receive_contract_seq FROM work WHERE work_seq = #{work_seq }) != '0' THEN (SELECT receive_contract_seq FROM work WHERE work_seq = #{work_seq }) ELSE '0' END -->
+         </if>   
+         <if test="work_name   neq null and work_name neq ''"> 
+            , work_name   = #{work_name}             
+         </if>   
+         <if test="work_arrival             neq null and work_arrival                 neq '' "> , work_arrival   = #{work_arrival} </if>   
+         <if test="work_finish                neq null and work_finish                 neq '' "> , work_finish      = #{work_finish} </if>   
+         <if test="work_breaktime neq null and work_breaktime neq ''">
+            , work_breaktime = #{work_breaktime }
+         </if>
+         <if test="work_addr                neq null and work_addr                 neq '' "> , work_addr      = #{work_addr} </if>
+         <if test="work_latlng             neq null and work_latlng                 neq '' "> , work_latlng      = #{work_latlng} </if>   
+         <if test="work_day                neq null and work_day                    neq '' "> , work_day      = #{work_day} </if>   
+         <if test="manager_seq             neq null and manager_seq             neq '' "> , manager_seq   = #{manager_seq} </if>   
+         <if test="manager_name          neq null and manager_name          neq '' "> , manager_name   = FN_ENCRYPT(#{manager_name}) </if>   
+         <if test="manager_phone         neq null and manager_phone            neq '' "> , manager_phone   = FN_ENCRYPT(#{manager_phone}) </if>
+         <if test="work_manager_name     neq null and work_manager_name     neq '' "> , work_manager_name   = FN_ENCRYPT(#{work_manager_name  })</if>
+         <if test="work_manager_phone    neq null and work_manager_phone  neq '' "> , work_manager_phone   = FN_ENCRYPT(#{work_manager_phone })</if>
+         <if test="pay_type                 neq null and pay_type                    neq '' "> , pay_type      = #{pay_type           }</if>
+         <if test="breakfast_yn            neq null and breakfast_yn               neq '' "> , breakfast_yn   = #{breakfast_yn}</if>
+         <if test="work_age                 neq null and work_age                    neq '' "> , work_age      = #{work_age           }</if>
+         <if test="work_blood_pressure   neq null and work_blood_pressure   neq '' "> , work_blood_pressure   = #{work_blood_pressure}</if>
+         <if test="is_tax                      neq null and is_tax                       neq '' "> , is_tax      = #{is_tax             }</if>
+         <if test="is_worker_info             neq null and is_worker_info              neq '' "> , is_worker_info   = #{is_worker_info       }</if>
+            <if test="use_yn                    neq null and use_yn                    neq '' "> , use_yn         = #{use_yn} </if>
+            <if test="search_flag              neq null and search_flag                 neq '' "> , search_flag         = #{search_flag} </if>
+            <if test="labor_contract_seq neq null and labor_contract_seq neq ''">
+				, labor_contract_seq = #{labor_contract_seq }
+            </if>
+            <if test="receive_contract_seq neq null and receive_contract_seq neq ''">
+				, receive_contract_seq = #{receive_contract_seq }
+            </if>
+            <if test="employer_search_yn neq null and employer_search_yn neq ''">
+				, employer_search_yn = #{employer_search_yn}
+            </if>
+         WHERE 
+            order_seq = #{order_seq}
+    </update>
+
+	<insert id="insertOrder" parameterType="OrderDTO" useGeneratedKeys="true" keyProperty="order_seq">
+		INSERT 
+			tbl_order 
+		SET
+			order_date = #{order_date}
+			<if test="employer_name neq null"> 
+				, employer_name	= #{employer_name} 
+			</if>
+			<if test="company_seq neq null"> 
+				, company_seq = #{company_seq} 
+			</if>	
+			<if test="work_name	neq null"> 
+				, work_name	= #{work_name} 
+			</if>	
+			<if test="work_addr	neq null and work_addr neq '' "> 
+				, work_addr	= #{work_addr} 
+			</if>
+			<if test="work_sido	neq null and work_sido neq '' "> 
+				, work_sido	= #{work_sido } 
+			</if>
+			<if test="work_sigugun neq null and work_sigugun neq '' "> 
+				, work_sigugun = #{work_sigugun } 
+			</if>
+			<if test="work_dongmyun	neq null and work_dongmyun neq '' "> 
+				, work_dongmyun	= #{work_dongmyun } 
+			</if>
+			<if test="work_rest	neq null and work_rest neq '' "> 
+				, work_rest	= #{work_rest } 
+			</if>
+			<if test="work_latlng neq null and work_latlng neq '' "> 
+				, work_latlng = #{work_latlng} 
+			</if>	
+			<if test="work_arrival neq null"> 
+				, work_arrival = #{work_arrival} 
+			</if>	
+			<if test="work_finish neq null"> 
+				, work_finish = #{work_finish} 
+			</if>	
+			<if test="manager_seq neq null"> 
+				, manager_seq = #{manager_seq} 
+			</if>
+			<if test="manager_name neq null"> 
+				, manager_name = FN_ENCRYPT(#{manager_name}) 
+			</if>	
+			<if test="manager_phone	neq null"> 
+				, manager_phone	= FN_ENCRYPT(#{manager_phone}) 
+			</if>
+			<if test="work_manager_name neq null"> 
+				, work_manager_name	= FN_ENCRYPT(#{work_manager_name}) 
+			</if>
+			<if test="work_manager_phone neq null"> 
+				, work_manager_phone= FN_ENCRYPT(#{work_manager_phone }) 
+			</if>
+			<if test="work_day neq null"> 
+				, work_day = #{work_day} 
+			</if>
+			<if test="pay_type neq null"> 
+				, pay_type = #{pay_type}
+			</if>
+			<if test="breakfast_yn neq null"> 
+				, breakfast_yn = #{breakfast_yn}
+			</if>
+			<if test="work_age neq null"> 
+				, work_age = #{work_age}
+			</if>
+			<if test="work_blood_pressure neq null"> 
+				, work_blood_pressure = #{work_blood_pressure}
+			</if>
+			<if test="is_tax neq null"> 
+				, is_tax = #{is_tax}
+			</if>
+			<if test="tax_name neq null"> 
+				, tax_name = FN_ENCRYPT(#{tax_name}) 
+			</if>
+			<if test="tax_phone neq null"> 
+				, tax_phone = FN_ENCRYPT(#{tax_phone}) 
+			</if>
+			<if test="is_worker_info neq null"> 
+				, is_worker_info = #{is_worker_info}
+			</if>
+			<if test="a_seq neq '' and a_seq neq null"> 
+				, a_seq = #{a_seq} 
+			</if>
+			<if test="order_json_seq neq '' and order_json_seq neq null">
+				, order_json_seq = #{order_json_seq }
+			</if>
+			<if test="order_company_seq neq '' and order_company_seq neq null">
+				, order_company_seq = #{order_company_seq }
+			</if>
+			<if test="owner_id neq '' and owner_id neq null">
+				, owner_id = #{owner_id }
+			</if>
+			<if test="order_owner_id neq '' and order_owner_id neq null">
+				, order_owner_id = #{order_owner_id }
+			</if>
+			<if test="labor_contract_seq neq null">
+				, labor_contract_seq = #{labor_contract_seq }
+			</if>
+			<if test="receive_contract_seq neq null">
+				, receive_contract_seq = #{receive_contract_seq }
+			</if>
+			<if test="work_breaktime neq null and work_breaktime neq ''">
+				, work_breaktime = #{work_breaktime }
+			</if>
+			<if test="employer_name_exists neq null and employer_name_exists neq ''">
+				, employer_name_exists = #{employer_name_exists}
+			</if>
+			, order_request = #{order_request }
+			, reg_date = NOW()
+			, reg_admin = #{reg_admin}
+			, mod_admin = #{reg_admin}
+	</insert>
+	
+  	<insert id="insertOrderWork" parameterType="OrderWorkDTO" useGeneratedKeys="true" keyProperty="work_seq">
+   		/* 오더 일정보 등록  tbl_order.insertOrderWork  */
+		INSERT 
+			tbl_order_work 
+		SET
+			reg_date = NOW()
+	      	, reg_admin = #{reg_admin}
+	      	, mod_admin = #{reg_admin}
+			, order_seq = #{order_seq}
+			, work_kind_name = #{work_kind_name}
+			, work_kind_code = #{work_kind_code}
+			, work_job_detail_name = #{work_job_detail_name}
+			, work_job_detail_code = #{work_job_detail_code}
+			, work_job_add_name = #{work_job_add_name}
+			, work_job_add_code = #{work_job_add_code}
+			, work_price = #{work_price}
+			, hold_work_price = #{work_price }
+			<if test="work_memo 	neq null"> , work_memo = #{work_memo}</if>
+			, worker_count = #{worker_count}
+	</insert>
+
+<!--
+  <delete id="removeOrderInfo" parameterType="OrderDTO">
+    /* 현장정보 삭제 work.removeOrderInfo */
+    DELETE FROM work
+    WHERE work_seq = #{work_seq}
+  </delete>
+-->
+
+	<update id="removeOrderInfo" parameterType="OrderDTO">
+    	/* 현장정보 삭제 tbl_order.removeOrderInfo */
+    	UPDATE 
+    		tbl_order 
+    	SET
+      		use_yn = 0
+      		<if test="reg_admin neq '' and reg_admin neq null"> , mod_admin = #{reg_admin} </if> 
+    	WHERE 
+    		order_seq IN
+    		<foreach collection="sel_order_seq" item="sel_seq"  open="(" close=")" separator=", ">
+      			#{sel_seq}
+    		</foreach>
+  	</update>
+  
+  	<select id="getSelectOrder" parameterType="OrderDTO" resultType="orderDTO">
+    	SELECT 
+			o.order_seq
+			, o.order_state
+			, o.order_date
+			, o.search_flag
+			, o.company_seq
+			, o.callcenter_memo
+			, o.employer_seq
+			, o.employer_name
+			, o.work_seq
+			, o.work_name
+			, o.work_arrival
+			, o.work_finish
+			, o.work_addr
+			, o.work_latlng
+			, o.manager_seq
+			, FN_DECRYPT(o.manager_name) as manager_name
+			, FN_DECRYPT(o.manager_phone) as manager_phone
+			, FN_DECRYPT(o.work_manager_name) as work_manager_name
+			, FN_DECRYPT(o.work_manager_phone) as work_manager_phone
+			, o.work_day
+			, o.pay_type
+			, o.breakfast_yn
+			, o.work_age
+			, o.work_blood_pressure
+			, o.is_tax
+			, o.is_worker_info
+			, FN_DECRYPT(o.tax_name) as tax_name
+			, FN_DECRYPT(o.tax_phone) as tax_phone
+			, o.use_yn
+			, o.a_seq
+			, o.order_request
+			, o.reg_date
+			, o.reg_admin
+			, o.mod_date
+			, o.mod_admin 
+			, o.labor_contract_seq
+			, o.receive_contract_seq
+		FROM
+			tbl_order o  
+		WHERE 
+			order_seq = #{order_seq}
+  	</select>
+  
+  	<select id="getOrderLogList" parameterType="OrderLogDTO" resultType="OrderLogDTO">
+    	SELECT 
+			*
+		FROM
+			tbl_order_log 
+	    WHERE 
+	    	1 = 1 
+	    	AND order_seq = #{order_seq}
+	    	<if test="log_type neq '' and log_type neq null"> and log_type = #{log_type} </if>    
+  	</select>
+  
+  	<select id="getSelectOrderLog" parameterType="OrderLogDTO" resultType="OrderLogDTO">
+    	SELECT 
+			*
+		FROM
+			tbl_order_log 
+	    WHERE 
+	    	1 = 1 AND log_seq = #{log_seq}
+  	</select>
+  
+  	<insert id="insertOrderLog" parameterType="OrderLogDTO" useGeneratedKeys="true" keyProperty="log_seq">
+    	/* 로그입력 tbl_order_log insertOrderLog*/
+    	INSERT INTO tbl_order_log (
+			log_type,
+			order_seq,
+		  	prarent_seq,
+		  	prev_data,
+		  	change_data,
+		  	reg_date,
+		  	reg_admin
+		)VALUES (
+		    #{log_type},
+		    #{order_seq},
+		    #{prarent_seq},
+		    #{prev_data},
+		    #{change_data},
+			NOW(),
+		    #{reg_admin}
+  		) 
+  	</insert>
+  
+  	<update id="setOrderWorkInfo" parameterType="OrderDTO">
+    	/* 오더정보 수정 tbl_order_work.setOrderWorkInfo  */
+    	UPDATE 
+    		tbl_order_work 
+    	SET
+      		mod_date = NOW()
+     		, mod_admin = 	#{mod_admin       }
+			<if test="work_kind_name neq null">, work_kind_name = #{work_kind_name}</if>
+			<if test="work_kind_code neq null ">, work_kind_code = #{work_kind_code}</if>
+			<if test="work_job_detail_name neq null ">, work_job_detail_name = #{work_job_detail_name}</if>
+			<if test="work_job_detail_code neq null ">, work_job_detail_code = #{work_job_detail_code}</if>
+			<if test="work_job_add_name neq null">, work_job_add_name = #{work_job_add_name}</if>
+			<if test="work_job_add_code neq null ">, work_job_add_code = #{work_job_add_code}</if>
+			<if test="work_price neq null  ">, work_price = #{work_price}</if>
+			<if test="ilbo_state       	neq null"> ,ilbo_state	= #{ilbo_state       }</if>
+      		<if test="use_yn              neq null"> , use_yn      	= #{use_yn} </if>
+      		<if test="worker_count neq null and worker_count neq '' ">, worker_count = #{worker_count}</if>
+      		<if test="work_memo neq null and work_memo neq '' ">, work_memo = #{work_memo}</if>
+      		<if test="worker_company_seq neq null and worker_company_seq neq '' ">, worker_company_seq = #{worker_company_seq}</if>
+      		<if test="worker_company_name neq null and worker_company_name neq '' ">, worker_company_name = #{worker_company_name}</if>
+      		<if test="use_code neq null and use_code neq '' ">, use_code = #{use_code}</if>
+      		<if test="use_name neq null and use_name neq '' ">, use_name = #{use_name}</if>
+      		<if test="career_name neq null and career_name neq ''">
+      			, career_name = #{career_name }
+      		</if>
+      		<if test="career_use_seq neq null and career_use_seq neq ''">
+      			, career_use_seq = #{career_use_seq }
+      		</if>
+    	WHERE 
+    		work_seq = #{work_seq}
+  	</update>
+  
+    <select id="getTotalWork" parameterType="OrderDTO" resultType="int">
+    	/* 오더Work count 조회 order.getTotalWork */
+    	SELECT 
+	 		IFNULL(SUM(worker_count),0) AS ct 
+		FROM
+	  		tbl_order_work
+		WHERE 
+			use_yn = 1 
+	  		AND order_seq IN 
+	  			(SELECT order_seq FROM tbl_order o LEFT OUTER JOIN company c ON o.company_seq = c.company_seq WHERE o.use_yn = 1  
+	  			<if test="start_reg_date neq '' and start_reg_date neq null"> AND DATE_FORMAT(o.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_reg_date} </if>
+    			<if test="end_reg_date   neq '' and end_reg_date   neq null"> AND DATE_FORMAT(o.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_reg_date} </if>
+    			<if test="adminLevel neq null and adminLevel neq ''">
+					<choose>
+						<when test="adminLevel gt 0 and adminLevel lt 3">
+							<if test="company_seq neq null and company_seq neq ''">
+								AND o.order_company_seq = #{company_seq }
+							</if>		
+						</when>
+						<otherwise>
+							<if test="adminLevel neq '0'.toString() and adminLevel eq '3'.toString() and company_seq neq null and company_seq neq ''">
+								AND o.order_company_seq = #{company_seq }
+								AND o.owner_id = #{admin_id }
+							</if>
+						</otherwise>
+					</choose>
+				</if>
+      			) 
+  	</select>
+  	<update id="initWorkLatlng" parameterType="OrderDTO">
+  		/* 오더관리>복구 할 때 좌표값 초기화 initWorkLatlng order.xml */
+  		UPDATE
+  			tbl_order
+  		SET
+  			work_latlng = NULL
+  		WHERE
+  			order_seq = #{order_seq}		
+  	</update>
+</mapper>

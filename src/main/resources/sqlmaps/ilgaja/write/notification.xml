@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.NotificationMapper">
+
+	<select id="selectSuperAdminListCount" parameterType="NotificationDTO" resultType="int">
+		/* selectSuperAdminListCount 슈퍼어드민 알림 리스트 개수 notification.xml */
+		SELECT
+			IFNULL(COUNT(*), 0) AS cnt
+		FROM
+			tbl_notification a
+		WHERE
+			a.use_yn = 1
+	</select>
+
+	<select id="selectListCnt" parameterType="NotificationDTO" resultType="int">
+		/* 알림 리스트 개수 */
+		SELECT 
+   			IFNULL(COUNT(*),0) AS cnt
+		FROM
+			tbl_notification a
+			JOIN tbl_notification_log b
+				ON a.notification_seq = b.notification_seq 
+		WHERE
+		    a.use_yn = 1
+			<if test="status_flag neq null and status_flag neq ''">
+   				AND a.status_flag = #{status_flag}
+   			</if>
+			<if test='notification_type neq "" and notification_type neq null'>
+				AND b.notification_type = #{notification_type }
+			</if>
+			<if test='adminSeq neq "" and adminSeq neq null'>
+				AND b.admin_seq = #{adminSeq }
+			</if>
+   			<if test="query neq null and query neq ''">
+   				${query}
+   			</if>
+	</select>
+	
+	<select id="selectSuperAdminList" parameterType="NotificationDTO" resultType="NotificationDTO">
+		/* selectSuperAdminList 슈퍼어드민 알림 리스트 notification.xml */
+		SELECT
+			a.*
+			,(SELECT company_name FROM company WHERE company_seq = a.worker_company_seq) AS worker_company_name
+   			,(SELECT company_name FROM company WHERE company_seq = a.work_company_seq) AS work_company_name
+   		FROM
+   			tbl_notification a
+   		WHERE
+   			use_yn = 1	
+		<if test="status_flag neq null and status_flag neq ''">
+			AND a.status_flag = #{status_flag}
+		</if>
+		<if test="query neq null and query neq ''">
+			${query}
+		</if>	
+		ORDER BY a.reg_date DESC
+		<if test="paging neq null">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+	</select>
+	
+	<select id="selectList" parameterType="NotificationDTO" resultType="NotificationDTO">
+		/* 알림 리스트 */
+		SELECT 
+   			a.* 
+   			,(SELECT company_name FROM company WHERE company_seq = a.worker_company_seq) AS worker_company_name
+   			,(SELECT company_name FROM company WHERE company_seq = a.work_company_seq) AS work_company_name
+   			,b.notification_log_seq
+   			,b.admin_seq
+   			,b.notification_type
+   			,b.read_yn
+   		FROM 
+   			tbl_notification a
+   			JOIN tbl_notification_log b ON a.notification_seq = b.notification_seq
+		WHERE
+		    a.use_yn=1
+			<if test='notification_type neq "" and notification_type neq null'>
+				AND b.notification_type = #{notification_type }
+			</if>
+			<if test='adminSeq neq "" and adminSeq neq null'>
+				AND b.admin_seq = #{adminSeq }
+			</if>
+   			<if test="status_flag neq null and status_flag neq ''">
+   				AND a.status_flag = #{status_flag}
+   			</if>
+   			<if test="query neq null and query neq ''">
+   				${query}
+   			</if>
+		ORDER BY b.reg_date DESC
+		<if test="paging neq null">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+	</select>
+	
+	
+	
+	<select id="selectNotificationListCnt" parameterType="NotificationDTO" resultType="int">
+		/* 알림 리스트 개수 */
+		SELECT  
+			COUNT(a.notification_seq) as ct
+		FROM
+			tbl_notification a 
+			JOIN tbl_notification_log b 
+				ON a.notification_seq = b.notification_seq  
+		WHERE 
+			1 = 1
+		  	AND (a.work_company_seq = #{company_seq } OR a.worker_company_seq = #{company_seq})
+		  	AND b.notification_type = #{notification_type }
+		  	AND b.admin_seq = #{admin_seq}
+	</select>
+	
+	
+	<select id="selectNotificationList" parameterType="NotificationDTO" resultType="NotificationDTO">
+		/* 알림 리스트 */
+
+		SELECT  
+			a.*
+			,b.notification_log_seq
+			,b.admin_seq
+   			,b.notification_type
+   			,b.read_yn
+		FROM
+			tbl_notification a 
+		JOIN tbl_notification_log b ON a.notification_seq = b.notification_seq  
+		WHERE 1 =1
+		  	AND ( a.work_company_seq = #{company_seq } OR a.worker_company_seq = #{company_seq})
+		  	AND b.notification_type = #{notification_type }
+		  	AND b.admin_seq = #{admin_seq}
+		ORDER BY notification_seq DESC
+		<if test="paging neq null">
+				LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+		 
+					
+	</select>
+	
+	
+	<update id="updateNotification" parameterType="NotificationDTO">
+	/*읽음 처리*/	
+		UPDATE
+			tbl_notification_log
+		SET
+			mod_date = now()
+			<if test="read_yn neq null and read_yn neq '' ">
+				, read_date = now()
+				, read_yn = 1
+			</if>
+			<if test="mod_admin neq null and mod_admin neq '' ">
+				, mod_admin = #{mod_admin}
+			</if>
+		WHERE	notification_log_seq= #{notification_log_seq}
+				
+	</update>
+	
+	
+</mapper>

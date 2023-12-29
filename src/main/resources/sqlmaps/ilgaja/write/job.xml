@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.JobMapper">
+	<select id="selectJobListCnt" parameterType="JobDTO" resultType="int">
+		/* job.xml selectJobListCnt */
+		SELECT
+			COUNT(job_seq) AS totalCnt
+		FROM
+			tbl_job
+		WHERE
+			1 = 1
+			AND use_yn = '1'
+			<if test="job_code neq null and job_code neq '' and job_code neq '0'.toString()">
+				AND job_code = #{job_code }
+			</if>
+			<if test="job_kind neq null and job_kind neq ''">
+				AND job_kind = #{job_kind }
+			</if>
+			<choose>
+				<when test="job_rank neq null and job_rank neq '' and job_rank neq '1'.toString()">
+					AND job_rank = #{job_rank }
+				</when>
+				<otherwise>
+					AND job_rank = '1'
+				</otherwise>
+			</choose>
+			AND del_yn = '0'
+	</select>
+	
+	<select id="selectJobList" parameterType="JobDTO" resultType="JobDTO">
+		/* job.xml selectJobList */
+		SELECT
+			job_seq,
+			job_kind,
+			job_field,
+			job_work_fee,
+			job_worker_fee,
+			job_image_name,
+			job_code,
+			job_name,
+			job_rank,
+			basic_price,
+			short_price,
+			short_price_night,
+			add_day_time,
+			add_night_time,
+			detail_use_yn,
+			use_yn,
+			del_yn,
+			reg_date,
+			reg_admin,
+			mod_date,
+			mod_admin
+		FROM
+			tbl_job
+		WHERE
+			1 = 1
+			AND del_yn = '0'
+			<if test="use_yn neq null and use_yn neq ''"> AND use_yn = #{use_yn} </if>
+			<if test="job_code neq null and job_code neq '' and job_code neq '0'.toString()">	AND job_code = #{job_code }	</if>
+			<if test="job_kind neq null and job_kind neq ''">		AND job_kind = #{job_kind }	</if>
+			<if test="job_field neq null and job_field neq ''">
+				AND job_field = #{job_field }
+			</if>
+			<choose>
+				<when test="job_rank neq null and job_rank neq '' and job_rank neq '1'.toString()">
+					AND job_rank = #{job_rank }
+				</when>
+				<otherwise>
+					AND job_rank = '1'
+				</otherwise>
+			</choose>
+			<choose>
+				<when test="orderBy neq null and orderBy neq ''" >
+					ORDER BY ${orderBy}
+				</when>
+				<otherwise>
+					ORDER BY job_kind ASC, job_order ASC
+				</otherwise>
+			</choose>
+		<if test="paging neq null">	LIMIT ${paging.startPage }, ${paging.endPage }		</if>
+	</select>
+	
+	<select id="getJobList" parameterType="JobDTO" resultType="JobDTO">
+		/* job.xml getJobList */
+		SELECT
+			job_seq,
+			job_kind,
+			job_field,
+			job_work_fee,
+			job_worker_fee,
+			job_image_name,
+			job_code,
+			job_name,
+			job_rank,
+			basic_price,
+			short_price,
+			short_price_night,
+			add_day_time,
+			add_night_time,
+			detail_use_yn,
+			use_yn,
+			del_yn,
+			reg_date,
+			reg_admin,
+			mod_date,
+			mod_admin
+		FROM
+			tbl_job
+		WHERE
+			1 = 1
+			<if test="use_yn neq null and use_yn neq ''"> AND use_yn = #{use_yn} </if>
+			<if test="del_yn neq null and del_yn neq ''"> AND del_yn = #{del_yn} </if>
+			<if test="job_code neq null and job_code neq '' and job_code neq '0'.toString()">	AND job_code = #{job_code }	</if>
+			<if test="job_kind neq null and job_kind neq ''">		AND job_kind = #{job_kind }	</if>
+			<if test="job_rank neq null and job_rank neq ''">		AND job_rank = #{job_rank }	</if>
+			<if test="job_field neq null and job_field neq ''">
+				AND job_field = #{job_field }
+			</if>
+			<choose>
+				<when test="orderBy neq null and orderBy neq ''" >
+					ORDER BY ${orderBy}
+				</when>
+				<otherwise>
+					ORDER BY job_seq DESC
+				</otherwise>
+			</choose>
+	</select>
+	
+	
+	<select id="selectInfo" parameterType="JobDTO" resultType="JobDTO">
+		/* job.xml selectInfo */
+		SELECT
+			job_seq,
+			job_kind,
+			job_field,
+			job_work_fee,
+			job_worker_fee,
+			job_image_name,
+			job_code,
+			job_name,
+			job_rank,
+			job_background,
+			job_color,
+			basic_price,
+			short_price,
+			short_price_night,
+			add_day_time,
+			add_night_time,
+			detail_use_yn,
+			use_yn,
+			del_yn,
+			reg_admin,
+			reg_date,
+			mod_admin,
+			mod_date
+		FROM
+			tbl_job
+		WHERE 
+			1 = 1
+			AND use_yn = '1'
+			<if test="job_seq neq '' and job_seq neq null">
+				AND job_seq = #{job_seq }
+			</if>
+	</select>
+	
+	<insert id="insertJob" parameterType="JobDTO">
+		/* job.xml insertJob */
+		INSERT INTO tbl_job (
+			job_code,
+			job_kind,
+			<if test="job_image_name neq null and job_image_name neq ''">
+				job_image_name,
+			</if>
+			job_field,
+			job_work_fee,
+			job_worker_fee,
+			job_name,
+			job_rank,
+			basic_price,
+			short_price,
+			short_price_night,
+			add_day_time,
+			add_night_time,
+			detail_use_yn,
+			use_yn,
+			del_yn,
+			reg_admin,
+			reg_date,
+			mod_admin,
+			mod_date
+		) VALUES (
+			<choose>
+				<when test="job_rank neq null and job_rank eq '1'.toString()">
+					(SELECT MAX(job_seq) + 1 FROM tbl_job ALIAS_FOR_SUBQUERY),
+				</when>
+				<otherwise>
+					#{job_code },
+				</otherwise>
+			</choose>
+			#{job_kind },
+			<if test="job_image_name neq null and job_image_name neq ''">
+				#{job_image_name },
+			</if>
+			#{job_field },
+			#{job_work_fee },
+			#{job_worker_fee },
+			#{job_name },
+			#{job_rank },
+			#{basic_price },
+			#{short_price },
+			#{short_price_night },
+			#{add_day_time },
+			#{add_night_time },
+			#{detail_use_yn },
+			#{use_yn },
+			'0',
+			#{reg_admin },
+			NOW(),
+			#{reg_admin },
+			NOW()
+		)
+	</insert>
+	
+	<update id="updateJob" parameterType="JobDTO">
+		/* job.xml updateJob */
+		UPDATE
+			tbl_job
+		SET
+			job_kind = #{job_kind },
+			job_name = #{job_name },
+			<if test="job_image_name neq null and job_image_name neq ''">
+				job_image_name = #{job_image_name },
+			</if>
+			job_field = #{job_field },
+			job_work_fee = #{job_work_fee },
+			job_worker_fee = #{job_worker_fee },
+			job_color = #{job_color},
+			job_background = #{job_background},
+			<choose>
+				<when test="detail_use_yn eq '0'.toString()">
+					basic_price = #{basic_price },
+					short_price = #{short_price },
+					short_price_night = #{short_price_night },
+					add_day_time = #{add_day_time },
+					add_night_time = #{add_night_time },
+					detail_use_yn = '0',
+				</when>
+				<otherwise>
+					detail_use_yn = '1',
+				</otherwise>
+			</choose>
+			use_yn = #{use_yn },
+			mod_date = NOW(),
+			mod_admin = #{reg_admin }
+		WHERE
+			job_seq = #{job_seq }
+	</update>
+	
+	<update id="deleteJob" parameterType="JobDTO">
+		/* job.xml deleteJob */
+		UPDATE
+			tbl_job
+		SET
+			del_yn = '1'
+		WHERE
+			job_seq = #{job_seq }
+	</update>
+	
+	<insert id="insertJobDetail" parameterType="JobDTO" useGeneratedKeys="true" keyProperty="job_seq">
+		/* job.xml insertJobDetail */
+		INSERT INTO tbl_job (
+			job_code,
+			job_name,
+			job_rank,
+			basic_price,
+			short_price,
+			short_price_night,
+			add_day_time,
+			add_night_time,
+			use_yn,
+			del_yn,
+			reg_admin,
+			reg_date,
+			mod_admin,
+			mod_date
+		) VALUES (
+			#{job_code },
+			#{job_name },
+			#{job_rank },
+			#{basic_price },
+			#{short_price },
+			#{short_price_night},
+			#{add_day_time },
+			#{add_night_time },
+			#{use_yn },
+			'0',
+			#{reg_admin },
+			NOW(),
+			#{reg_admin },
+			NOW()
+		)
+	</insert>
+	
+	<update id="updateJobDetail" parameterType="JobDTO">
+		/* job.xml updateJobDetail */
+		UPDATE
+			tbl_job
+		SET
+			job_name = #{job_name },
+			basic_price = #{basic_price },
+			short_price = #{short_price },
+			short_price_night = #{short_price_night },
+			add_day_time = #{add_day_time },
+			add_night_time = #{add_night_time },
+			use_yn = #{use_yn },
+			job_order = #{job_order },
+			mod_date = NOW(),
+			mod_admin = #{reg_admin }
+		WHERE
+			job_seq = #{job_seq }
+			AND job_rank = #{job_rank }
+	</update>
+	
+	<update id="deleteJobDetail" parameterType="JobDTO">
+		/* job.xml deleteJobDetail */
+		UPDATE
+			tbl_job
+		SET
+			del_yn = '1'
+		WHERE
+			job_seq = #{job_seq }
+			AND job_rank = #{job_rank }
+	</update>
+	
+	<insert id="insertAddJobChoose" parameterType="JobDTO" useGeneratedKeys="true" keyProperty="job_seq">
+		/* job.xml insertJobDetail */
+		INSERT INTO tbl_job (
+			job_code,
+			job_name,
+			job_rank,
+			basic_price,
+			short_price,
+			short_price_night,
+			add_day_time,
+			add_night_time,
+			use_yn,
+			del_yn,
+			reg_admin,
+			reg_date,
+			mod_admin,
+			mod_date
+		) VALUES (
+			#{job_code },
+			#{job_name },
+			#{job_rank },
+			#{basic_price },
+			'0',
+			'0',
+			'0',
+			'0',
+			#{use_yn },
+			'0',
+			#{reg_admin },
+			NOW(),
+			#{reg_admin },
+			NOW()
+		)
+	</insert>
+	
+	<update id="updateAddJobChoose" parameterType="JobDTO">
+		/* job.xml updateAddJobChoose */
+		UPDATE
+			tbl_job
+		SET
+			job_name = #{job_name },
+			basic_price = #{basic_price },
+			use_yn = #{use_yn },
+			job_order = #{job_order },
+			mod_date = NOW(),
+			mod_admin = #{reg_admin }
+		WHERE
+			job_seq = #{job_seq }
+			AND job_rank = #{job_rank }
+	</update>
+	
+	<update id="deleteAddJobChoose" parameterType="JobDTO">
+		/* job.xml deleteAddJobChoose */
+		UPDATE
+			tbl_job
+		SET
+			del_yn = '1'
+		WHERE
+			job_seq = #{job_seq }
+			AND job_rank = #{job_rank }
+	</update>
+	
+	<select id="selectChooseList" parameterType="JobDTO" resultType="JobDTO">
+		/* job.xml selectChooseList */
+		SELECT
+			job_seq,
+			job_kind,
+			job_field,
+			job_work_fee,
+			job_worker_fee,
+			job_image_name,
+			job_code,
+			job_name,
+			job_rank,
+			basic_price,
+			short_price,
+			short_price_night,
+			add_day_time,
+			add_night_time,
+			detail_use_yn,
+			use_yn,
+			del_yn,
+			reg_admin,
+			reg_date,
+			mod_admin,
+			mod_date
+		FROM
+			tbl_job
+		WHERE
+			1 = 1
+			AND use_yn = '1'
+			AND job_seq IN
+			<foreach collection="job_seq_arr" item="job_seq" open="(" close=")" separator=", ">
+				 #{job_seq }
+			</foreach>
+		ORDER BY job_seq ASC
+	</select>
+	
+	<select id="selectJob" parameterType="JobDTO" resultType="JobDTO">
+		SELECT
+			job_seq,
+			job_kind,
+			job_code,
+			job_field,
+			job_work_fee,
+			job_worker_fee,
+			job_image_name,
+			job_name,
+			job_rank,
+			basic_price,
+			short_price,
+			short_price_night,
+			add_day_time,
+			add_night_time,
+			detail_use_yn,
+			use_yn,
+			del_yn,
+			reg_admin,
+			reg_date,
+			mod_admin,
+			mod_date
+		FROM
+			tbl_job
+		WHERE
+			use_yn = '1'
+			AND del_yn = '0'
+	</select>
+	
+	<update id="updateJobOrder" parameterType="JobDTO">
+		UPDATE
+			tbl_job
+		SET
+			job_order = #{job_order }
+		WHERE 
+			job_seq = #{job_seq }
+	</update>
+	
+	<update id="updateWorkerJobName" parameterType="JobDTO">
+		/* worker.xml updateJobName */
+		UPDATE
+			worker
+		SET
+			worker_job_name = REPLACE(worker_job_name , #{before_job_name }, #{job_name })
+	</update>
+</mapper>

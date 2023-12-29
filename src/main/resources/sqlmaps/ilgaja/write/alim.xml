@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.AlimMapper">
+	<resultMap id="alimReceiveList" type="AlimReceiveDTO">
+		<id property="receive_seq" column="receive_seq" />		
+		<result property="alim_seq" column="alim_seq" />
+		<result property="worker_name" column="worker_name" />
+		<result property="manager_name" column="manager_name" />
+	</resultMap>
+	
+	<resultMap id="alimList" type="AlimDTO">
+		<id property="alim_seq" column="alim_seq" />
+		<result property="alim_title" column="alim_title" />
+		<result property="alim_content" column="alim_content" />
+		<result property="alim_writer" column="alim_writer" />
+		<result property="company_seq" column="company_seq" />
+		<result property="writer_auth" column="writer_auth" />
+		<result property="worker_name" column="worker_name" />
+		<result property="manager_name" column="manager_name" />
+		<result property="main_view_yn" column="main_view_yn" />
+		<result property="reg_date" column="reg_date" />
+		<result property="alim_count" column="alim_count" />
+		
+		<collection property="alimReceiveList" column="receive_seq" resultMap="alimReceiveList" ofType="AlimReceiveDTO" javaType="java.util.ArrayList" />
+	</resultMap>
+	
+	<insert id="insertAlim" parameterType="AlimDTO" useGeneratedKeys="true" keyProperty="alim_seq">
+		/* alim.xml insertAlim */
+		INSERT INTO tbl_alim (
+			alim_title,
+			alim_content,
+			flag,
+			alim_writer,
+			company_seq,
+			work_seq,
+			del_yn,
+			<if test="main_view_yn neq null and main_view_yn neq ''">
+				main_view_yn,
+			</if>
+			reg_date,
+			reg_admin,
+			mod_date,
+			mod_admin,
+			writer_auth
+		) 
+		VALUES
+		(
+			#{alim_title },
+			#{alim_content },
+			#{flag },
+			#{alim_writer },
+			#{company_seq },
+			#{work_seq},
+			'0',
+			<if test="main_view_yn neq null and main_view_yn neq ''">
+				#{main_view_yn },
+			</if>
+			NOW(),
+			#{reg_admin },
+			NOW(),
+			#{reg_admin },
+			#{adminLevel }
+		)
+	</insert>
+	
+	<insert id="insertAlimReceive" parameterType="AlimReceiveDTO" useGeneratedKeys="true" keyProperty="receive_seq">
+		/* alim.xml insertAlimReceive */
+		INSERT INTO tbl_alim_receive (
+			alim_seq,
+			worker_seq,
+			read_yn,
+			del_yn,
+			read_date
+		) 
+		VALUES
+		<foreach item="item" index="index" separator="," collection="workerSeqList">
+			(
+				#{alim_seq },
+				#{item.worker_seq },
+				'0',
+				'0',
+				NULL
+			)
+		</foreach>
+	</insert>
+	
+	<insert id="insertManagerAlimReceive" parameterType="AlimReceiveDTO" useGeneratedKeys="true" keyProperty="receive_seq">
+		/* alim.xml insertAlimReceive */
+		INSERT INTO tbl_alim_receive (
+			alim_seq,
+			manager_seq,
+			read_yn,
+			del_yn,
+			read_date
+		) 
+		VALUES
+		<foreach item="item" index="index" separator="," collection="managerSeqList">
+			(
+				#{alim_seq },
+				#{item.manager_seq },
+				'0',
+				'0',
+				NULL
+			)
+		</foreach>
+	</insert>
+	
+	<select id="selectListCnt" parameterType="AlimDTO" resultType="int">
+		/* alim.xml selectListCnt */	
+		SELECT
+			COUNT(a.alim_seq) AS CNT
+		FROM
+			tbl_alim a
+		WHERE
+			1 = 1
+			AND del_yn = '0'
+			<if test="searchKey neq '' and searchKey neq null and searchValue neq '' and searchValue neq null">
+				AND ${searchKey } LIKE CONCAT('%', #{searchValue }, '%')
+			</if>
+			<if test="(searchKey eq '' or searchKey eq null) and (searchValue neq '' and searchValue neq null)">
+				AND (alim_title LIKE CONCAT('%', #{searchValue }, '%') 
+				OR alim_content LIKE CONCAT('%', #{searchValue }, '%') 
+				OR alim_writer LIKE CONCAT('%', #{searchValue }, '%'))
+			</if>
+			<if test="startDate neq '' and startDate neq null">	
+				AND DATE_FORMAT(reg_date, "%Y-%m-%d") <![CDATA[>=]]>  #{startDate}	AND DATE_FORMAT(reg_date, "%Y-%m-%d") <![CDATA[<=]]>  #{endDate}	
+			</if>
+			<if test="adminLevel neq null and adminLevel neq '' and adminLevel neq '0'.toString()">
+				<if test="company_seq neq null and company_seq neq ''">
+					AND company_seq = #{company_seq }
+				</if>
+			</if>
+	</select>
+	
+	<select id="selectList" parameterType="AlimDTO" resultMap="alimList">
+		/* alim.xml selectList */
+			SELECT 
+				a.alim_seq,
+				a.alim_title,
+         		a.alim_content,
+         		a.company_seq,
+			    a.alim_writer,
+			    a.del_yn,
+			    a.main_view_yn,
+			    a.reg_date,
+			    a.reg_admin,
+			    a.mod_date,
+			    a.mod_admin,
+			    a.writer_auth,
+			    r.receive_seq,
+			    COUNT(a.alim_seq) AS alim_count,
+			    fn_decrypt(w.worker_name) AS worker_name,
+			    fn_decrypt(m.manager_name) AS manager_name
+			FROM (
+      			SELECT 
+         			alim_seq,
+         			alim_title,
+         			alim_content,
+         			company_seq,
+			         alim_writer,
+			         del_yn,
+			         main_view_yn,
+			         reg_date,
+			         reg_admin,
+			         mod_date,
+			         mod_admin,
+			         writer_auth
+				FROM
+         			tbl_alim
+         		ORDER BY alim_seq DESC
+				<if test="paging neq null">
+				   LIMIT ${paging.startPage}, ${paging.endPage}
+				</if>
+      		) a
+         	LEFT OUTER JOIN tbl_alim_receive r 
+         		ON a.alim_seq = r.alim_seq
+         	LEFT OUTER JOIN worker w
+         		ON r.worker_seq = w.worker_seq
+         	LEFT OUTER JOIN manager m
+         		ON r.manager_seq = m.manager_seq 
+      		WHERE
+         		1 = 1
+         		AND A.del_yn = '0' 
+         		<if test="searchKey neq '' and searchKey neq null and searchValue neq '' and searchValue neq null">
+            		AND ${searchKey } LIKE CONCAT('%', #{searchValue }, '%')
+         		</if>
+				<if test="(searchKey eq '' or searchKey eq null) and (searchValue neq '' and searchValue neq null)">
+					AND (A.alim_title LIKE CONCAT('%', #{searchValue }, '%') 
+					OR A.alim_content LIKE CONCAT('%', #{searchValue }, '%') 
+					OR A.alim_writer LIKE CONCAT('%', #{searchValue }, '%'))
+				</if>
+				<if test="startDate neq '' and startDate neq null">   
+					AND DATE_FORMAT(A.reg_date, "%Y-%m-%d") <![CDATA[>=]]>  #{startDate}   AND DATE_FORMAT(A.reg_date, "%Y-%m-%d") <![CDATA[<=]]>  #{endDate}   
+				</if>
+				<if test="adminLevel neq null and adminLevel neq '' and adminLevel neq '0'.toString()">
+					<if test="company_seq neq null and company_seq neq ''">
+						AND A.company_seq = #{company_seq }
+					</if>
+				</if>
+			GROUP BY a.alim_seq
+      		ORDER BY a.alim_seq DESC
+	</select>
+	
+	<select id="selectSearchList" parameterType="AlimDTO" resultMap="alimList">
+		/* alim.xml selectSearchList */
+		SELECT
+			*
+		FROM (
+			SELECT 
+				a.alim_seq,
+				a.alim_title,
+         		a.alim_content,
+         		a.company_seq,
+			    a.alim_writer,
+			    a.del_yn,
+			    a.main_view_yn,
+			    a.reg_date,
+			    a.reg_admin,
+			    a.mod_date,
+			    a.mod_admin,
+			    a.writer_auth,
+			    r.receive_seq,
+			    COUNT(a.alim_seq) AS alim_count,
+			    fn_decrypt(w.worker_name) AS worker_name,
+			    fn_decrypt(m.manager_name) AS manager_name
+			FROM (
+      			SELECT 
+         			alim_seq,
+         			alim_title,
+         			alim_content,
+         			company_seq,
+			         alim_writer,
+			         del_yn,
+			         main_view_yn,
+			         reg_date,
+			         reg_admin,
+			         mod_date,
+			         mod_admin,
+			         writer_auth
+				FROM
+         			tbl_alim
+         		ORDER BY alim_seq DESC
+      		) a
+         	LEFT OUTER JOIN tbl_alim_receive r 
+         		ON a.alim_seq = r.alim_seq
+         	LEFT OUTER JOIN worker w
+         		ON r.worker_seq = w.worker_seq
+         	LEFT OUTER JOIN manager m
+         		ON r.manager_seq = m.manager_seq 
+      		WHERE
+         		1 = 1
+         		AND A.del_yn = '0' 
+         		<if test="searchKey neq '' and searchKey neq null and searchValue neq '' and searchValue neq null">
+            		AND ${searchKey } LIKE CONCAT('%', #{searchValue }, '%')
+         		</if>
+				<if test="(searchKey eq '' or searchKey eq null) and (searchValue neq '' and searchValue neq null)">
+					AND (A.alim_title LIKE CONCAT('%', #{searchValue }, '%') 
+					OR A.alim_content LIKE CONCAT('%', #{searchValue }, '%') 
+					OR A.alim_writer LIKE CONCAT('%', #{searchValue }, '%'))
+				</if>
+				<if test="startDate neq '' and startDate neq null">   
+					AND DATE_FORMAT(A.reg_date, "%Y-%m-%d") <![CDATA[>=]]>  #{startDate}   AND DATE_FORMAT(A.reg_date, "%Y-%m-%d") <![CDATA[<=]]>  #{endDate}   
+				</if>
+				<if test="adminLevel neq null and adminLevel neq '' and adminLevel neq '0'.toString()">
+					<if test="company_seq neq null and company_seq neq ''">
+						AND A.company_seq = #{company_seq }
+					</if>
+				</if>
+			GROUP BY a.alim_seq
+      		ORDER BY a.alim_seq DESC
+      	) AS l
+      	<if test="paging neq null">
+		   LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+	</select>
+	
+	<select id="selectInfo" parameterType="AlimDTO" resultType="AlimDTO">
+		/* alim.xml selectInfo */
+		SELECT
+			alim_seq,
+			alim_title,
+			alim_content,
+			company_seq,
+			alim_writer,
+			writer_auth,
+			main_view_yn,
+			del_yn,
+			reg_date,
+			reg_admin,
+			mod_date,
+			mod_admin
+		FROM
+			tbl_alim
+		WHERE
+			1 = 1
+			AND del_yn = '0'
+			<if test="alim_seq neq null and alim_seq neq ''">
+				AND alim_seq = #{alim_seq }
+			</if>
+	</select>
+	
+	<select id="selectReceiveTokenInfo" parameterType="WorkerDTO" resultType="WorkerDTO">
+		/* alim.xml selectReceiveTokenInfo */
+		SELECT
+			worker_seq,
+			push_token,
+			app_version,
+			os_type
+		FROM
+			worker
+		WHERE
+			1 = 1
+			AND worker_seq IN 
+			<foreach collection="sel_worker_seq" open="(" close=")" separator="," item="item" index="i">
+				#{item }
+			</foreach>
+			AND app_version >= 20
+			AND push_token IS NOT NULL
+			AND worker_push_yn = '1'
+			AND admin_push_yn = '1'
+			AND (worker_app_use_status = '1' OR worker_app_use_status = '5' OR worker_app_use_status = '4')
+			AND worker_app_status = '1'
+	</select>
+	
+	<select id="selectReceiveList" parameterType="AlimReceiveDTO" resultType="AlimReceiveDTO">
+		/* alim.xml selectReceiveList */
+		SELECT
+			A.receive_seq,
+			A.alim_seq,
+			A.worker_seq,
+			A.read_yn,
+			A.del_yn,
+			A.read_date,
+			fn_decrypt(B.worker_name) AS worker_name,
+			fn_decrypt(C.manager_name) AS manager_name
+		FROM
+			tbl_alim_receive A
+			LEFT OUTER JOIN worker B ON A.worker_seq = B.worker_seq
+			LEFT OUTER JOIN manager C ON A.manager_seq = C.manager_seq
+		WHERE
+			1 = 1 
+			<if test="alim_seq neq null and alim_seq neq ''">
+				AND	alim_seq = #{alim_seq }
+			</if>
+	</select>
+	
+	<update id="updateAlim" parameterType="AlimDTO">
+		/* alim.xml updateAlim */
+		UPDATE
+			tbl_alim
+		SET
+			alim_title = #{alim_title }
+			, alim_content = #{alim_content }
+			<choose>
+				<when test="main_view_yn neq null and main_view_yn neq ''">
+					, main_view_yn = #{main_view_yn }
+				</when>
+				<otherwise>
+					, main_view_yn = '0'
+				</otherwise>
+			</choose>
+		WHERE 
+			alim_seq = #{alim_seq }
+	</update>
+	
+	<update id="deleteAlim" parameterType="AlimDTO">
+		/* alim.xml deleteAlim */
+		UPDATE
+			tbl_alim
+		SET
+			del_yn = '1'
+		WHERE
+			alim_seq = #{alim_seq }
+	</update>
+	
+	<update id="deleteReceiveAlim" parameterType="AlimDTO">
+		/* alim.xml deleteReceiveAlim */
+		UPDATE
+			tbl_alim_receive
+		SET
+			del_yn = '1'
+		WHERE
+			alim_seq = #{alim_seq }
+	</update>
+	
+	<select id="selectAlimList" parameterType="AlimReceiveDTO" resultType="AlimReceiveDTO">
+		/* alim.xml selectAlimList */
+		SELECT 
+			A.alim_seq,
+			A.alim_title,
+			A.alim_content,
+			A.company_seq,
+			A.alim_writer,
+			A.reg_date,
+			A.reg_admin,
+			A.mod_date,
+			A.mod_admin,
+			B.receive_seq,
+			B.worker_seq,
+			B.read_yn,
+			B.read_date 
+		FROM
+			tbl_alim A
+			LEFT OUTER JOIN tbl_alim_receive B 
+			ON A.alim_seq = B.alim_seq
+		WHERE
+			1 = 1
+			AND A.del_yn = '0'
+			AND B.del_yn = '0'
+			<if test="worker_seq neq null and worker_seq neq ''">
+				AND worker_seq = #{worker_seq }			
+			</if>
+		ORDER BY A.reg_date DESC
+		<if test="paging neq null">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+	</select>
+	
+	<select id="selectAlimListCnt" parameterType="AlimReceiveDTO" resultType="int">
+		/* alim.xml selectAlimListCnt */
+		SELECT
+			COUNT(receive_seq) AS CNT
+		FROM
+			tbl_alim A
+			LEFT OUTER JOIN tbl_alim_receive B 
+			ON A.alim_seq = B.alim_seq
+		WHERE 
+			1 = 1
+			AND A.del_yn = '0'
+			AND B.del_yn = '0'
+			<if test="worker_seq neq null and worker_seq neq ''">
+				AND worker_seq = #{worker_seq }
+			</if>
+	</select>
+	
+	<update id="setUpdateAlim" parameterType="AlimReceiveDTO">
+		/* alim.xml setUpdateAlim */
+		UPDATE
+			tbl_alim_receive
+		SET
+			mod_date = now(),
+			mod_admin = "WORKER"
+			<if test="del_yn neq null and del_yn neq ''"> 
+				, del_yn = #{del_yn}
+			</if>
+			<if test="read_yn neq null and read_yn neq ''"> 
+				, read_yn= #{read_yn}
+				, read_date = NOW()
+			</if>
+		WHERE		
+			1=1
+			AND  receive_seq= #{receive_seq}
+	</update>
+	
+	<select id="selectManagerReceiveTokenInfo" parameterType="ManagerDTO" resultType="ManagerDTO">
+		/* alim.xml selectManagerReceiveTokenInfo */
+		SELECT
+			manager_seq,
+			push_token,
+			app_version,
+			os_type
+		FROM
+			manager
+		WHERE
+			1 = 1
+			AND manager_seq IN 
+			<foreach collection="sel_manager_seq" open="(" close=")" separator="," item="item" index="i">
+				#{item }
+			</foreach>
+<!-- 			AND app_version >= 20 -->
+			AND push_token IS NOT NULL
+			AND manager_push_yn = '1'
+	</select>
+</mapper>

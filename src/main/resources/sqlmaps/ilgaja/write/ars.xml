@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.ArsMapper">
+
+	<select id="getWork" parameterType="String" resultType="WorkDTO">
+    	<!--  1. 현장테이블에서 현장 메니져 폰번호에 맞는 현장을 찾는다. -->
+    	WITH tbl_dummy AS 
+    		(SELECT 
+    			FN_ENCRYPT(#{phoneNo }) AS managerPhone
+    		)
+		SELECT 
+			work_seq
+			, company_seq
+			, manager_seq
+			, FN_DECRYPT(manager_phone) AS manager_phone 
+		FROM 
+			work 
+		WHERE 
+			manager_phone = (SELECT managerPhone FROM tbl_dummy) 
+			AND	use_yn = '1'
+		ORDER BY work_seq DESC 
+		LIMIT 0, 1
+  	</select>
+  	
+  	<select id="getMilbo" parameterType="String" resultType="IlboDTO">
+    	<!--   2 현장이 있을 경우 일일대장 에서 현장에 대한 지점을 찾는다. -->
+    	WITH tbl_dummy AS 
+    		(SELECT 
+    			FN_ENCRYPT(#{managerPhone }) AS managerPhone
+    		)
+		SELECT 
+			ilbo_seq,
+			worker_company_seq, 
+			work_company_seq 
+		FROM 
+			ilbo 
+		WHERE 
+<!-- 			work_seq = #{workSeq}  -->
+			manager_phone = (SELECT managerPhone FROM tbl_dummy)
+			AND ilbo_date <![CDATA[>=]]> DATE_FORMAT(NOW(), "%Y-%m-%d") 
+			AND	use_yn = '1' 
+		ORDER BY ilbo_date DESC 
+		LIMIT 0, 1
+  	</select>
+  	
+  	<select id="getWilbo" parameterType="String" resultType="IlboDTO">
+    	<!--  3. 1,2번이 존재 하지 않을 때. 일보에서 현장담장자 번호에 대한 지점을 찾는다. -->
+    	WITH tbl_dummy AS 
+    		(SELECT
+    			FN_ENCRYPT(#{workManagerPhone }) AS ilboWorkManagerPhone
+    		)
+		SELECT 
+			ilbo_seq,
+			worker_company_seq, 
+			work_company_seq 
+		FROM 
+			ilbo 
+		WHERE 
+			ilbo_work_manager_phone = (SELECT ilboWorkManagerPhone FROM tbl_dummy)  
+			AND ilbo_date <![CDATA[>=]]> DATE_FORMAT(NOW(), "%Y-%m-%d") 
+			AND	use_yn = '1'
+		ORDER BY ilbo_date DESC 
+		LIMIT 0, 1
+  	</select>
+  	
+  	<select id="getManager" parameterType="String" resultType="ManagerDTO">
+    	<!--  4. 3번이 존재 하지 않을 경우 메니져 테이블에서 처음등록한 지점을 찾는다. 현장매니져 본사 매니져 (현장매니져가 있으면 현장 매니져가 먼저 검색된다.) -->
+    	WITH tbl_dummy AS 
+    		(SELECT
+    			FN_ENCRYPT(#{managerPhone }) AS managerPhone
+    		)
+		SELECT 
+			manager_seq
+			, company_seq 
+		FROM 
+			manager 
+		WHERE 
+			manager_phone = (SELECT managerPhone FROM tbl_dummy) 
+			AND parent_company_seq = 0 
+			AND use_yn = '1'
+		ORDER BY manager_type DESC 
+		LIMIT 0, 1
+  	</select>
+  	
+  	<select id="getWorker" parameterType="String" resultType="WorkerDTO">
+    	<!--  5. 4번이 존재 하지 않으면 구직자 테이블에서 해당 지점을 찾는다. -->
+    	WITH tbl_dummy AS 
+    		(SELECT
+    			FN_ENCRYPT(#{workerPhone }) AS workerPhone
+    		)
+		SELECT 
+			worker_seq
+			, company_seq 
+		FROM 
+			worker 
+		WHERE 
+			worker_phone = (SELECT workerPhone FROM tbl_dummy) 
+			AND use_yn = '1'
+			AND del_yn = '0'
+		ORDER BY worker_seq DESC 
+		LIMIT 0, 1
+  	</select>
+  	
+  	
+  	<select id="getComapny" parameterType="String" resultType="CompanyDTO">
+    	<!--  지점정보 -->
+		SELECT 
+			company_seq,
+	  		company_type,
+	  		company_num,
+	  		company_name,
+	  		business_name,
+	  		FN_DECRYPT(company_owner) AS company_owner,
+	  		company_business,
+	  		company_sector,
+	  		company_license_num,
+	  		FN_DECRYPT(company_account) AS company_account,
+	  		company_bank_name,
+	  		FN_DECRYPT(company_bank_account) AS company_bank_account,
+	  		company_bank_account_holder,
+	  		FN_DECRYPT(company_tel) AS company_tel,
+	  		company_fax,
+	  		FN_DECRYPT(company_phone) AS company_phone,
+	  		FN_DECRYPT(company_email) AS company_email,
+	  		FN_DECRYPT(ars_phone) AS ars_phone,
+	  		ars_phone_push_token,
+	  		work_fee_rate,
+	  		worker_fee_rate,
+	  		company_addr,
+	  		company_feature,
+	  		company_memo,
+	  		company_license_scan_yn,
+	  		company_corp_scan_yn,
+	  		company_bank_scan_yn,
+	  		company_etc_scan_yn,
+	  		share_yn,
+	  		use_yn,
+	  		company_order,
+	  		reg_date,
+	  		reg_admin,
+	  		mod_date,
+	  		mod_admin  
+  		FROM 
+  			company 
+  		WHERE 
+  			company_seq = #{companySeq}
+  	</select>
+  	
+  	<insert id="insertInfo" parameterType="ArsDTO">
+    	/* 로그 생성 ars.xml.insertInfo */
+    	INSERT 
+    		tbl_ars_log 
+    	SET
+    		user_cid = FN_ENCRYPT(#{user_cid})
+    		<if test="return_type neq '' and return_type neq null"> 
+    			, return_type = #{return_type}	
+    		</if>
+    		<if test="type_seq neq '' and type_seq neq null"> 
+    			, type_seq = #{type_seq}	
+    		</if>
+    		<if test="company_seq neq '' and company_seq neq null"> 
+    			, company_seq = #{company_seq} 
+    		</if>
+    		<if test="receive_phone neq '' and receive_phone neq null"> 
+    			, receive_phone = FN_ENCRYPT(#{receive_phone}) 
+    		</if>
+    		<if test="result_code neq '' and result_code neq null"> 
+    			, result_code = #{result_code}	 
+    		</if>
+    		<if test="memo neq '' and memo neq null"> 
+    			, memo = #{memo} 			 
+    		</if>
+ 	</insert>
+  
+  	<select id="getSelectInfoLimitOne" parameterType="ArsDTO" resultType="ArsDTO">
+    	<!--  ARS 로그 30초 이내-->
+    	WITH tbl_dummy AS 
+    		(SELECT
+    			FN_ENCRYPT(#{user_cid}) AS userCid
+    			<if test="receive_phone neq '' and receive_phone neq null">
+    			, FN_ENCRYPT(#{receive_phone }) AS receivePhone
+    			</if>
+    		)
+		SELECT 
+			seq
+			, FN_DECRYPT(user_cid) as user_cid
+			, return_type
+			, type_seq
+			, company_seq
+			, FN_DECRYPT(receive_phone) as receive_phone
+			, result_code
+			, memo
+			, reg_date  
+		FROM 
+			tbl_ars_log 
+		WHERE 
+			user_cid = (SELECT userCid FROM tbl_dummy)
+			<if test="receive_phone neq '' and receive_phone neq null">  
+				AND receive_phone   = (SELECT receivePhone FROM tbl_dummy) 
+			</if>
+			AND reg_date  <![CDATA[ >= ]]> DATE_SUB(NOW(), INTERVAL 30 SECOND)
+		ORDER BY seq DESC
+		LIMIT 0, 1
+  </select>
+	
+  	
+  
+  
+  	
+
+</mapper>

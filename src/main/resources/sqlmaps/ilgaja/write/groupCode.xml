@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.GroupCodeMapper">
+	<select id="selectListCnt" parameterType="GroupCodeDTO" resultType="int">
+		/* groupCode.xml selectListCnt 그룹 코드 리스트 카운트 */
+		SELECT
+			COUNT(group_seq) AS CNT
+		FROM
+			tbl_code_group
+		WHERE
+			1 = 1
+				AND del_yn = '0'		
+			<if test="use_yn neq '' and use_yn neq null">
+				AND use_yn = #{use_yn}		
+			</if>
+			<if test="group_code neq '' and group_code neq null">
+				AND group_code = #{group_code }
+			</if>
+<!-- 			<if test="startDate neq '' and startDate neq null">	 -->
+<!-- 				AND DATE_FORMAT(reg_date, "%Y-%m-%d") <![CDATA[>=]]>  #{startDate}	AND DATE_FORMAT(reg_date, "%Y-%m-%d") <![CDATA[<=]]>  #{endDate}	 -->
+<!-- 			</if> -->
+<!-- 			<if test="searchKey neq '' and searchKey neq null and searchValue neq '' and searchValue neq null"> -->
+<!-- 				AND ${searchKey } LIKE CONCAT('%', #{searchValue }, '%') -->
+<!-- 			</if> -->
+<!-- 			<if test="searchKey eq '' or searchKey eq null and searchValue neq '' and searchValue neq null"> -->
+<!-- 				AND (group_name LIKE CONCAT('%', #{searchValue }, '%')  -->
+<!-- 				OR group_code LIKE CONCAT('%', #{searchValue }, '%')) -->
+<!-- 			</if> -->
+	</select>
+	
+	<select id="selectList" parameterType="GroupCodeDTO" resultType="GroupCodeDTO">
+		/* groupCode.xml selectList 그룹 코드 리스트 */
+		SELECT
+			group_seq,
+			group_name,
+			group_code,
+			use_yn,
+			del_yn,
+			reg_admin,
+			reg_date,
+			mod_admin,
+			mod_date
+		FROM
+			tbl_code_group
+		WHERE 
+			1 = 1
+				AND del_yn = '0'		
+			<if test="use_yn neq '' and use_yn neq null">
+				AND use_yn = #{use_yn}		
+			</if>
+			<if test="group_code neq '' and group_code neq null">
+				AND group_code = #{group_code }
+			</if>
+<!-- 			<if test="startDate neq '' and startDate neq null">	 -->
+<!-- 				AND DATE_FORMAT(reg_date, "%Y-%m-%d") <![CDATA[>=]]>  #{startDate}	AND DATE_FORMAT(reg_date, "%Y-%m-%d") <![CDATA[<=]]>  #{endDate}	 -->
+<!-- 			</if> -->
+<!-- 			<if test="searchKey neq '' and searchKey neq null and searchValue neq '' and searchValue neq null"> -->
+<!-- 				AND ${searchKey } LIKE CONCAT('%', #{searchValue }, '%') -->
+<!-- 			</if> -->
+<!-- 			<if test="searchKey eq '' or searchKey eq null and searchValue neq '' and searchValue neq null"> -->
+<!-- 				AND (group_name LIKE CONCAT('%', #{searchValue }, '%')  -->
+<!-- 				OR group_code LIKE CONCAT('%', #{searchValue }, '%')) -->
+<!-- 			</if> -->
+		ORDER BY group_seq DESC
+		<if test="paging neq null">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+	</select>
+	
+	<insert id="insertGroupCode" parameterType="GroupCodeDTO" useGeneratedKeys="true" keyProperty="group_seq">
+		/* groupCode.xml insertGroupCode */
+		INSERT INTO tbl_code_group (
+			group_name,
+			group_code,
+			use_yn,
+			del_yn,
+			reg_admin,
+			reg_date,
+			mod_admin,
+			mod_date
+		) 
+		VALUES
+		(
+			#{group_name },
+			UPPER(#{group_code }),
+			#{use_yn },
+			'0',
+			#{reg_admin },
+			NOW(),
+			#{reg_admin },
+			NOW()
+		)
+	</insert>
+	
+	<select id="selectInfo" parameterType="GroupCodeDTO" resultType="GroupCodeDTO">
+		/* 그룹 코드 Info */
+		SELECT
+			group_seq,
+			group_name,
+			group_code,
+			use_yn,
+			del_yn,
+			reg_admin,
+			reg_date,
+			mod_admin,
+			mod_date
+		FROM
+			tbl_code_group
+		WHERE 
+			1 = 1
+			<if test="del_yn neq '' and del_yn neq null">
+				AND del_yn = #{del_yn }		
+			</if>
+			<if test="use_yn neq '' and use_yn neq null">
+				AND use_yn = #{use_yn}		
+			</if>
+			<if test="group_seq neq '' and group_seq neq null">
+				AND group_seq = #{group_seq }
+			</if>
+	</select>
+	
+	<update id="updateGroupCode" parameterType="GroupCodeDTO">
+		/* groupCode.xml updateGroupCode */
+		UPDATE 
+		 	tbl_code_group 
+		SET
+			group_code = UPPER(#{group_code }),
+		 	group_name = #{group_name },
+			use_yn = #{use_yn },
+			mod_date = NOW(),
+			mod_admin = #{reg_admin } 
+		WHERE 
+			group_seq = #{group_seq } 
+	</update>
+	
+	<update id="deleteGroupCode" parameterType="GroupCodeDTO">
+		/* groupCode.xml deleteGroupCode */
+		UPDATE 
+			tbl_code_group
+		SET
+			del_yn = '1'
+		WHERE 
+			group_seq = #{group_seq }
+	</update>
+</mapper>

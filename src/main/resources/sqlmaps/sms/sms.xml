@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.sms.SmsMapper">
+
+	<insert id="insertInfo" parameterType="SmsDTO">
+		<selectKey keyProperty="resultCnt" order="AFTER" resultType="int">
+			SELECT 1
+		</selectKey>
+		
+		/* Sms 등록 insertInfo sms.xml */	
+		INSERT INTO sc_tran (
+			tr_senddate, 
+			tr_sendstat, 
+			tr_msgtype, 
+			tr_phone, 
+			tr_callback, 
+			tr_msg
+			<if test="tr_etc1 neq '' and tr_etc1 neq null"> ,tr_etc1 </if>
+			,tr_etc2
+			,tr_etc3
+			,tr_etc4
+		) VALUES (
+			now(), 
+			0, 
+			#{tr_msgtype}, 
+			#{tr_phone}, 
+			#{tr_callback}, 
+			#{tr_msg}
+			<if test="tr_etc1 neq '' and tr_etc1 neq null"> , #{tr_etc1} </if>
+			, #{reg_admin }
+			, NOW()
+			, #{tr_etc4 }
+		)
+	</insert>
+	
+	<insert id="insertMmsInfo" parameterType="SmsDTO">
+		<selectKey keyProperty="resultCnt" order="AFTER" resultType="int">
+			SELECT 1
+		</selectKey>
+		INSERT INTO MMS_MSG (
+			PHONE, 
+			CALLBACK, 
+			STATUS, 
+			REQDATE, 
+			MSG, 
+			TYPE
+			<if test="tr_etc1 neq '' and tr_etc1 neq null"> ,etc1 </if>
+			,etc2
+			,etc3
+			,etc4
+		) VALUES (
+			#{tr_phone }, 
+			#{tr_callback }, 
+			'0', 
+			NOW(), 
+			#{tr_msg }, 
+			'0'
+			<if test="tr_etc1 neq '' and tr_etc1 neq null"> , #{tr_etc1} </if>
+			, #{reg_admin }
+			, NOW()
+			, #{tr_etc4 }
+		)
+	</insert>
+	
+	<select id="selectSmsListCnt" parameterType="SmsDTO" resultType="int">
+		SELECT 
+			COUNT(a.tr_num) AS CNT 
+		FROM(
+			SELECT 
+				tr_num,
+				tr_msg,
+				tr_phone,
+				tr_etc1,
+				tr_etc2,
+				tr_etc3,
+				tr_etc4,
+				'S' AS m_type
+			FROM 
+				sc_log_${tableName }
+			WHERE
+				1 = 1
+				<if test="searchKey != '' and searchKey != null and searchValue != '' and searchValue != null">
+					AND ${searchKey } LIKE CONCAT('%', #{searchValue }, '%')
+				</if>
+				<if test="searchKey == '' or searchKey == null and searchValue != '' and searchValue != null">
+					AND (tr_etc3 LIKE CONCAT('%', #{searchValue }, '%') 
+					OR tr_msg LIKE CONCAT('%', #{searchValue }, '%'))
+				</if>
+				<if test="searchKey2 neq '' and searchKey2 neq null">
+					AND tr_etc4 = #{searchKey2 }
+				</if>
+				<if test="adminLevel neq '' and adminLevel neq null and adminLevel neq '0'.toString()">
+					AND tr_etc4 = #{tr_etc4 }
+				</if>
+			UNION
+			SELECT 
+				msgkey AS tr_num,
+				msg AS tr_msg,
+				phone AS tr_phone,
+				etc1 AS tr_etc1,
+				etc2 AS tr_etc2,
+				etc3 AS tr_etc3,
+				etc4 AS tr_etc4,
+				'M' AS m_type
+			FROM 
+				mms_log_${tableName }
+			WHERE
+				1 = 1
+				<if test="searchKey != '' and searchKey != null and searchValue != '' and searchValue != null">
+					<if test="searchKey eq 'tr_etc3'.toString()">
+						AND etc3 LIKE CONCAT('%', #{searchValue }, '%')					
+					</if>
+					<if test="searchKey eq 'tr_msg'.toString()">
+						AND msg LIKE CONCAT('%', #{searchValue }, '%')
+					</if>
+				</if>
+				<if test="searchKey == '' or searchKey == null and searchValue != '' and searchValue != null">
+					AND (etc3 LIKE CONCAT('%', #{searchValue }, '%') 
+					OR msg LIKE CONCAT('%', #{searchValue }, '%'))
+				</if>
+				<if test="searchKey2 neq '' and searchKey2 neq null">
+					AND etc4 = #{searchKey2 }
+				</if>
+				<if test="adminLevel neq '' and adminLevel neq null and adminLevel neq '0'.toString()">
+					AND etc4 = #{tr_etc4 }
+				</if>
+				) a
+	</select>
+	
+	<select id="selectSmsList" parameterType="SmsDTO" resultType="smsDTO">
+		SELECT 
+			a.* 
+		FROM(
+			SELECT 
+				tr_num,
+				tr_msg,
+				tr_phone,
+				tr_etc1,
+				tr_etc2,
+				tr_etc3,
+				tr_etc4,
+				'S' AS m_type
+			FROM 
+				sc_log_${tableName }
+			WHERE
+				1 = 1
+				<if test="searchKey != '' and searchKey != null and searchValue != '' and searchValue != null">
+					AND ${searchKey } LIKE CONCAT('%', #{searchValue }, '%')
+				</if>
+				<if test="searchKey == '' or searchKey == null and searchValue != '' and searchValue != null">
+					AND (tr_etc3 LIKE CONCAT('%', #{searchValue }, '%') 
+					OR tr_msg LIKE CONCAT('%', #{searchValue }, '%'))
+				</if>
+				<if test="searchKey2 neq '' and searchKey2 neq null">
+					AND tr_etc4 = #{searchKey2 }
+				</if>
+				<if test="adminLevel neq '' and adminLevel neq null and adminLevel neq '0'.toString()">
+					AND tr_etc4 = #{tr_etc4 }
+				</if>
+			UNION
+			SELECT 
+				msgkey AS tr_num,
+				msg AS tr_msg,
+				phone AS tr_phone,
+				etc1 AS tr_etc1,
+				etc2 AS tr_etc2,
+				etc3 AS tr_etc3,
+				etc4 AS tr_etc4,
+				'M' AS m_type
+			FROM 
+				mms_log_${tableName }
+			WHERE
+				1 = 1
+				<if test="searchKey != '' and searchKey != null and searchValue != '' and searchValue != null">
+					<if test="searchKey eq 'tr_etc3'.toString()">
+						AND etc3 LIKE CONCAT('%', #{searchValue }, '%')					
+					</if>
+					<if test="searchKey eq 'tr_msg'.toString()">
+						AND msg LIKE CONCAT('%', #{searchValue }, '%')
+					</if>
+				</if>
+				<if test="searchKey == '' or searchKey == null and searchValue != '' and searchValue != null">
+					AND (etc3 LIKE CONCAT('%', #{searchValue }, '%') 
+					OR msg LIKE CONCAT('%', #{searchValue }, '%'))
+				</if>
+				<if test="searchKey2 neq '' and searchKey2 neq null">
+					AND etc4 = #{searchKey2 }
+				</if>
+				<if test="adminLevel neq '' and adminLevel neq null and adminLevel neq '0'.toString()">
+					AND etc4 = #{tr_etc4 }
+				</if>
+				) a
+		ORDER BY a.tr_etc3 DESC
+		<if test="paging != null">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+	</select>
+</mapper>

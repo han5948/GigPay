@@ -1,0 +1,55 @@
+@charset "utf-8";
+i{font-style:normal}
+.break{display:block;} /*  데스크탑 : block -> 모바일화면 : inline*/
+.plump{}	/*  데스크탑 : 속성없음 -> 모바일화면 : block */
+.block{display:block}	/*  데스크탑 : block -> 모바일화면 : block */
+.block2{display:block;    color: #00a1e9;}	/*  데스크탑 : block -> 모바일화면 : block */
+
+	@media all and (max-width:480px) {
+		.plump{display:block}
+		.block{display:block}
+	}
+	@media all and (max-width:1024px) {
+		.m-none{display:none}
+		.break{display:inline}
+	}
+
+
+/* 스킵네비게이션 */
+#skipNavi {height:0;}
+#skipNavi .skipLink {position:absolute;top:-1000px;left:-1000px;overflow:hidden;z-index:5000;}
+#skipNavi .skipLink:focus, #skipNavi .skipLink:active {top:0;left:0;padding:10px 20px;background:#1e64ba;color:#fff;}
+
+.ov{overflow:hidden}
+
+
+.u-tit02{font-weight:400; color:#4a4a4a; font-size:18px; line-height:31px;margin-bottom:10px;} /*한줄*/
+.u-tit03{font-weight:400; color:#4a4a4a; font-size:18px; line-height:130%;margin-bottom:10px;} /*두줄*/
+
+
+	@media all and (max-width:340px) {
+		.u-tit02,.u-tit03{font-size:17px;}
+	}
+
+
+/* 라디오 ,체크박스, 셀렉트 */
+.radio-box{display:inline-block; margin-right:15px;vertical-align:top;}
+.radio-box input[type="radio"]{ display:none;}
+.radio-box label{position:relative; padding-left:29px; font-size:18px ; color:#4a4a4a; line-height:31px; font-weight:300}
+.radio-box label:after{width:18px; height:18px; position:absolute; border-radius:100%; left:0; top:2px ;border:1px solid #bdbdbd; display:block; content:""}
+.radio-box input[type="radio"]:checked + label:before{ position:absolute; width:10px; height:10px; background:#d5306d; border-radius:100%; left:5px; top:7px; display:block; content:""}
+.radio-box input[type="radio"]:checked +  label{color:#222}
+
+
+.check-box{display:inline-block; margin-right:15px;vertical-align:top;}
+.check-box input[type="checkbox"]{ display:none;}
+.check-box label{position:relative; padding-left:22px; font-size:13px ; color:#9b9b9b; line-height:31px;}
+.check-box label:after{width:15px; height:15px; position:absolute;  left:0; top:4px ; display:block; content:""; border:1px solid #dadada}
+.check-box input[type="checkbox"]:checked +  label:after{background:url(/resources/manager/image/Sub/check-on.png) no-repeat center 3px; background-size:12px auto}
+.check-box input[type="checkbox"]:checked +  label{color:#4a4a4a}
+
+
+.select-box{position:relative;border:1px solid #333; display:inline-block;vertical-align:top;background:#fff;border-radius:5px;}
+.select-box:after{background:url(/resources/manager/image/Sub/select-arrow.png) no-repeat center center; background-size:7px auto; position:absolute;z-index:1; width:10px; height:10px; position:absolute; right:7px; top:50%;margin-top:-5px; display:block; content:""}
+.select-box select{font-size:15px; font-weight:300; height:38px; position:relative; z-index:2;text-indent:2px; cursor:pointer; -webkit-appearance:none;letter-spacing:-0.03em; background:none; -moz-appearance:none;background:none; appearance:none;border:none; width:100%; margin:0; padding:0 20px 0 0;}
+.select-box select::-ms-expand{display:none;}

@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+		"-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+		 "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+	<!-- system  tiles -->
+	<definition name="system-layouts-tiles" template="/WEB-INF/layouts/system/layouts-tiles.jsp">
+		<put-attribute name="header"    value="/WEB-INF/layouts/system/header.jsp" />
+		<put-attribute name="left"    value="/WEB-INF/layouts/system/left.jsp" />		
+		<put-attribute name="content"   value="" />
+		<put-attribute name="footer"    value="/WEB-INF/layouts/system/footer.jsp" />
+		
+	</definition>
+	
+	<definition name="*.system" extends="system-layouts-tiles">
+		<put-attribute name="content"   value="/WEB-INF/views/{1}.jsp" />
+	</definition>
+	<definition name="/system/*.system" extends="system-layouts-tiles">
+		<put-attribute name="content"   value="/WEB-INF/views/system/{1}.jsp" />
+	</definition>
+	<definition name="/system/*/*.system" extends="system-layouts-tiles">
+		<put-attribute name="content"   value="/WEB-INF/views/system/{1}/{2}.jsp" />
+	</definition>
+	<definition name="/system/*/*/*.system" extends="system-layouts-tiles">
+		<put-attribute name="content"   value="/WEB-INF/views/system/{1}/{2}/{3}.jsp" />
+	</definition>
+	
+	<definition name="system-no-tiles" template="/WEB-INF/layouts/system/noTemplate.jsp">
+		<put-attribute name="noTemplate"   value="" />
+	</definition>
+	
+	<definition name="*.no_system" extends="system-no-tiles">
+		<put-attribute name="noTemplate" value="/WEB-INF/views/{1}.jsp" />
+	</definition>
+	
+	<definition name="/system/*.no_system" extends="system-no-tiles">
+		<put-attribute name="noTemplate" value="/WEB-INF/views/system/{1}.jsp" />
+	</definition>
+	<definition name="/system/*/*.no_system" extends="system-no-tiles">
+		<put-attribute name="noTemplate"   value="/WEB-INF/views/system/{1}/{2}.jsp" />
+	</definition>
+	<definition name="/system/*/*/*.no_system" extends="system-no-tiles">
+		<put-attribute name="noTemplate"   value="/WEB-INF/views/system/{1}/{2}/{3}.jsp" />
+	</definition>
+
+  <!-- dashboard tiles -->
+  <definition name="admin-dashboard" template="/WEB-INF/layouts/admin/dashboard.jsp">
+    <put-attribute name="dashboard"   value="" />
+    <put-attribute name="content"   value="" />
+    <put-attribute name="header" value="/WEB-INF/layouts/admin/header.jsp" />
+  </definition>	
+  
+  <definition name="/admin/*.dashboard" extends="admin-dashboard">
+    <put-attribute name="dashboard"   value="/WEB-INF/views/admin/{1}.jsp" />
+  </definition>
+  
+  <!-- admin tiles -->
+  <definition name="admin-layouts-tiles" template="/WEB-INF/layouts/admin/layouts-tiles.jsp">
+    <put-attribute name="header"  value="/WEB-INF/layouts/admin/header.jsp" />
+    <put-attribute name="reserves-header"  value="/WEB-INF/layouts/admin/reserves-header.jsp" />
+    <put-attribute name="left"    value="/WEB-INF/layouts/admin/left.jsp" />
+    <put-attribute name="content" value="" />
+    <put-attribute name="footer"  value="/WEB-INF/layouts/admin/footer.jsp" />
+  </definition>
+	
+	
+  <definition name="*.admin" extends="admin-layouts-tiles">
+    <put-attribute name="content"   value="/WEB-INF/views/{1}.jsp" />
+  </definition>
+  <definition name="/admin/*.admin" extends="admin-layouts-tiles">
+    <put-attribute name="content"   value="/WEB-INF/views/admin/{1}.jsp" />
+  </definition>
+  <definition name="/admin/*/*.admin" extends="admin-layouts-tiles">
+    <put-attribute name="content"   value="/WEB-INF/views/admin/{1}/{2}.jsp" />
+  </definition>
+  <definition name="/admin/*/*/*.admin" extends="admin-layouts-tiles">
+    <put-attribute name="content"   value="/WEB-INF/views/admin/{1}/{2}/{3}.jsp" />
+  </definition>
+  <!-- // admin tiles -->
+  
+  <!-- left 메뉴 admin -->
+  <definition name="admin-leftLayouts-tiles" template="/WEB-INF/layouts/admin/leftLayouts-tiles.jsp">
+    <put-attribute name="header"  value="/WEB-INF/layouts/admin/header.jsp" />
+    <put-attribute name="content" value="" />
+    <put-attribute name="footer"  value="/WEB-INF/layouts/admin/footer.jsp" />
+  </definition>
+  
+  <definition name="*.leftAdmin" extends="admin-leftLayouts-tiles">
+    <put-attribute name="content"   value="/WEB-INF/views/{1}.jsp" />
+  </definition>
+  <definition name="/admin/*.leftAdmin" extends="admin-leftLayouts-tiles">
+    <put-attribute name="content"   value="/WEB-INF/views/admin/{1}.jsp" />
+  </definition>
+  <definition name="/admin/*/*.leftAdmin" extends="admin-leftLayouts-tiles">
+    <put-attribute name="content"   value="/WEB-INF/views/admin/{1}/{2}.jsp" />
+  </definition>
+  <definition name="/admin/*/*/*.leftAdmin" extends="admin-leftLayouts-tiles">
+    <put-attribute name="content"   value="/WEB-INF/views/admin/{1}/{2}/{3}.jsp" />
+  </definition>
+  <!-- left 메뉴 -->
+
+  
+  
+  <!-- admin no tiles -->
+  <definition name="admin-no-tiles" template="/WEB-INF/layouts/admin/noTemplate.jsp">
+    <put-attribute name="noTemplate"   value="" />
+  </definition>
+
+  <definition name="*.no_admin" extends="admin-no-tiles">
+    <put-attribute name="noTemplate" value="/WEB-INF/views/{1}.jsp" />
+  </definition>
+
+  <definition name="/admin/*.no_admin" extends="admin-no-tiles">
+    <put-attribute name="noTemplate" value="/WEB-INF/views/admin/{1}.jsp" />
+  </definition>
+  <definition name="/admin/*/*.no_admin" extends="admin-no-tiles">
+    <put-attribute name="noTemplate"   value="/WEB-INF/views/admin/{1}/{2}.jsp" />
+  </definition>
+  <definition name="/admin/*/*/*.no_admin" extends="admin-no-tiles">
+    <put-attribute name="noTemplate"   value="/WEB-INF/views/admin/{1}/{2}/{3}.jsp" />
+  </definition>
+  <!-- // admin no tiles -->
+
+
+  <!-- admin popup tiles -->
+  <definition name="admin-popup-tiles" template="/WEB-INF/layouts/admin/popupTemplate.jsp">
+    <put-attribute name="popupTemplate"   value="" />
+  </definition>
+
+  <definition name="*.popup_admin" extends="admin-popup-tiles">
+    <put-attribute name="popupTemplate" value="/WEB-INF/views/{1}.jsp" />
+  </definition>
+
+  <definition name="/admin/*.popup_admin" extends="admin-popup-tiles">
+    <put-attribute name="popupTemplate" value="/WEB-INF/views/admin/{1}.jsp" />
+  </definition>
+  <definition name="/admin/*/*.popup_admin" extends="admin-popup-tiles">
+    <put-attribute name="popupTemplate"   value="/WEB-INF/views/admin/{1}/{2}.jsp" />
+  </definition>
+  <definition name="/admin/*/*/*.popup_admin" extends="admin-popup-tiles">
+    <put-attribute name="popupTemplate"   value="/WEB-INF/views/admin/{1}/{2}/{3}.jsp" />
+  </definition>
+  <!-- // admin popup tiles -->
+  
+  <!-- admin layout tiles -->
+  <definition name="admin-layout-tiles" template="/WEB-INF/layouts/admin/layoutTemplate.jsp">
+    <put-attribute name="layoutTemplate"   value="" />
+  </definition>
+
+  <definition name="*.layout_admin" extends="admin-layout-tiles">
+    <put-attribute name="layoutTemplate" value="/WEB-INF/views/{1}.jsp" />
+  </definition>
+
+  <definition name="/admin/*.layout_admin" extends="admin-layout-tiles">
+    <put-attribute name="layoutTemplate" value="/WEB-INF/views/admin/{1}.jsp" />
+  </definition>
+  <definition name="/admin/*/*.layout_admin" extends="admin-layout-tiles">
+    <put-attribute name="layoutTemplate"   value="/WEB-INF/views/admin/{1}/{2}.jsp" />
+  </definition>
+  <definition name="/admin/*/*/*.layout_admin" extends="admin-layout-tiles">
+    <put-attribute name="layoutTemplate"   value="/WEB-INF/views/admin/{1}/{2}/{3}.jsp" />
+  </definition>
+  <!-- // admin layout tiles -->
+
+
+
+  <!-- web tiles -->
+<!--   
+  <definition name="web-layouts-tiles" template="/WEB-INF/layouts/web/layouts-tiles.jsp">
+    <put-attribute name="header"  value="/WEB-INF/layouts/web/header.jsp" />
+    <put-attribute name="left"    value="/WEB-INF/layouts/web/left.jsp" />
+    <put-attribute name="content" value="" />
+    <put-attribute name="footer"  value="/WEB-INF/layouts/web/footer.jsp" />
+  </definition>
+
+  <definition name="*.web" extends="web-layouts-tiles">
+    <put-attribute name="content"   value="/WEB-INF/views/{1}.jsp" />
+  </definition>
+  <definition name="/web/*.web" extends="web-layouts-tiles">
+    <put-attribute name="content"   value="/WEB-INF/views/web/{1}.jsp" />
+  </definition>
+  <definition name="/web/*/*.web" extends="web-layouts-tiles">
+    <put-attribute name="content"   value="/WEB-INF/views/web/{1}/{2}.jsp" />
+  </definition>
+  <definition name="/web/*/*/*.web" extends="web-layouts-tiles">
+    <put-attribute name="content"   value="/WEB-INF/views/web/{1}/{2}/{3}.jsp" />
+  </definition>
+   -->
+  <!-- // web tiles -->
+
+  <!-- web no tiles -->
+<!--   
+  <definition name="web-no-tiles" template="/WEB-INF/layouts/web/noTemplate.jsp">
+    <put-attribute name="noTemplate"   value="" />
+  </definition>
+
+  <definition name="*.no_web" extends="web-no-tiles">
+    <put-attribute name="noTemplate" value="/WEB-INF/views/{1}.jsp" />
+  </definition>
+
+  <definition name="/web/*.no_web" extends="web-no-tiles">
+    <put-attribute name="noTemplate" value="/WEB-INF/views/web/{1}.jsp" />
+  </definition>
+  <definition name="/web/*/*.no_web" extends="web-no-tiles">
+    <put-attribute name="noTemplate"   value="/WEB-INF/views/web/{1}/{2}.jsp" />
+  </definition>
+  <definition name="/web/*/*/*.no_web" extends="web-no-tiles">
+    <put-attribute name="noTemplate"   value="/WEB-INF/views/web/{1}/{2}/{3}.jsp" />
+  </definition>
+   -->
+  <!-- // web no tiles -->
+  
+  <definition name="web-layouts-tiles" template="/WEB-INF/layouts/web/noTemplate.jsp">
+    <put-attribute name="noTemplate"   value="" />
+  </definition>
+
+  <definition name="*.web" extends="web-layouts-tiles">
+    <put-attribute name="noTemplate" value="/WEB-INF/views/{1}.jsp" />
+  </definition>
+
+  <definition name="/web/*.web" extends="web-layouts-tiles">
+    <put-attribute name="noTemplate" value="/WEB-INF/views/web/{1}.jsp" />
+  </definition>
+  <definition name="/web/*/*.web" extends="web-layouts-tiles">
+    <put-attribute name="noTemplate"   value="/WEB-INF/views/web/{1}/{2}.jsp" />
+  </definition>
+  <definition name="/web/*/*/*.web" extends="web-layouts-tiles">
+    <put-attribute name="noTemplate"   value="/WEB-INF/views/web/{1}/{2}/{3}.jsp" />
+  </definition>
+  
+  <!-- manager tiles -->
+  <definition name="manager-layouts-tiles" template="/WEB-INF/layouts/manager/layouts-tiles.jsp">
+    <put-attribute name="header"  value="/WEB-INF/layouts/manager/header.jsp" />
+    <put-attribute name="content" value="" />
+    <put-attribute name="footer"  value="/WEB-INF/layouts/manager/footer.jsp" />
+  </definition>
+
+  <definition name="*.manager" extends="manager-layouts-tiles">
+    <put-attribute name="content"   value="/WEB-INF/views/{1}.jsp" />
+  </definition>
+  <definition name="/manager/*.manager" extends="manager-layouts-tiles">
+    <put-attribute name="content"   value="/WEB-INF/views/manager/{1}.jsp" />
+  </definition>
+  <definition name="/manager/*/*.manager" extends="manager-layouts-tiles">
+    <put-attribute name="content"   value="/WEB-INF/views/manager/{1}/{2}.jsp" />
+  </definition>
+  <definition name="/manager/*/*/*.manager" extends="manager-layouts-tiles">
+    <put-attribute name="content"   value="/WEB-INF/views/manager/{1}/{2}/{3}.jsp" />
+  </definition>
+  <!-- // manager tiles -->
+
+  <!-- manager no tiles -->
+  <definition name="manager-no-tiles" template="/WEB-INF/layouts/manager/noTemplate.jsp">
+    <put-attribute name="noTemplate"   value="" />
+  </definition>
+   <definition name="*.no_manager" extends="manager-no-tiles">
+    <put-attribute name="noTemplate" value="/WEB-INF/views/{1}.jsp" />
+  </definition>
+
+  <definition name="/manager/*.no_manager" extends="manager-no-tiles">
+    <put-attribute name="noTemplate" value="/WEB-INF/views/manager/{1}.jsp" />
+  </definition>
+  <definition name="/manager/*/*.no_manager" extends="manager-no-tiles">
+    <put-attribute name="noTemplate"   value="/WEB-INF/views/manager/{1}/{2}.jsp" />
+  </definition>
+  <definition name="/manager/*/*/*.no_manager" extends="manager-no-tiles">
+    <put-attribute name="noTemplate"   value="/WEB-INF/views/manager/{1}/{2}/{3}.jsp" />
+  </definition>
+
+</tiles-definitions>

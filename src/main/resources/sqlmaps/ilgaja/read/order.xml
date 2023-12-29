@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.read.ReplicationOrderMapper">
+	<select id="getOrderTotalCnt" parameterType="OrderDTO" resultType="int">
+		/* 오더정보 조회 work.getOrderTotalCnt */
+    		SELECT 
+    			COUNT(1)
+    		FROM 
+    			tbl_order o 
+    			LEFT JOIN employer e ON o.employer_seq = e.employer_seq
+    			LEFT JOIN company c ON o.company_seq = c.company_seq
+    		WHERE 
+    			1 = 1
+    			${where}
+    			<if test="srh_company_seq neq '' and srh_company_seq neq null"> AND o.company_seq = #{srh_company_seq} </if>
+    			<if test="start_reg_date neq '' and start_reg_date neq null"> AND DATE_FORMAT(o.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_reg_date}</if>
+    			<if test="end_reg_date   neq '' and end_reg_date   neq null"> AND DATE_FORMAT(o.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_reg_date} </if>
+    			<if test="srh_use_yn      neq '' and srh_use_yn      neq null"> AND o.use_yn = #{srh_use_yn} </if>
+    			<if test="order_state      neq '' and order_state      neq null"> AND o.order_state = #{order_state} </if>
+    			<if test="adminLevel neq null and adminLevel neq ''">
+					<choose>
+						<when test="adminLevel gt 0 and adminLevel lt 3">
+							<if test="company_seq neq null and company_seq neq ''">
+								AND o.order_company_seq = #{company_seq }
+							</if>		
+						</when>
+						<otherwise>
+							<if test="adminLevel neq '0'.toString() and adminLevel eq '3'.toString() and company_seq neq null and company_seq neq ''">
+								AND o.order_company_seq = #{company_seq }
+								AND o.owner_id = #{admin_id }
+							</if>
+						</otherwise>
+					</choose>
+				</if>
+  	</select>
+
+  	<select id="getOrderList" parameterType="OrderDTO" resultType="OrderDTO">
+        /* 오더리스트 getOrderList order.xml */
+        SELECT
+        	order_seq
+         	, order_state
+         	, order_date
+         	, search_flag
+         	, company_seq
+         	, callcenter_memo
+         	, employer_seq
+         	, employer_name
+         	, work_seq
+         	, work_name
+			, case when reg_manager_phone is null and order_state <![CDATA[ < ]]> 3 and order_request = 'CALL' then ''
+				else owner_id end as owner_id
+			, work_arrival
+         	, work_finish
+         	, work_breaktime
+         	, work_addr
+         	, work_sido
+         	, work_sigugun
+         	, work_dongmyun
+         	, work_rest
+         	, work_latlng
+         	, manager_seq
+         	, case when reg_manager_phone is null and order_state <![CDATA[ < ]]> 3 and order_request = 'CALL' then ''
+            	else FN_DECRYPT(manager_name) end as manager_name
+         	, FN_DECRYPT(manager_phone) as manager_phone
+         	, FN_DECRYPT(work_manager_name) as work_manager_name
+         	, FN_DECRYPT(work_manager_phone) as work_manager_phone
+         	, manager_use_status
+         	, work_day
+         	, pay_type
+         	, breakfast_yn
+         	, work_age
+         	, work_blood_pressure
+         	, is_tax
+         	, is_worker_info
+         	, FN_DECRYPT(tax_name) as tax_name
+         	, FN_DECRYPT(tax_phone) as tax_phone
+         	, use_yn
+         	, a_seq
+         	, order_request
+         	, reg_date
+         	, reg_admin
+         	, mod_date
+         	, mod_admin 
+         	, access_view
+         	, company_name
+         	, manager_type
+         	, total_work
+         	, order_company_seq
+         	, order_company_name
+         	, order_owner_id
+         	, labor_contract_seq
+         	, labor_contract_name
+         	, receive_contract_seq
+         	, receive_contract_name
+         	, employer_search_yn
+         	, employer_name_exists
+         	, employer_detail
+         	, parking_option
+        	, manager_reg_date
+        	, employer_num
+        	, work_latlng_count
+        FROM
+	       	(SELECT 
+	        	o.order_seq
+	         	, o.order_state
+	         	, o.order_date
+	         	, o.search_flag
+	         	, o.company_seq
+	         	, o.callcenter_memo
+	         	, o.employer_seq
+	         	, o.employer_name
+	         	, o.work_seq
+	         	, o.work_name
+	         	, o.owner_id
+	         	, o.work_arrival
+	         	, o.work_finish
+	         	, o.work_breaktime
+	         	, o.work_addr
+	         	, o.work_sido
+	         	, o.work_sigugun
+	         	, o.work_dongmyun
+	         	, o.work_rest
+	         	, o.work_latlng
+	         	, o.manager_seq
+	         	, (o.manager_name) as manager_name
+	         	, (o.manager_phone) as manager_phone
+	         	, (o.work_manager_name) as work_manager_name
+	         	, (o.work_manager_phone) as work_manager_phone
+	         	, IFNULL(manager_use_status, -1) AS manager_use_status
+	         	, o.work_day
+	         	, o.pay_type
+	         	, o.breakfast_yn
+	         	, o.work_age
+	         	, o.work_blood_pressure
+	         	, o.is_tax
+	         	, o.is_worker_info
+	         	, (o.tax_name) as tax_name
+	         	, (o.tax_phone) as tax_phone
+	         	, o.use_yn
+	         	, o.a_seq
+	         	, o.order_request
+	         	, o.reg_date
+	         	, o.reg_admin
+	         	, o.mod_date
+	         	, o.mod_admin 
+	         	, IFNULL( CONCAT(a.utm_source   ,'|'   ,IFNULL(a.n_keyword,' ')   ,'|'    ,IFNULL(a.n_rank,' ') ,'|' ,a_os)   ,'E') AS access_view
+	         	, c.company_name
+	         	, IFNULL(m.manager_type, 'N') AS manager_type
+	         	, (SELECT SUM(worker_count) FROM tbl_order_work WHERE use_yn = 1 AND order_seq = o.order_seq) as total_work
+	         	, o.order_company_seq
+	         	, c2.company_name AS order_company_name
+	         	, o.order_owner_id
+	         	, o.labor_contract_seq
+	         	, co.contract_name AS labor_contract_name
+	         	, o.receive_contract_seq
+	         	, co2.contract_name AS receive_contract_name
+	         	, o.employer_search_yn
+	         	, o.employer_name_exists
+	         	, o.employer_detail
+	         	, o.parking_option
+	       	 	, m.reg_date as manager_reg_date
+	       	 	, (SELECT employer_num FROM employer where employer_seq = o.employer_seq) as employer_num
+	       	 	, m.manager_phone as reg_manager_phone
+	       	 	, (SELECT COUNT(1)
+	       	 	   FROM work WHERE work_latlng = o.work_latlng) as work_latlng_count
+	      	FROM
+	         	tbl_order o 
+				LEFT OUTER JOIN company c 
+					ON o.company_seq = c.company_seq
+		        LEFT OUTER JOIN (SELECT manager_seq, manager_phone,manager_type, manager_use_status, date_format(reg_date, '%Y-%m-%d %H:%i') as reg_date
+		                         FROM manager
+		                         WHERE use_yn = '1' AND parent_company_seq = 0) m
+		        	ON o.manager_phone = m.manager_phone
+		        LEFT OUTER JOIN access_log a 
+		        	ON o.a_seq = a.a_seq
+		        LEFT OUTER JOIN company c2 
+		        	ON o.order_company_seq = c2.company_seq
+		        LEFT OUTER JOIN tbl_contract co 
+		        	ON o.labor_contract_seq = co.contract_seq
+		        LEFT OUTER JOIN tbl_contract co2 
+		        	ON o.receive_contract_seq = co2.contract_seq
+			WHERE 
+	        	1 = 1
+	           	${where}
+	         	<if test="srh_company_seq neq '' and srh_company_seq neq null"> AND o.company_seq = #{srh_company_seq} </if>
+	         	<if test="start_reg_date neq '' and start_reg_date neq null"> AND DATE_FORMAT(o.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_reg_date}</if>
+	         	<if test="end_reg_date   neq '' and end_reg_date   neq null"> AND DATE_FORMAT(o.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_reg_date} </if>
+	         	<if test="srh_use_yn      neq '' and srh_use_yn      neq null"> AND o.use_yn = #{srh_use_yn} </if>
+	         	<if test="order_state      neq '' and order_state      neq null"> AND o.order_state = #{order_state} </if>
+	         	<if test="adminLevel neq null and adminLevel neq ''">
+		            <choose>
+						<when test="adminLevel gt 0 and adminLevel lt 3">
+							<if test="company_seq neq null and company_seq neq ''">
+								AND o.order_company_seq = #{company_seq }
+		                  	</if>      
+		               	</when>
+		               	<otherwise>
+							<if test="adminLevel neq '0'.toString() and adminLevel eq '3'.toString() and company_seq neq null and company_seq neq ''">
+		                    	AND (o.order_company_seq = #{company_seq }
+		                     	OR o.owner_id = #{admin_id })
+		                  	</if>
+		               	</otherwise>
+					</choose>
+				</if>
+			ORDER BY ${sidx} ${sord}
+	      	<if test="paging != null">
+				<choose>
+					<when test="paging.pageNo gt 0">
+	                	LIMIT ${paging.startPage}, ${paging.endPage}
+	              	</when>
+	              	<otherwise>
+		                LIMIT 0, ${paging.endPage}
+	              	</otherwise>
+	         	</choose>
+	      	</if>) AS t
+    </select>
+  
+   	<select id="getSelectInfo" parameterType="OrderDTO" resultType="OrderDTO">
+		SELECT 
+			o.order_seq
+         	, o.order_state
+         	, o.order_date
+         	, o.search_flag
+         	, o.company_seq
+         	, o.callcenter_memo
+         	, o.employer_seq
+         	, o.employer_name
+         	, o.work_seq
+         	, o.work_name
+         	, o.work_arrival
+         	, o.work_finish
+         	, o.work_breaktime
+         	, o.work_addr
+         	, o.work_sido
+         	, o.work_sigugun
+         	, o.work_dongmyun
+         	, o.work_rest
+         	, o.work_latlng
+         	, o.manager_seq
+         	, FN_DECRYPT(o.manager_name) as manager_name
+         	, FN_DECRYPT(o.manager_phone) as manager_phone
+         	, FN_DECRYPT(o.work_manager_name) as work_manager_name
+         	, FN_DECRYPT(o.work_manager_phone) as work_manager_phone
+         	, o.work_day
+         	, o.pay_type
+         	, o.breakfast_yn
+         	, o.work_age
+         	, o.work_blood_pressure
+         	, o.is_tax
+         	, o.is_worker_info
+         	, FN_DECRYPT(o.tax_name) as tax_name
+         	, FN_DECRYPT(o.tax_phone) as tax_phone
+         	, o.order_json_seq
+         	, o.use_yn
+         	, o.a_seq
+         	, o.order_request
+         	, o.reg_date
+         	, o.reg_admin
+         	, o.mod_date
+         	, o.mod_admin 
+         	, o.owner_id
+         	, o.order_owner_id
+         	, o.order_company_seq
+         	, o.labor_contract_seq
+         	, o.receive_contract_seq
+         	, o.parking_option
+         	, o.employer_detail
+         	, (CASE
+               WHEN e.sign_manager_type = 'O'
+               THEN o.manager_seq
+               WHEN e.sign_manager_type = 'E'
+               THEN e.sign_manager_seq
+            END) AS sign_manager_seq
+            , e.employer_income_code
+            , e.employer_income_name
+            , e.employer_pay_code
+            , e.employer_pay_name
+      	FROM
+			tbl_order o 
+         	LEFT OUTER JOIN employer e 
+         		ON o.employer_seq = e.employer_seq 
+      	WHERE 
+      		order_seq = #{order_seq}   
+    </select>
+  
+  	<select id="getOrderWorkInfo" parameterType="OrderWorkDTO" resultType="OrderWorkDTO">
+    	SELECT 
+			*
+		FROM
+			tbl_order_work 
+		WHERE 
+			work_seq = #{work_seq}   
+  	</select>
+  
+  	<select id="getOrderWorkTotalCnt" parameterType="OrderWorkDTO" resultType="int">
+    	/* 오더정보 조회 work.getOrderTotalCnt */
+    	SELECT 
+    		COUNT(1)
+    	FROM 
+    		tbl_order_work o 
+    	WHERE 
+    		1 = 1 
+    		AND order_seq = #{order_seq}
+  	</select>
+
+  	<select id="getOrderWorkList" parameterType="OrderWorkDTO" resultType="OrderWorkDTO">
+    	SELECT 
+			*
+		FROM
+			tbl_order_work o
+		WHERE 
+			1 = 1
+	       	AND order_seq = #{order_seq}
+		ORDER BY  ${sidx} ${sord}
+			<if test="paging != null">
+				<choose>
+					<when test="paging.pageNo gt 0">
+		    			LIMIT ${paging.startPage}, ${paging.endPage}
+		        	</when>
+		        	<otherwise>
+		    			LIMIT 0, ${paging.endPage}
+		        	</otherwise>
+		      	</choose>
+			</if>
+  	</select>
+
+  	<select id="getSelectOrder" parameterType="OrderDTO" resultType="orderDTO">
+       SELECT 
+         o.order_seq
+         , o.order_state
+         , o.order_date
+         , o.search_flag
+         , o.company_seq
+         , o.callcenter_memo
+         , o.employer_seq
+         , o.employer_name
+         , o.work_seq
+         , o.work_name
+         , o.work_arrival
+         , o.work_finish
+         , o.work_breaktime
+         , o.work_addr
+         , o.work_sido
+         , o.work_sigugun
+         , o.work_dongmyun
+         , o.work_rest
+         , o.work_latlng
+         , o.manager_seq
+         , FN_DECRYPT(o.manager_name) as manager_name
+         , FN_DECRYPT(o.manager_phone) as manager_phone
+         , FN_DECRYPT(o.work_manager_name) as work_manager_name
+         , FN_DECRYPT(o.work_manager_phone) as work_manager_phone
+         , o.work_day
+         , o.pay_type
+         , o.breakfast_yn
+         , o.work_age
+         , o.work_blood_pressure
+         , o.is_tax
+         , o.is_worker_info
+         , FN_DECRYPT(o.tax_name) as tax_name
+         , FN_DECRYPT(o.tax_phone) as tax_phone
+         , o.use_yn
+         , o.a_seq
+         , o.order_request
+         , o.reg_date
+         , o.reg_admin
+         , o.mod_date
+         , o.mod_admin 
+         , o.labor_contract_seq
+         , o.receive_contract_seq
+         , o.employer_search_yn
+         , o.employer_name_exists
+      FROM
+         tbl_order o  
+      WHERE 
+         order_seq = #{order_seq}
+    </select>
+  
+  	<select id="getOrderLogList" parameterType="OrderLogDTO" resultType="OrderLogDTO">
+    	SELECT 
+			*
+		FROM
+			tbl_order_log 
+	    WHERE 
+	    	1 = 1 
+	    	AND order_seq = #{order_seq}
+	    	<if test="log_type neq '' and log_type neq null"> and log_type = #{log_type} </if>    
+  	</select>
+  
+  	<select id="getSelectOrderLog" parameterType="OrderLogDTO" resultType="OrderLogDTO">
+    	SELECT 
+			*
+		FROM
+			tbl_order_log 
+	    WHERE 
+	    	1 = 1 
+	    	AND log_seq = #{log_seq}
+  	</select>
+  
+    <select id="getTotalWork" parameterType="OrderDTO" resultType="int">
+    	/* 오더Work count 조회 order.getTotalWork */
+    	SELECT 
+	 		IFNULL(SUM(worker_count),0) AS ct 
+		FROM
+	  		tbl_order_work
+		WHERE 
+			use_yn = 1 
+	  		AND order_seq IN 
+	  			(SELECT order_seq FROM tbl_order o LEFT OUTER JOIN company c ON o.company_seq = c.company_seq WHERE o.use_yn = 1  
+	  			<if test="start_reg_date neq '' and start_reg_date neq null"> AND DATE_FORMAT(o.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_reg_date} </if>
+    			<if test="end_reg_date   neq '' and end_reg_date   neq null"> AND DATE_FORMAT(o.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_reg_date} </if>
+    			<if test="adminLevel neq null and adminLevel neq ''">
+					<choose>
+						<when test="adminLevel gt 0 and adminLevel lt 3">
+							<if test="company_seq neq null and company_seq neq ''">
+								AND o.order_company_seq = #{company_seq }
+							</if>		
+						</when>
+						<otherwise>
+							<if test="adminLevel neq '0'.toString() and adminLevel eq '3'.toString() and company_seq neq null and company_seq neq ''">
+								AND (o.order_company_seq = #{company_seq }
+								OR o.owner_id = #{admin_id })
+							</if>
+						</otherwise>
+					</choose>
+				</if>
+      			) 
+  	</select>
+
+    <select id="getEmployerByEmployerNum" parameterType="OrderDTO" resultType="EmployerDTO">
+    	/* 사업자(주민)번호로 구인처 조회 order.getEmployerByEmployerNum */
+    	select
+    	    employer_seq, employer_name, employer_num
+    	from employer
+    	where use_yn = '1' and employer_num = #{employer_num}
+	</select>
+
+    <select id="getWorkListByWorkLatlng" parameterType="OrderDTO" resultType="WorkDTO">
+    	/* 좌표가 같은 현장 리스트 조회 order.getWorkListByWorkLatlng */
+    	select
+			work_seq, work_addr, work_name
+    	    , FN_DECRYPT(work_manager_name) work_manager_name, FN_DECRYPT(work_manager_phone) work_manager_phone
+    	    , work_arrival, work_finish, work_age, work_blood_pressure
+    		, work_dongmyun, work_sigugun, work_sido, work_rest
+    	from work
+    	where use_yn = '1' and work_latlng = #{work_latlng}
+    	order by reg_date desc
+	</select>
+</mapper>

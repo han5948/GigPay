@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.RatingMapper">
+
+
+	<select id="selectListCnt" parameterType="RatingDTO" resultType="int">
+		/* 평가 목록 Cnt selectListCnt tbl_worker_rating.xml */
+		SELECT
+			COUNT(1)
+		FROM
+			tbl_worker_rating
+		WHERE 1=1
+				<if test="searchValue neq '' and searchValue neq null and searchKey neq '' and searchKey neq null">	AND ${searchKey} LIKE CONCAT('%', #{searchValue}, '%')	</if>
+				<if test="useYn neq '' and useYn neq null">	AND use_yn = #{useYn}		</if>
+				<if test="delYn neq '' and delYn neq null">	AND del_yn = #{delYn}		</if>
+		
+	</select>
+	
+	<select id="selectList" parameterType="RatingDTO" resultType="RatingDTO">
+		/* 평가 목록 selectList tbl_worker_rating.xml */
+		SELECT
+			*
+		FROM
+			tbl_worker_rating  
+		WHERE   1=1
+				<if test="searchValue neq '' and searchValue neq null and searchKey neq '' and searchKey neq null">	AND ${searchKey} LIKE CONCAT('%', #{searchValue}, '%')	</if>
+				<if test="useYn neq '' and useYn neq null">	AND use_yn = #{useYn}		</if>
+				<if test="delYn neq '' and delYn neq null">	AND del_yn = #{delYn}		</if>
+		
+		ORDER BY reg_date DESC
+		<if test="paging neq null">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+	</select>
+
+	<select id="selectInfo" parameterType="RatingDTO" resultType="RatingDTO">
+		/* 평가 내용 selectInfo tbl_worker_rating.xml */
+		SELECT
+			*
+		FROM
+			tbl_worker_rating WHERE 1=1
+			<if test="ilbo_seq neq '' and ilbo_seq neq null"> AND  ilbo_seq = #{ilbo_seq}	</if>
+			<if test="rating_seq neq '' and rating_seq neq null"> AND  rating_seq = #{rating_seq}	</if>
+			<if test="rating_type neq '' and rating_type neq null"> AND rating_type = #{rating_type} </if> 
+			
+	</select>
+
+	<insert id="insertInfo" parameterType="RatingDTO" useGeneratedKeys="true" keyProperty="rating_seq">
+		/* 평가 등록 insertInfo board.xml */	
+		INSERT tbl_worker_rating SET
+			worker_seq = #{worker_seq}
+			<if test="rating_type neq '' and rating_type neq null"> , rating_type = #{rating_type }	</if>
+			<if test="ilbo_seq neq '' and ilbo_seq neq null"> , ilbo_seq = #{ilbo_seq}	</if>
+			<if test="employer_seq neq '' and employer_seq	neq null"> , employer_seq = #{employer_seq}	</if>
+			<if test="work_seq neq '' and work_seq neq null"> , work_seq = #{work_seq}	</if>
+			<if test="manager_seq neq '' and manager_seq neq null"> , manager_seq = #{manager_seq}	</if>
+			,rate = #{rate}
+			<if test="comment neq '' and comment neq null"> , comment = #{comment}	</if>
+			, reg_date = now()
+			, reg_admin = #{reg_admin}
+			, mod_admin = #{mod_admin}
+			
+	</insert>
+
+	<update id="updateInfo" parameterType="RatingDTO">
+		/* 평가정보 수정 updateInfo board.xml */	
+		UPDATE tbl_worker_rating SET
+			 mod_admin	= #{reg_admin}
+			<if test="worker_seq neq '' and worker_seq neq null"> , worker_seq = #{worker_seq}	</if>
+			<if test="employer_seq neq '' and employer_seq	neq null"> , employer_seq = #{employer_seq}	</if>
+			<if test="work_seq neq '' and work_seq neq null"> , work_seq = #{work_seq}	</if>
+			<if test="manager_seq neq '' and manager_seq neq null"> , manager_seq = #{manager_seq}	</if>
+			,rate = #{rate}
+			<if test="comment neq '' and comment neq null"> , comment = #{comment}	</if>
+			<if test="use_yn neq '' and use_yn neq null">, use_yn 	= #{useYn}		</if>
+			<if test="del_yn neq '' and del_yn neq null">, del_yn 	= #{delYn}		</if>
+	  WHERE
+			rating_seq = #{rating_seq}
+	</update>
+
+	<update id="deleteInfo" parameterType="RatingDTO">
+		/* 평가정보 삭제 deleteInfo board.xml */
+		UPDATE tbl_worker_rating SET
+			del_yn			= 'Y'
+			, mod_admin	= #{mod_admin}
+		WHERE
+		<choose>
+			<when test="rating_seq neq '' and	rating_seq neq	null">	rating_seq = #{rating_seq}	</when>
+			<otherwise>
+				rating_seq IN
+				<foreach collection="seqArr" item="selSeq"  open="(" close=")" separator=", ">
+					#{selSeq}
+				</foreach>
+			</otherwise>
+		</choose>
+	</update>
+	
+
+</mapper>

@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.BoardMapper">
+
+	<select id="selectInfoListCnt" parameterType="BoardDTO" resultType="int">
+		/* 게시판 목록 Cnt selectListCnt board.xml */
+		SELECT
+			COUNT(1)
+		FROM
+			tbl_board_group
+		WHERE 
+			1=1
+			<if test="searchValue neq '' and searchValue neq null and searchKey neq '' and searchKey neq null">	
+				AND ${searchKey} LIKE CONCAT('%', #{searchValue}, '%')	
+			</if>
+			<if test="use_yn neq '' and use_yn neq null">	
+				AND use_yn = #{use_yn}		
+			</if>
+			<if test="del_yn neq '' and del_yn neq null">	
+				AND del_yn = #{del_yn}		
+			</if>
+	</select>
+	
+	<select id="selectInfoList" parameterType="BoardDTO" resultType="BoardDTO">
+		/* 게시판 목록 selectList tbl_board.xml */
+		SELECT
+			*
+		FROM
+			tbl_board_group  
+		WHERE  
+			1=1
+			<if test="searchValue neq '' and searchValue neq null and searchKey neq '' and searchKey neq null">	
+				AND ${searchKey} LIKE CONCAT('%', #{searchValue}, '%')	
+			</if>
+			<if test="use_yn neq '' and use_yn neq null">	
+				AND use_yn = #{use_yn}		
+			</if>
+			<if test="del_yn neq '' and del_yn neq null">	
+				AND del_yn = #{del_yn}		
+			</if>
+		ORDER BY reg_date DESC
+		<if test="paging neq null">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+	</select>
+	
+	<insert id="insertBoardInfo" parameterType="BoardDTO" useGeneratedKeys="true" keyProperty="board_seq">
+		/* 게시판 등록 insertInfo board.xml */	
+		INSERT  
+			tbl_board_group 
+		SET
+			board_type = #{board_type}  
+			, board_name = #{board_name}                                     
+			, board_comment = #{board_comment}   
+			, reply_yn = #{reply_yn}
+			, pass_yn = #{pass_yn}
+			, editor_yn = #{editor_yn}
+			, email_yn = #{email_yn}
+			, phone_yn = #{phone_yn}
+			, write_company_seq = #{write_company_seq}
+			, write_admin_auth = #{write_admin_auth}
+			, reg_date = now()
+			, reg_admin = #{reg_admin}
+			, mod_admin = #{mod_admin}
+	</insert>
+	
+	<select id="selectBoardInfo" parameterType="BoardDTO" resultType="BoardDTO">
+		/* 게시판  selectBoardInfo tbl_board.xml */
+		SELECT
+			*
+		FROM
+			tbl_board_group 
+		WHERE 
+			1=1
+			<if test="board_group_seq neq '' and board_group_seq neq null">
+				AND board_group_seq = #{board_group_seq}
+			</if>
+			<if test="board_name neq '' and board_name neq null"> 
+				AND board_name = #{board_name}
+			</if>
+	</select>
+	
+	<update id="updateBoardInfo" parameterType="BoardDTO">
+		/* 게시판정보 수정 updateInfo board.xml */	
+		UPDATE 
+			tbl_board_group 
+		SET
+			mod_admin		= #{mod_admin}
+			<if test="board_type neq '' and board_type neq null"> 				
+				, board_type = #{board_type} 
+			</if>  
+			<if test="board_name neq '' and board_name neq null"> 			
+				, board_name = #{board_name} 
+			</if>
+			<if test="board_title neq '' and board_title neq null">			
+				, board_title = #{board_title}
+			</if>
+			<if test="board_comment neq '' and board_comment neq null"> 
+				, board_comment = #{board_comment} 
+			</if>   
+			<if test="reply_yn neq '' and reply_yn neq null"> 						
+				, reply_yn = #{reply_yn} 
+			</if>
+			<if test="pass_yn neq '' and pass_yn neq null">						
+				, pass_yn = #{pass_yn}	
+			</if>
+			<if test="editor_yn neq '' and editor_yn neq null">					
+				, editor_yn = #{editor_yn}	
+			</if>
+			<if test="email_yn neq '' and email_yn neq null">					
+				, email_yn = #{email_yn}	
+			</if>
+			<if test="phone_yn neq '' and phone_yn neq null">					
+				, phone_yn = #{phone_yn}	
+			</if>
+			<if test="write_company_seq neq '' and write_company_seq neq null">	
+				, write_company_seq = #{write_company_seq}	
+			</if>
+			<if test="write_admin_auth neq '' and write_admin_auth neq null">	
+				, write_admin_auth = #{write_admin_auth}	
+			</if>
+			<if test="use_yn neq '' and use_yn neq null">							
+				, use_yn = #{use_yn}		
+			</if>
+			<if test="del_yn neq '' and del_yn neq null">							
+				, del_yn = #{del_yn}		
+			</if>
+	  	WHERE
+			board_group_seq = #{board_group_seq}
+	</update>
+
+
+	<select id="selectListCnt" parameterType="BoardDTO" resultType="int">
+		/* 게시판 목록 Cnt selectListCnt tbl_board.xml */
+		SELECT
+			COUNT(1)
+		FROM
+			tbl_board
+		WHERE 
+			1=1
+			<if test="board_group_seq neq '' and board_group_seq neq null">
+				AND board_group_seq = #{board_group_seq}
+			</if>
+			<if test="searchValue neq '' and searchValue neq null and searchKey neq '' and searchKey neq null">	
+				AND ${searchKey} LIKE CONCAT('%', #{searchValue}, '%')	
+			</if>
+			<if test="use_yn neq '' and use_yn neq null">	
+				AND use_yn = #{use_yn}		
+			</if>
+			<if test="del_yn neq '' and del_yn neq null">	
+				AND del_yn = #{del_yn}		
+			</if>
+	</select>
+	
+	<select id="selectList" parameterType="BoardDTO" resultType="BoardDTO">
+		/* 게시판 목록 selectList tbl_board.xml */
+		SELECT
+			board_seq
+			, board_group_seq
+			, board_writer
+			, member_seq
+			, board_pass
+			, fn_decrypt(board_email) as board_email
+			, fn_decrypt(board_phone) as board_phone
+			, board_title
+			, board_contents
+			, view_cnt
+			, use_yn
+			, del_yn
+			, reg_date
+			, reg_admin
+			, mod_date
+			, mod_admin 
+		FROM
+			tbl_board  
+		WHERE   
+			board_group_seq = #{board_group_seq}
+			<if test="searchValue neq '' and searchValue neq null and searchKey neq '' and searchKey neq null">	
+				AND ${searchKey} LIKE CONCAT('%', #{searchValue}, '%')	
+			</if>
+			<if test="use_yn neq '' and use_yn neq null">	
+				AND use_yn = #{use_yn}		
+			</if>
+			<if test="del_yn neq '' and del_yn neq null">	
+				AND del_yn = #{del_yn}		
+			</if>
+		
+		ORDER BY reg_date DESC
+		<if test="paging neq null">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+	</select>
+
+	<select id="selectInfo" parameterType="BoardDTO" resultType="BoardDTO">
+		/* 게시판 내용 selectInfo tbl_board.xml */
+		SELECT
+			board_seq
+			, board_group_seq
+			, board_writer
+			, member_seq
+			, board_pass
+			, fn_decrypt(board_email) as board_email
+			, fn_decrypt(board_phone) as board_phone
+			, board_title
+			, board_contents
+			, view_cnt
+			, use_yn
+			, del_yn
+			, reg_date
+			, reg_admin
+			, mod_date
+			, mod_admin 
+		FROM
+			tbl_board		
+		WHERE 
+			board_seq = #{board_seq}
+	</select>
+
+	<insert id="insertInfo" parameterType="BoardDTO" useGeneratedKeys="true" keyProperty="board_seq">
+		/* 게시판 등록 insertInfo board.xml */	
+		INSERT 
+			tbl_board 
+		SET
+			board_group_seq = #{board_group_seq}
+			, member_seq = #{member_seq}
+			<if test="board_writer neq '' and board_writer neq null"> 
+				, board_writer = #{board_writer }	
+			</if>
+			<if test="board_pass neq '' and board_pass neq null"> 
+				, board_pass = #{board_pass}	
+			</if>
+			<if test="board_title neq '' and board_title neq null"> 
+				, board_title = #{board_title}	
+			</if>
+			<if test="board_contents neq '' and board_contents neq null"> 
+				, board_contents = #{board_contents}	
+			</if>
+			<if test="board_email neq '' and board_email neq null"> 
+				, board_email = fn_encrypt(#{board_email})	
+			</if>
+			<if test="board_phone neq '' and board_phone neq null"> 
+				, board_phone = fn_encrypt(#{board_phone})	
+			</if>
+			, reg_date = now()
+			, reg_admin = #{reg_admin}
+			, mod_admin = #{mod_admin}
+	</insert>
+
+	<update id="updateInfo" parameterType="BoardDTO">
+		/* 게시판정보 수정 updateInfo board.xml */	
+		UPDATE 
+			tbl_board 
+		SET
+			mod_admin = #{reg_admin}
+			<if test="board_pass neq '' and board_pass neq null"> 
+				, board_pass = #{board_pass}	
+			</if>
+			<if test="board_title neq '' and board_title neq null"> 
+				, board_title = #{board_title}	
+			</if>
+			<if test="board_contents neq '' and board_contents neq null"> 
+				, board_contents = #{board_contents}	
+			</if>
+			<if test="board_email neq '' and board_email neq null"> 
+				, board_email = fn_encrypt(#{board_email})	
+			</if>
+			<if test="board_phone neq '' and board_phone neq null"> 
+				, board_phone = fn_encrypt(#{board_phone})	
+			</if>
+			<if test="use_yn neq '' and use_yn neq null">
+				, use_yn = #{use_yn}		
+			</if>
+			<if test="del_yn neq '' and del_yn neq null">
+				, del_yn = #{del_yn}		
+			</if>
+	  	WHERE
+			board_seq = #{board_seq}
+	</update>
+
+	<update id="updateViewCount" parameterType="BoardDTO">
+		/* 게시판정보 수정 updateViewCount board.xml */	
+		UPDATE 
+			tbl_board 
+		SET
+			view_cnt = view_cnt + 1
+	  	WHERE
+			board_seq = #{board_seq}
+	</update>
+
+
+	<update id="deleteInfo" parameterType="BoardDTO">
+		/* 게시판정보 삭제 deleteInfo board.xml */
+		UPDATE 
+			tbl_board 
+		SET
+			del_yn = '1'
+			, mod_admin	= #{mod_admin}
+		WHERE
+			<choose>
+				<when test="board_seq neq '' and	board_seq neq	null">	
+					board_seq = #{board_seq}	
+				</when>
+				<otherwise>
+					board_seq IN
+					<foreach collection="seqArr" item="selSeq"  open="(" close=")" separator=", ">
+						#{selSeq}
+					</foreach>
+				</otherwise>
+			</choose>
+	</update>
+	
+<!-- 	<insert id="insertReply" parameterType="ReplyDTO" useGeneratedKeys="true" keyProperty="reply_seq"> -->
+	<insert id="insertReply" parameterType="BoardReplyDTO" useGeneratedKeys="true" keyProperty="reply_seq">
+		/* 댓글 등록 insertReply board.xml */	
+		INSERT 
+			tbl_board_reply 
+		SET
+			board_seq = #{board_seq}    
+			, parent_seq = #{parent_seq}  
+			, depth = #{depth}        
+			, reply_content = #{reply_content}
+			, reply_writer = #{reply_writer}
+			<if test="reply_pass neq '' and reply_pass neq null">
+				, reply_pass = #{reply_pass} 
+			</if>
+			, reg_date = now()
+			, reg_admin	= #{reg_admin}
+			, mod_admin	= #{mod_admin}
+	</insert>
+	
+<!-- 	<select id="getReplyList" resultType="ReplyDTO" parameterType="ReplyDTO"> -->
+	 <select id="getReplyList" resultType="BoardReplyDTO" parameterType="BoardReplyDTO">
+        <!-- select
+            *
+        from
+            tbl_board_reply
+        where
+            board_seq = #{board_seq}
+            <if test="use_yn neq '' and use_yn neq null">	AND use_yn = #{use_yn}	</if>
+			<if test="del_yn neq '' and del_yn neq null">	AND del_yn = #{del_yn}		</if>
+        order by reply_seq asc
+         -->
+        /* board.xml getReplyList 댓글목록조회 */
+        SELECT 
+		  	reply_seq,
+		  	board_seq,
+		  	parent_seq,
+		  	depth,
+		  	reply_content,
+		  	reply_writer,
+		  	reply_pass,
+		  	use_yn,
+		  	del_yn,
+		  	DATE_FORMAT(reg_date, "%Y-%m-%d %H:%i:%s") AS reg_date,
+		  	reg_admin,
+		  	mod_date,
+		  	mod_admin
+		FROM
+		  	tbl_board_reply
+		WHERE
+			<choose>
+		  		<when test="parent_seq neq '' and parent_seq neq null">
+		  			parent_seq = #{parent_seq}
+		  		</when>
+		  		<otherwise>
+			  		parent_seq = 0
+		  		</otherwise>
+		  	</choose>
+		  	AND board_seq = #{board_seq}
+		  	<if test="use_yn neq '' and use_yn neq null">	
+		  		AND use_yn = #{use_yn}		
+		  	</if>
+		  	<if test="del_yn neq '' and del_yn neq null">	
+		  		AND del_yn = #{del_yn}		
+		  	</if>
+		ORDER BY reply_seq DESC
+		<if test="parent_seq eq '' or parent_seq eq null">
+			<if test="paging neq null"> 
+				LIMIT ${paging.startPage }, ${paging.endPage }
+			</if>
+		</if>
+		
+<!-- 		( -->
+<!-- 		SELECT  -->
+<!-- 		  *, -->
+<!-- 		  reply_seq AS id  -->
+<!-- 		FROM -->
+<!-- 		  tbl_board_reply  -->
+<!-- 		WHERE  -->
+<!-- 		  board_seq = #{board_seq}   -->
+<!-- 		  AND parent_seq = 0  -->
+<!-- 		<if test="use_yn neq '' and use_yn neq null">	AND use_yn = #{use_yn}		</if> -->
+<!-- 		<if test="del_yn neq '' and del_yn neq null">	AND del_yn = #{del_yn}		</if> -->
+<!-- 		ORDER BY id DESC -->
+<!-- 		<if test="paging neq null"> -->
+<!-- 			LIMIT ${paging.startPage }, ${paging.endPage } -->
+<!-- 		</if> -->
+<!-- 		)  -->
+<!-- 		UNION -->
+<!-- 		( -->
+<!-- 		SELECT  -->
+<!-- 		  * , -->
+<!-- 		  parent_seq AS id -->
+<!-- 		FROM -->
+<!-- 		  tbl_board_reply  -->
+<!-- 		WHERE parent_seq IN  -->
+<!-- 		  (SELECT  -->
+<!-- 		    *  -->
+<!-- 		  FROM -->
+<!-- 		    (SELECT  -->
+<!-- 		      reply_seq  -->
+<!-- 		    FROM -->
+<!-- 		      tbl_board_reply  -->
+<!-- 		    WHERE board_seq = #{board_seq} -->
+<!-- 		      AND parent_seq = 0  -->
+<!--      		<if test="use_yn neq '' and use_yn neq null">	AND use_yn = #{use_yn}		</if> -->
+<!-- 			<if test="del_yn neq '' and del_yn neq null">	AND del_yn = #{del_yn}		</if> -->
+<!-- 			ORDER BY reply_seq DESC -->
+<!-- 		    <if test="paging neq null"> -->
+<!-- 			LIMIT ${paging.startPage }, ${paging.endPage } -->
+<!-- 			</if> -->
+<!-- 			) AS t -->
+<!-- 		  ) -->
+<!-- 		)  -->
+<!-- 		ORDER BY id DESC, -->
+<!-- 		depth ASC  -->
+
+		
+<!-- 		SELECT  -->
+<!-- 			* -->
+<!-- 			,parent_seq AS id -->
+<!-- 		FROM tbl_board_reply WHERE board_seq = 13 AND parent_seq != 0 -->
+<!-- 			<if test="use_yn neq '' and use_yn neq null">	AND use_yn = #{use_yn}	</if> -->
+<!-- 			<if test="del_yn neq '' and del_yn neq null">	AND del_yn = #{del_yn}		</if> -->
+<!-- 		ORDER BY id ASC, depth ASC -->
+
+    </select>
+    <select id="getReplyListCnt" parameterType="BoardReplyDTO" resultType="int">
+    	/* board.xml getReplyListCnt 댓글 갯수 */
+        SELECT 
+			COUNT(*) 
+        FROM 
+        (SELECT 
+			*,
+		    reply_seq AS id 
+		FROM
+		    tbl_board_reply 
+		WHERE 
+			board_seq = #{board_seq} 
+		    AND parent_seq = 0 
+		    <if test="use_yn neq '' and use_yn neq null">	
+		    	AND use_yn = #{use_yn}		
+		    </if>
+			<if test="del_yn neq '' and del_yn neq null">	
+				AND del_yn = #{del_yn}		
+			</if>
+		 ) A 
+	</select>
+	 <!-- <select id="replyInfo" resultType="ReplyDTO" parameterType="ReplyDTO"> -->
+	 
+	<select id="replyInfo" resultType="BoardReplyDTO" parameterType="BoardReplyDTO">
+		SELECT
+			*
+        FROM
+            tbl_board_reply
+        WHERE
+            reply_seq = #{reply_seq}
+        	<if test="use_yn neq '' and use_yn neq null">	
+        		AND use_yn = #{use_yn}		
+        	</if>
+			<if test="del_yn neq '' and del_yn neq null">	
+				AND del_yn = #{del_yn}		
+			</if>
+    </select>
+    
+<!--     <update id="delReply" parameterType="ReplyDTO"> -->
+    <update id="delReply" parameterType="BoardReplyDTO">
+		/* 댓글 삭제 delReply board.xml */
+		UPDATE 
+			tbl_board_reply 
+		SET
+			del_yn = '1'
+			, mod_admin	= #{mod_admin}
+		WHERE
+			<choose>
+				<when test="reply_seq neq '' and reply_seq neq null">	 
+					reply_seq = #{reply_seq} OR parent_seq = #{reply_seq}	
+				</when>
+				<otherwise>
+					reply_seq IN
+					<foreach collection="seqArr" item="selSeq"  open="(" close=")" separator=", ">
+						#{selSeq}
+					</foreach>
+				</otherwise>
+			</choose>
+	</update>
+	
+<!-- 	<update id="updateReply" parameterType="ReplyDTO"> -->
+	<update id="updateReply" parameterType="BoardReplyDTO">
+		/* 댓글 수정 updateReply board.xml */	
+		UPDATE 
+			tbl_board_reply 
+		SET
+			reply_content = #{reply_content}
+<!-- 			, reply_writer  	= #{reply_writer} -->
+<!-- 			, reply_pass  = #{reply_pass} -->
+			, mod_admin	 = #{mod_admin}
+			<if test="use_yn neq '' and use_yn neq null">
+				, use_yn 	= #{use_yn}		
+			</if>
+			<if test="del_yn neq '' and del_yn neq null">
+				, del_yn 	= #{del_yn}		
+			</if>
+		WHERE 
+			reply_seq = #{reply_seq}
+	</update>
+</mapper>

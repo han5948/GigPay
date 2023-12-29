@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.SmsTemplateMapper">
+	<select id="selectListCnt" parameterType="SmsTemplateDTO" resultType="int">
+		/* SMS 템플릿 리스트 카운트 */
+		SELECT
+			COUNT(template_seq) AS CNT
+		FROM
+			tbl_sms_template
+		WHERE
+			1 = 1
+				AND del_yn = '0'		
+			<if test="use_yn != '' and use_yn != null">
+				AND use_yn = #{use_yn}		
+			</if>
+			<if test="startDate != '' and startDate != null">	
+				AND DATE_FORMAT(reg_date, "%Y-%m-%d") <![CDATA[>=]]>  #{startDate}	AND DATE_FORMAT(reg_date, "%Y-%m-%d") <![CDATA[<=]]>  #{endDate}	
+			</if>
+			<if test="searchKey != '' and searchKey != null and searchValue != '' and searchValue != null">
+				AND ${searchKey } LIKE CONCAT('%', #{searchValue }, '%')
+			</if>
+			<if test="searchKey == '' or searchKey == null and searchValue != '' and searchValue != null">
+				AND (template_title LIKE CONCAT('%', #{searchValue }, '%') 
+				OR template_content LIKE CONCAT('%', #{searchValue }, '%'))
+			</if>
+			<if test="adminLevel != null and adminLevel != '0'.toString()">
+				AND (company_seq = #{company_seq } OR company_seq = '0')
+			</if>
+	</select>
+	
+	<select id="selectList" parameterType="SmsTemplateDTO" resultType="SmsTemplateDTO">
+		/* SMS 템플릿 리스트 */
+		SELECT
+			template_seq,
+			template_title,
+			template_content,
+			company_seq,
+			use_yn,
+			del_yn,
+			reg_admin,
+			reg_date,
+			mod_admin,
+			mod_date,
+			(select company_name from company where company_seq = s.company_seq) as company_name
+		FROM
+			tbl_sms_template s
+		WHERE 
+			1 = 1
+			AND del_yn = '0'		
+			<if test="use_yn != '' and use_yn != null">
+				AND use_yn = #{use_yn}		
+			</if>
+			<if test="startDate != '' and startDate != null">	
+				AND DATE_FORMAT(reg_date, "%Y-%m-%d") <![CDATA[>=]]>  #{startDate}	AND DATE_FORMAT(reg_date, "%Y-%m-%d") <![CDATA[<=]]>  #{endDate}	
+			</if>
+			<if test="searchKey != '' and searchKey != null and searchValue != '' and searchValue != null">
+				AND ${searchKey } LIKE CONCAT('%', #{searchValue }, '%')
+			</if>
+			<if test="searchKey == '' or searchKey == null and searchValue != '' and searchValue != null">
+				AND (template_title LIKE CONCAT('%', #{searchValue }, '%') 
+				OR template_content LIKE CONCAT('%', #{searchValue }, '%'))
+			</if>
+			<if test="adminLevel != null and adminLevel != '0'.toString()">
+				AND (company_seq = #{company_seq } OR company_seq = '0')
+			</if>
+		ORDER BY template_seq DESC
+		<if test="paging != null">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+	</select>
+	
+	<insert id="insertSmsTemplate" parameterType="SmsTemplateDTO" useGeneratedKeys="true" keyProperty="template_seq">
+		INSERT INTO tbl_sms_template (
+			template_title,
+			template_content,
+			company_seq,
+			use_yn,
+			del_yn,
+			reg_admin,
+			reg_date,
+			mod_admin,
+			mod_date
+		) 
+		VALUES
+		(
+			#{template_title },
+			#{template_content },
+			#{company_seq },
+			#{use_yn },
+			'0',
+			#{reg_admin },
+			NOW(),
+			#{reg_admin },
+			NOW()
+		)
+	</insert>
+	
+	<select id="selectInfo" parameterType="SmsTemplateDTO" resultType="SmsTemplateDTO">
+		/* SMS 템플릿 Info */
+		SELECT
+			template_seq,
+			template_title,
+			template_content,
+			company_seq,
+			use_yn,
+			del_yn,
+			reg_admin,
+			reg_date,
+			mod_admin,
+			mod_date
+		FROM
+			tbl_sms_template
+		WHERE 
+			1 = 1
+			AND del_yn = '0'		
+			AND use_yn = '1'		
+			<if test="template_seq != '' and template_seq != null">
+				AND template_seq = #{template_seq }
+			</if>
+	</select>
+	
+	<update id="updateSmsTemplate" parameterType="SmsTemplateDTO">
+		UPDATE 
+		 	tbl_sms_template
+		SET
+			<if test="company_seq != null and company_seq != ''">
+				company_seq = #{company_seq },
+			</if>
+		 	template_title = #{template_title },
+		 	template_content = #{template_content },
+			use_yn = #{use_yn },
+			mod_date = NOW(),
+			mod_admin = #{reg_admin } 
+		WHERE 
+			template_seq = #{template_seq } 
+	</update>
+	
+	<update id="deleteSmsTemplate" parameterType="SmsTemplateDTO">
+		UPDATE 
+			tbl_sms_template
+		SET
+			del_yn = '1'
+		WHERE 
+			template_seq = #{template_seq }
+	</update>
+</mapper>

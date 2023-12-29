@@ -1,0 +1,157 @@
+@charset "UTF-8";
+
+.paging ul li{
+	display: inline;
+}
+.paging ul {
+	text-align: center;
+}
+#query {
+	display:none;
+}
+
+.board-table{
+	border-top: 2px solid #000;
+	border-bottom: 3px solid #E6E6E6;
+}
+.board-table tr{
+	border-bottom: 1px solid #E6E6E6;
+}
+.board-table th{
+	padding:15px 15px;
+	font-weight: bold;
+	text-align:left;
+	border-right: 1px solid #E6E6E6;
+}
+.board-table td{
+	padding: 15px;
+}
+#board_pass{
+	width:100px;
+	height: 26px;
+}
+.btn-module{
+	display: inline-block;
+}
+.fR{
+	float: right;
+	margin-right: 1px;
+}
+.fL{
+	float: left;
+}
+.reply-write-div{
+	width: 420px;
+	float: right;
+}
+.reply-write-div tr{
+	padding:10px;
+}
+#reply_save{
+	height: 69px;
+	width: 18%;
+	border-radius: 10px;
+}
+#reply_area{
+	border-top: 1px solid #E6E6E6;
+}
+#reply_area td{
+	padding: 10px;
+}
+#reply_area tr{
+	border-bottom: 1px solid #E6E6E6;
+}
+.boardTable{
+	border-top: 2px solid #000;
+	border-bottom: 3px solid #E6E6E6;
+}
+.boardTable tr{
+	border-bottom: 1px solid #E6E6E6;
+}
+.boardTable th{
+	border-right: 1px solid #E6E6E6;
+	font-weight: bold;
+}
+.boardTable td{
+	padding: 10px;
+	line-height: 20px;
+}
+
+.title{
+	font-size: 25px;
+	font-weight: bold;
+	line-height: initial;
+}
+.paging ul strong{
+	overflow: hidden;
+    display: inline-block;
+    margin: 0 1px;
+    font-size: 14px;
+    color: #666;
+    height: 34px;
+    width: 40px;
+    line-height: 34px;
+}
+#board_title{
+	width: 700px;
+}
+.questions-title{
+	font-size: 20px;
+	font-weight: bold;
+	background-color: #F0F0F0;
+}
+.answer-title{
+	font-size: 20px;
+	font-weight: bold;
+	background-color: #F0F0F0;
+}
+.faq-content{
+	text-align: left;
+	background-color: #F0F0F0;
+}
+.subReply td > div{
+	padding-left: 150px;
+	padding-right: 150px;
+}
+.subReply{
+	background-color: #F0F0F0;
+}
+.reply-writer{
+	color: black;
+	font-weight: bold;
+}
+.reply-content{
+	padding: 5px 0px;
+}
+#reply_content{
+	width:100%;
+	margin: 10px 0;
+}
+.subReply textarea:last-child{
+	width: 100%;
+	padding: 5px;
+	margin-top: 5px;
+}
+.reply_div{
+	border-top: 2px solid #F0F0F0;
+	padding-top: 15px;
+}
+.hight25{
+	height: 25px;
+}
+.replyRegBtn{
+	border: 1px solid #5aa5da;
+	background-color: #5aa5da;
+	color: #fff;
+	padding: 5px 30px;
+}
+#reply_count{
+	font-weight: bold;
+}
+input[readonly]{
+    border: none;
+    background-color: inherit;
+}
+input[readonly]:focus{
+    outline: none;
+}

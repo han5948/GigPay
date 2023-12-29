@@ -1,0 +1,1315 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.read.ReplicationStaticMapper">
+
+	<resultMap id="accountMap" type="AccountListDTO"> 
+		<id property="companySeq" column="companySeq" />
+		<result property="companyName" column="companyName" />
+		
+		<collection property="resultData" ofType="AccountingDTO" javaType="java.util.ArrayList" resultMap="resultData"/>       
+	</resultMap>
+	
+	<resultMap id="resultData" type="AccountingDTO">
+     	<result property="company_seq"     column="company_seq" />
+        <result property="company_name"    column="company_name" />
+        <result property="worker_company_seq"    column="worker_company_seq" />
+        <result property="admin_id"     column="admin_id" />
+        <result property="admin_name"    column="admin_name" />
+        <result property="ilbo_date"    column="ilbo_date" />
+        <result property="ilbo_unit_price"    column="ilbo_unit_price" />
+        <result property="ilbo_fee"    column="ilbo_fee" />
+        <result property="share_fee"    column="share_fee" />
+        <result property="out_count"    column="out_count" />
+        <result property="counselor_fee"    column="counselor_fee" />
+        <result property="sort_flag"    column="sort_flag" />
+        
+    </resultMap>
+    
+    <resultMap id="accountConsultingMap" type="AccountListDTO"> 
+		<id property="adminId" column="adminId" />
+		<result property="adminName" column="adminName" />
+		
+		<collection property="resultData" ofType="AccountingDTO" javaType="java.util.ArrayList" resultMap="resultData"/>       
+	</resultMap>
+	
+	<select id="selectAccountingList" parameterType="AccountingDTO" resultMap="accountMap">
+		/* static.xml selectAccountingList 지점매출 통계  */
+		SELECT 
+			C.company_seq AS companySeq
+			, C.company_name AS companyName
+			, D.*
+		FROM 
+			company AS C 
+			LEFT JOIN (
+				SELECT 
+			  		A.ilbo_date,
+			  		A.company_seq,
+			  		B.worker_company_seq,  
+			  		IFNULL(B.ct, 0) AS out_count,
+			  		IFNULL(B.ilbo_unit_price, 0) AS ilbo_unit_price,
+			  		IFNULL(B.ilbo_fee, 0) AS ilbo_fee,
+			  		IFNULL(B.share_fee, 0) AS share_fee 
+			 	FROM 
+					(SELECT 
+						company_seq
+						, D.ilbo_date 
+					FROM 
+						company C  
+						CROSS JOIN (	
+							SELECT 
+								ilbo_date 
+							FROM
+								(SELECT 
+						    		ilbo_date, 
+						    		DAYOFMONTH(ilbo_date) AS dom, 
+						    		DAYOFWEEK(ilbo_date) AS dow, 
+						    		WEEKOFYEAR(ilbo_date) AS woy, 
+						    		LPAD(DAYOFMONTH(ilbo_date), 2, '0') AS dom_f 
+								FROM
+									(SELECT 
+										CONCAT(LEFT( #{startDate}, 7), '-', n) AS ilbo_date 
+									FROM
+										(SELECT '01' AS n        
+							    			UNION SELECT '02'  UNION SELECT '03'  UNION SELECT '04'  UNION SELECT '05'
+							    			UNION SELECT '06'  UNION SELECT '07'  UNION SELECT '08'  UNION SELECT '09'  UNION SELECT '10'
+							    			UNION SELECT '11' UNION SELECT '12' UNION SELECT '13' UNION SELECT '14' UNION SELECT '15'
+							    			UNION SELECT '16' UNION SELECT '17' UNION SELECT '18' UNION SELECT '19' UNION SELECT '20'
+							    			UNION SELECT '21' UNION SELECT '22' UNION SELECT '23' UNION SELECT '24' UNION SELECT '25'
+							    			UNION SELECT '26' UNION SELECT '27' UNION SELECT '28' UNION SELECT '29' UNION SELECT '30'
+							    			UNION SELECT '31' UNION SELECT '32' UNION SELECT '33' UNION SELECT '34' UNION SELECT '35') AS a
+						   		) AS b
+							) AS c
+					WHERE
+						dom IS NOT NULL) D 
+				ORDER BY company_seq, ilbo_date) A 
+			LEFT OUTER JOIN
+				(SELECT 
+					ilbo_date,
+					worker_company_seq,
+					SUM(1) AS ct,
+					SUM(ilbo_unit_price) AS ilbo_unit_price,
+					SUM(ilbo_fee) AS ilbo_fee,
+					SUM(share_fee) AS share_fee
+				FROM
+					ilbo 
+				WHERE 
+					work_company_seq = 13 
+					AND use_yn = 1 
+					AND ilbo_fee > 0 
+				GROUP BY worker_company_seq, ilbo_date) B
+				ON A.company_seq = B.worker_company_seq AND A.ilbo_date = b.ilbo_date
+				ORDER BY company_seq, A.ilbo_date) D ON C.company_seq = D.company_seq
+		 	WHERE 
+		 		C.use_yn = 1
+		</select>
+		
+	<select id="selectAccountingAdList" parameterType="AccountingDTO" resultType="AccountingDTO">
+		/* static.xml selectAccountAdList 본사 매출, 본사수입, 광고료 통계  */
+		SELECT 
+		  N.ilbo_date,
+		  DAYOFWEEK(N.ilbo_date) AS day_of_week,
+		  IFNULL(D.share_fee+D.ilbo_fee,0) AS total_sales,
+		  IFNULL(D.ilbo_fee, 0) AS ilbo_fee,
+		  IFNULL(ad.ad_price, 0) AS ad_price 
+		FROM
+		  (SELECT 
+		    ilbo_date 
+		  FROM
+		    (SELECT 
+		      ilbo_date,
+		      DAYOFMONTH(ilbo_date) AS dom,
+		      DAYOFWEEK(ilbo_date) AS dow,
+		      WEEKOFYEAR(ilbo_date) AS woy,
+		      LPAD(DAYOFMONTH(ilbo_date), 2, '0') AS dom_f 
+		    FROM
+		      (SELECT 
+		        CONCAT(LEFT(#{startDate}, 7), '-', n) AS ilbo_date 
+		      FROM
+		        (SELECT '01' AS n 
+		        UNION SELECT '02' UNION SELECT '03' UNION SELECT '04' UNION SELECT '05' 
+		        UNION SELECT '06' UNION SELECT '07' UNION SELECT '08' UNION SELECT '09' UNION SELECT '10' 
+		        UNION SELECT '11' UNION SELECT '12' UNION SELECT '13' UNION SELECT '14' UNION SELECT '15' 
+		        UNION SELECT '16' UNION SELECT '17' UNION SELECT '18' UNION SELECT '19' UNION SELECT '20' 
+		        UNION SELECT '21' UNION SELECT '22' UNION SELECT '23' UNION SELECT '24' UNION SELECT '25' 
+		        UNION SELECT '26' UNION SELECT '27' UNION SELECT '28' UNION SELECT '29' UNION SELECT '30'
+		        UNION SELECT '31' UNION SELECT '32' UNION SELECT '33' UNION SELECT '34' UNION SELECT '35'
+		        ) AS a
+		      ) AS b
+		    ) AS c 
+		  WHERE dom IS NOT NULL) N 
+		  LEFT JOIN 
+		    (SELECT 
+		      ilbo_date,
+		      SUM(share_fee) AS share_fee,
+		      SUM(ilbo_fee) AS ilbo_fee 
+		    FROM
+		      ilbo 
+		    WHERE work_company_seq = 13 
+		      AND use_yn = 1 
+		      AND ilbo_fee > 0 
+		      <!-- AND worker_company_seq != 0
+  			  AND worker_company_seq != 13 -->
+		    GROUP BY ilbo_date) D 
+		    ON D.ilbo_date = N.ilbo_date 
+		  LEFT JOIN 
+		    (SELECT 
+		      DATE_FORMAT(ad_date, '%Y-%m-%d') AS ad_date,
+		      SUM(ad_nonamt + ad_amt) AS ad_price 
+		    FROM
+		      tbl_ad 
+		    GROUP BY ad_date) ad 
+		    ON N.ilbo_date = ad.ad_date
+	</select>
+
+	<select id="getStaticList" parameterType="StaticDTO" resultType="StaticDTO">
+    	/* 매출 조회 Static.getStaticList */
+		<!--  다른 지점의 share_fee 를 ilbo_fee 로 잡아 준다. -->	
+		SELECT 
+			company_seq,
+			company_name,
+			ilbo_date,
+			SUM(unitPriceSum) AS unitPriceSum,
+			SUM(feeSum)  AS feeSum,
+			SUM(shareSum) AS shareSum,
+			SUM(deducationSum) AS deducationSum,
+			SUM(paySum) AS paySum, 
+			SUM(counselorSum) AS counselorSum,
+			admin_id,
+			SUM(output_cnt) AS output_cnt
+		FROM (
+			(SELECT 
+				i.work_company_seq as company_seq,
+				i.work_company_name as company_name,
+				<choose>
+					<when test="searchMode eq 'M'.toString()"> 
+						DATE_FORMAT(ilbo_date, '%Y-%m') as ilbo_date, 
+					</when>
+					<when test="searchMode eq 'Y'.toString()"> 
+						DATE_FORMAT(ilbo_date, '%Y') as ilbo_date, 
+					</when>
+					<otherwise>	
+						ilbo_date, 
+					</otherwise>
+				</choose> 
+			  	SUM(ilbo_unit_price) AS unitPriceSum,
+			  	SUM(ilbo_fee)  AS feeSum,
+			  	SUM(share_fee) AS shareSum,
+			  	SUM(ilbo_deduction) AS deducationSum,
+			  	SUM(ilbo_pay) AS paySum,
+			  	SUM(counselor_fee) AS counselorSum,
+			  	admin_id,
+			  	COUNT(ilbo_seq) AS output_cnt 
+			FROM
+				ilbo i 
+			  	LEFT OUTER JOIN admin a  
+			  		ON i.work_owner = a.admin_id 
+			WHERE 
+				1 = 1 
+				<!-- AND i.output_status_code = '100015' -->
+			  	AND i.use_yn = 1 
+			  	AND ilbo_fee != 0 
+		  		<if test="admin_id neq null and admin_id neq ''">
+					AND (
+				    	i.worker_owner = #{admin_id }
+				    	OR i.work_owner = #{admin_id }
+				    	OR i.owner_id = #{admin_id }
+				  	)	  
+		  		</if>
+			  	AND i.work_company_seq = #{company_seq} 
+			  	AND ilbo_date <![CDATA[ >= ]]> #{startDate}
+    	      	AND ilbo_date <![CDATA[ <= ]]> #{endDate}
+			GROUP BY 
+			  	<choose>
+					<when test="searchMode eq 'M'.toString()"> 
+						DATE_FORMAT(ilbo_date, '%Y-%m') 
+					</when>
+					<when test="searchMode eq 'Y'.toString()"> 
+						DATE_FORMAT(ilbo_date, '%Y') 
+					</when>
+					<otherwise>	
+						ilbo_date 
+					</otherwise>
+				</choose> 
+			)
+			
+		UNION ALL
+		
+			(SELECT 
+				i.worker_company_seq as company_seq,
+			  	i.worker_company_name as company_name,
+			  	<choose>
+					<when test="searchMode eq 'M'.toString()"> 
+						DATE_FORMAT(ilbo_date, '%Y-%m') as ilbo_date, 
+					</when>
+					<when test="searchMode eq 'Y'.toString()"> 
+						DATE_FORMAT(ilbo_date, '%Y') as ilbo_date, 
+					</when>
+					<otherwise>	
+						ilbo_date, 
+					</otherwise>
+				</choose>
+			  	0 AS unitPriceSum,
+			  	SUM(share_fee)  AS feeSum,
+			  	0 AS shareSum,
+			  	0 AS deducationSum,
+			  	0 AS paySum,
+			  	SUM(counselor_fee) AS counselorSum,
+			  	a.admin_id,
+			  	COUNT(ilbo_seq) AS output_cnt 
+			FROM
+			  	ilbo i 
+			  	LEFT OUTER JOIN admin a 
+			  		ON i.worker_owner = a.admin_id
+			WHERE 1 = 1 
+			  	<!-- AND i.output_status_code = '100015' -->
+			  	AND i.use_yn = 1 
+			  	AND i.share_fee != 0 
+			  	<if test="admin_id neq null and admin_id neq ''">
+					AND (
+				    	i.worker_owner = #{admin_id }
+				    	OR i.work_owner = #{admin_id }
+				    	OR i.owner_id = #{admin_id }
+				  	)	  
+		  		</if>
+			  	AND i.work_company_seq !=  #{company_seq} 
+			  	AND i.worker_company_seq = #{company_seq} 
+			  	AND ilbo_date <![CDATA[ >= ]]> #{startDate}
+    	      	AND ilbo_date <![CDATA[ <= ]]> #{endDate}
+ 			GROUP BY 
+				<choose>
+					<when test="searchMode eq 'M'.toString()"> 
+						DATE_FORMAT(ilbo_date, '%Y-%m') 
+					</when>
+					<when test="searchMode eq 'Y'.toString()"> 
+						DATE_FORMAT(ilbo_date, '%Y') 
+					</when>
+					<otherwise>	
+						ilbo_date 
+					</otherwise>
+				</choose> 
+			)
+		) T 
+		WHERE 
+			1 = 1 
+			${where} 
+		GROUP BY 
+			ilbo_date 
+		ORDER BY 
+			ilbo_date ASC
+  	</select>
+    
+	<select id="selectCompanyAccountDayList" parameterType="AccountingDTO" resultType="AccountingDTO">
+		/* 정산 조회 Static.selectCompanyAccountDayList */
+    	SELECT 
+    		ilbo_date, 
+    		company_seq,
+    		worker_company_seq, 
+    		SUM(work_income) AS work_income, 
+			SUM(work_payment) AS work_payment,
+			SUM(work_payment_worker_fee) AS work_payment_worker_fee,
+			SUM(worker_income) AS worker_income,
+			SUM(worker_payment) AS worker_payment,
+			SUM(worker_income_worker_fee) AS worker_income_worker_fee
+    	FROM 
+    	(
+			SELECT 
+  				ilbo_date,
+  				work_company_seq AS company_seq,
+  				worker_company_seq,
+  				SUM(IF(ilbo_pay_code = '200003' OR ilbo_pay_code = '200007' OR ilbo_pay_code = '200004' OR ilbo_pay_code = '200008', 0,ilbo_fee)) AS work_income,
+    			SUM(IF(ilbo_pay_code = '200003' OR ilbo_pay_code = '200007' OR ilbo_pay_code = '200004' OR ilbo_pay_code = '200008', share_fee,0)) AS work_payment,
+    			SUM(IF(ilbo_pay_code = '200003' OR ilbo_pay_code = '200007' OR ilbo_pay_code = '200004' OR ilbo_pay_code = '200008', worker_fee,0)) AS work_payment_worker_fee,
+    			0 AS worker_income,
+				0 AS worker_payment,
+				0 AS worker_income_worker_fee
+			FROM
+  				ilbo 
+			WHERE 
+				worker_company_seq <![CDATA[ <> ]]> '0' 
+ 				AND work_company_seq <![CDATA[ <> ]]> worker_company_seq 
+    			AND work_company_seq = #{company_seq }
+    			AND worker_company_seq = #{worker_company_seq }
+    			AND ilbo_fee > 0 
+    			AND use_yn = '1'
+    			<if test="startDate neq '' and startDate neq null"> AND ilbo_date <![CDATA[ >= ]]> #{startDate} </if>
+	    	   	<if test="endDate   neq '' and endDate   neq null"> AND ilbo_date <![CDATA[ <= ]]> #{endDate} </if>
+			GROUP BY ilbo_date
+			
+			UNION
+
+			SELECT 
+  				ilbo_date,
+  				worker_company_seq,
+  				work_company_seq AS company_seq,
+  				0 AS work_income,
+  				0 AS work_payment,
+  				0 AS work_payment_worker_fee,
+    			SUM(IF(ilbo_pay_code = '200003' OR ilbo_pay_code = '200007' OR ilbo_pay_code = '200004' OR ilbo_pay_code = '200008', share_fee, 0)) AS worker_income,
+    			SUM(IF(ilbo_pay_code = '200003' OR ilbo_pay_code = '200007' OR ilbo_pay_code = '200004' OR ilbo_pay_code = '200008', 0,ilbo_fee)) AS worker_payment,
+    			SUM(IF(ilbo_pay_code = '200003' OR ilbo_pay_code = '200007' OR ilbo_pay_code = '200004' OR ilbo_pay_code = '200008', worker_fee, 0)) AS worker_income_worker_fee
+			FROM
+  				ilbo 
+			WHERE 
+				worker_company_seq <![CDATA[ <> ]]> '0' 
+ 				AND work_company_seq <![CDATA[ <> ]]> worker_company_seq 
+    			AND worker_company_seq = #{company_seq }
+    			AND work_company_seq = #{worker_company_seq }
+    			AND ilbo_fee > 0 
+    			AND use_yn = '1'
+    			<if test="startDate neq '' and startDate neq null"> AND ilbo_date <![CDATA[ >= ]]> #{startDate} </if>
+	    	   	<if test="endDate   neq '' and endDate   neq null"> AND ilbo_date <![CDATA[ <= ]]> #{endDate} </if> 
+			GROUP BY ilbo_date
+		) t 
+		GROUP BY ilbo_date 
+		ORDER BY ilbo_date
+  </select>
+  
+  	<select id="selectCompanyAccountDayList2" parameterType="AccountingDTO" resultType="AccountingDTO">
+  		/* selectCompanyAccountDayList2 */
+		SELECT 
+			company_seq,
+			worker_company_seq, 
+			SUM(work_income) AS work_income, 
+			SUM(work_payment) AS work_payment,
+			SUM(work_payment_worker_fee) AS work_payment_worker_fee,
+			SUM(worker_income) AS worker_income,
+			SUM(worker_payment) AS worker_payment,
+			SUM(worker_income_worker_fee) AS worker_income_worker_fee
+		FROM (
+			SELECT 
+				worker_company_seq,
+				work_company_seq AS company_seq,
+				0 AS work_income,
+  				0 AS work_payment,
+  				0 AS work_payment_worker_fee,
+    			SUM(IF(ilbo_pay_code = '200003' OR ilbo_pay_code = '200007' OR ilbo_pay_code = '200004' OR ilbo_pay_code = '200008', share_fee, 0)) AS worker_income,
+    			SUM(IF(ilbo_pay_code = '200003' OR ilbo_pay_code = '200007' OR ilbo_pay_code = '200004' OR ilbo_pay_code = '200008', 0,ilbo_fee)) AS worker_payment,
+    			SUM(IF(ilbo_pay_code = '200003' OR ilbo_pay_code = '200007' OR ilbo_pay_code = '200004' OR ilbo_pay_code = '200008', worker_fee, 0)) AS worker_income_worker_fee
+			FROM
+  				ilbo 
+			WHERE 
+				worker_company_seq <![CDATA[ <> ]]> '0' 
+ 				AND work_company_seq <![CDATA[ <> ]]> worker_company_seq 
+ 				<if test="company_seq neq '0'.toString()">
+  					AND worker_company_seq = #{company_seq }
+  				</if>
+ 				AND ilbo_fee > 0 
+ 				AND use_yn = '1'
+  				<if test="startDate neq '' and startDate neq null"> AND ilbo_date <![CDATA[ >= ]]> #{startDate} </if>
+	    	   	<if test="endDate   neq '' and endDate   neq null"> AND ilbo_date <![CDATA[ <= ]]> #{endDate} </if>
+			GROUP BY worker_company_seq, work_company_seq
+			
+			UNION
+ 
+			SELECT 
+  				work_company_seq AS company_seq,
+  				worker_company_seq,
+  				SUM(IF(ilbo_pay_code = '200003' OR ilbo_pay_code = '200007' OR ilbo_pay_code = '200004' OR ilbo_pay_code = '200008', 0,ilbo_fee)) AS work_income,
+    			SUM(IF(ilbo_pay_code = '200003' OR ilbo_pay_code = '200007' OR ilbo_pay_code = '200004' OR ilbo_pay_code = '200008', share_fee,0)) AS work_payment,
+    			SUM(IF(ilbo_pay_code = '200003' OR ilbo_pay_code = '200007' OR ilbo_pay_code = '200004' OR ilbo_pay_code = '200008', worker_fee,0)) AS work_payment_worker_fee,
+    			0 AS worker_income,
+				0 AS worker_payment,
+				0 AS worker_income_worker_fee
+			FROM
+  				ilbo 
+			WHERE 
+				worker_company_seq <![CDATA[ <> ]]> '0' 
+  				AND work_company_seq <![CDATA[ <> ]]> worker_company_seq 
+  				<if test="company_seq neq '0'.toString()">
+  					AND work_company_seq = #{company_seq }
+  				</if>
+  				AND ilbo_fee > 0 
+  				AND use_yn = '1'
+  				<if test="startDate neq '' and startDate neq null"> AND ilbo_date <![CDATA[ >= ]]> #{startDate} </if>
+	    	   	<if test="endDate   neq '' and endDate   neq null"> AND ilbo_date <![CDATA[ <= ]]> #{endDate} </if>
+			GROUP BY  work_company_seq, worker_company_seq
+		) t 
+		GROUP BY company_seq
+  	</select>
+  
+  	<select id="selectAllCompanyAccountDayList" parameterType="AccountingDTO" resultType="AccountingDTO">
+  		/* static.xml selectAllCompanyAccountDayList */
+<!--   		SELECT  -->
+<!-- 		  	company_seq, -->
+<!-- 		  	worker_company_seq, -->
+<!-- 		  	SUM(s1) AS ilbo_fee, -->
+<!-- 		  	SUM(s) AS share_fee  -->
+<!-- 		FROM ( -->
+<!-- 			SELECT  -->
+<!-- 		    	worker_company_seq, -->
+<!-- 		    	work_company_seq AS company_seq, -->
+<!-- 		    	SUM(ilbo_fee) AS s1, -->
+<!-- 		    	0 AS s  -->
+<!-- 		  	FROM -->
+<!-- 			    ilbo  -->
+<!-- 		  	WHERE  -->
+<!-- 		  		worker_company_seq <![CDATA[ <> ]]> '0'  -->
+<!-- 		    	AND work_company_seq <![CDATA[ <> ]]> worker_company_seq  -->
+<!-- 		    	AND ilbo_fee > 0  -->
+<!-- 		    	AND use_yn = '1'  -->
+<!-- 		    	<if test="startDate neq '' and startDate neq null"> AND ilbo_date <![CDATA[ >= ]]> #{startDate} </if> -->
+<!-- 	    	   	<if test="endDate   neq '' and endDate   neq null"> AND ilbo_date <![CDATA[ <= ]]> #{endDate} </if> -->
+<!-- 		  	GROUP BY  -->
+<!-- 		  		company_seq -->
+		  		
+<!-- 	  	UNION -->
+<!-- 	  		SELECT  -->
+<!-- 	    		work_company_seq AS company_seq, -->
+<!-- 	    		worker_company_seq, -->
+<!-- 			    0 AS s1, -->
+<!-- 		    	SUM(ilbo_fee) AS s  -->
+<!-- 		  	FROM -->
+<!-- 			    ilbo  -->
+<!--   			WHERE  -->
+<!--   				worker_company_seq <![CDATA[ <> ]]> '0'  -->
+<!-- 		    	AND work_company_seq <![CDATA[ <> ]]> worker_company_seq  -->
+<!-- 			    AND ilbo_fee > 0  -->
+<!-- 		    	AND use_yn = '1'  -->
+<!-- 		    	<if test="startDate neq '' and startDate neq null"> AND ilbo_date <![CDATA[ >= ]]> #{startDate} </if> -->
+<!-- 	    	   	<if test="endDate   neq '' and endDate   neq null"> AND ilbo_date <![CDATA[ <= ]]> #{endDate} </if> -->
+<!-- 		  	GROUP BY  -->
+<!-- 		  		worker_company_seq -->
+<!-- 		) t  -->
+<!-- 		GROUP BY  -->
+<!-- 			company_seq  -->
+		SELECT
+  			company_seq,
+  			worker_company_seq,
+  			SUM(work_income) AS work_income,
+  			SUM(work_payment) AS work_payment,
+  			SUM(work_payment_worker_fee) AS work_payment_worker_fee,
+  			SUM(worker_income) AS worker_income,
+  			SUM(worker_payment) AS worker_payment,
+  			SUM(worker_income_worker_fee) AS worker_income_worker_fee
+		FROM
+  			(SELECT
+    			work_company_seq AS company_seq,
+    			worker_company_seq,
+    			SUM(
+      				IF(
+        				ilbo_pay_code = '200003'
+        				OR ilbo_pay_code = '200007'
+        				OR ilbo_pay_code = '200004'
+        				OR ilbo_pay_code = '200008',
+        				0,
+        				ilbo_fee
+      				)
+    			) AS work_income,
+    			SUM(
+      				IF(
+				        ilbo_pay_code = '200003'
+				        OR ilbo_pay_code = '200007'
+				        OR ilbo_pay_code = '200004'
+				        OR ilbo_pay_code = '200008',
+				        share_fee,
+				        0
+      				)
+    			) AS work_payment,
+			    SUM(
+			      IF(
+			        ilbo_pay_code = '200003'
+			        OR ilbo_pay_code = '200007'
+			        OR ilbo_pay_code = '200004'
+			        OR ilbo_pay_code = '200008',
+			        worker_fee,
+			        0
+			      )
+			    ) AS work_payment_worker_fee,
+			    0 AS worker_income,
+			    0 AS worker_payment,
+			    0 AS worker_income_worker_fee
+  			FROM
+    			ilbo
+  			WHERE worker_company_seq <![CDATA[ <> ]]> '0'
+			    AND work_company_seq <![CDATA[ <> ]]> worker_company_seq
+			    AND ilbo_fee > 0
+			    AND use_yn = '1'
+		    <if test="startDate neq '' and startDate neq null">
+			    AND ilbo_date <![CDATA[ >= ]]> #{startDate}
+		    </if>
+		    <if test="endDate neq '' and endDate neq null">
+		    	AND ilbo_date <![CDATA[ <= ]]> #{endDate}
+		    </if>
+  			GROUP BY work_company_seq
+			UNION
+		  	SELECT
+				worker_company_seq,
+			    work_company_seq AS company_seq,
+			    0 AS work_income,
+			    0 AS work_payment,
+			    0 AS work_payment_worker_fee,
+			    SUM(
+					IF(
+			        	ilbo_pay_code = '200003'
+			        	OR ilbo_pay_code = '200007'
+			        	OR ilbo_pay_code = '200004'
+			        	OR ilbo_pay_code = '200008',
+			        	share_fee,
+			        	0
+			      	)
+			    ) AS worker_income,
+			    SUM(
+					IF(
+				        ilbo_pay_code = '200003'
+				        OR ilbo_pay_code = '200007'
+				        OR ilbo_pay_code = '200004'
+				        OR ilbo_pay_code = '200008',
+				        0,
+				        ilbo_fee
+			      	)
+			    ) AS worker_payment,
+			    SUM(
+			      	IF(
+				        ilbo_pay_code = '200003'
+				        OR ilbo_pay_code = '200007'
+				        OR ilbo_pay_code = '200004'
+				        OR ilbo_pay_code = '200008',
+				        worker_fee,
+				        0
+			      	)
+			    ) AS worker_income_worker_fee
+			FROM
+				ilbo
+			WHERE worker_company_seq <![CDATA[ <> ]]> '0'
+				AND work_company_seq <![CDATA[ <> ]]> worker_company_seq
+			    AND ilbo_fee > 0
+			    AND use_yn = '1'
+			<if test="startDate neq '' and startDate neq null">
+			    AND ilbo_date <![CDATA[ >= ]]> #{startDate}
+		    </if>
+		    <if test="endDate neq '' and endDate neq null">
+		    	AND ilbo_date <![CDATA[ <= ]]> #{endDate}
+		    </if>
+				GROUP BY worker_company_seq) t
+			GROUP BY company_seq
+  	</select>
+  	
+  <select id="selectAccountAll" parameterType="AccountingDTO" resultType="AccountingDTO">
+  /* 월간 집계 */
+		  SELECT 
+			c.company_name AS company_name,
+			IFNULL(s.ilbo_unit_price,0) AS ilbo_unit_price,
+			IFNULL(s.ilbo_fee,0) AS ilbo_fee,
+			IFNULL(s.share_fee,0) AS share_fee
+		FROM (
+		SELECT * FROM company WHERE use_yn =1 AND company_seq != 13 
+		) c LEFT OUTER JOIN (
+		SELECT 
+			 worker_company_seq,
+			  SUM(ilbo_unit_price) AS ilbo_unit_price,
+			  SUM(ilbo_fee) AS ilbo_fee,
+			  SUM(share_fee) AS share_fee
+			FROM
+			  ilbo 
+			WHERE company_seq = 13 
+			 AND use_yn = 1 
+			  AND ilbo_fee > 0 
+			<if test="startDate neq '' and startDate neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate} </if>
+    	   <if test="endDate   neq '' and endDate   neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate} </if>
+		GROUP BY worker_company_seq 
+		) s ON c.company_seq = s.worker_company_seq ORDER BY company_seq
+
+  </select>
+  
+  <select id="selectCompanyAccountAll" parameterType="AccountingDTO" resultType="AccountingDTO">
+  		/* 월간 집계 */
+		SELECT 
+  			IFNULL(company_seq, #{worker_company_seq }) AS company_seq,
+  			IFNULL(worker_company_seq, #{company_seq }) AS worker_company_seq,
+  			IFNULL(SUM(ilbo_fee), 0) AS ilbo_fee
+		FROM
+  			ilbo 
+		WHERE 
+			company_seq = #{worker_company_seq }
+  			AND worker_company_seq = #{company_seq } 
+  			<if test="startDate neq '' and startDate neq null"> 
+  				AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate} 
+  			</if>
+  			<if test="endDate   neq '' and endDate   neq null"> 
+  				AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate} 
+  			</if>
+  			AND use_yn = '1'
+  			AND ilbo_fee > 0 
+		
+  </select>
+    
+    <select id="selectCompanyAccountAll2" parameterType="AccountingDTO" resultType="AccountingDTO">
+  		/* 월간 집계 */
+		SELECT 
+  			IFNULL(company_seq, #{company_seq }) AS company_seq,
+  			IFNULL(worker_company_seq, #{worker_company_seq }) AS worker_company_seq,
+  			IFNULL(SUM(ilbo_fee), 0) AS ilbo_fee
+		FROM
+  			ilbo 
+		WHERE 
+			company_seq = #{company_seq }
+  			AND worker_company_seq = #{worker_company_seq } 
+  			<if test="startDate neq '' and startDate neq null"> 
+  				AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate} 
+  			</if>
+  			<if test="endDate   neq '' and endDate   neq null"> 
+  				AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate} 
+  			</if>
+  			AND use_yn = '1'
+  			AND ilbo_fee > 0 
+		
+  </select>
+  
+	<select id="selectSmartList" parameterType="AccountingDTO" resultType="AccountingDTO">
+		/* selectSmartList */
+		SELECT
+  			fee.company_seq,
+  			worker_company_seq,
+  			ilbo_fee,
+  			share_fee,
+  			c.work_fee_rate,
+  			c.worker_fee_rate,
+  			c.company_name
+  		FROM	
+			(SELECT 
+				company_seq,
+				worker_company_seq, 
+				SUM(s1) AS ilbo_fee, 
+				SUM(s) as share_fee 
+			FROM (
+				SELECT 
+					worker_company_seq,
+					work_company_seq AS company_seq,
+					SUM(ilbo_fee) AS s1,
+					0 AS s
+				FROM
+	  				ilbo 
+				WHERE 
+					worker_company_seq <![CDATA[ <> ]]> '0' 
+	 				AND work_company_seq <![CDATA[ <> ]]> worker_company_seq 
+	 				<if test="company_seq neq '0'.toString()">
+	  					AND worker_company_seq = #{company_seq }
+	  				</if>
+	 				AND ilbo_fee > 0 
+	 				AND use_yn = '1'
+	  				<if test="startDate neq '' and startDate neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate} </if>
+		    	   	<if test="endDate   neq '' and endDate   neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate} </if>
+				GROUP BY work_company_seq, worker_company_seq
+				
+				UNION
+	 
+				SELECT 
+	  				work_company_seq AS company_seq,
+	  				worker_company_seq,
+	  				0 AS s1,
+	  				SUM(ilbo_fee) AS s
+				FROM
+	  				ilbo 
+				WHERE 
+					worker_company_seq <![CDATA[ <> ]]> '0' 
+	  				AND work_company_seq <![CDATA[ <> ]]> worker_company_seq 
+	  				<if test="company_seq neq '0'.toString()">
+	  					AND work_company_seq = #{company_seq }
+	  				</if>
+	  				AND use_yn = '1'
+	  				AND ilbo_fee > 0 
+	  				<if test="startDate neq '' and startDate neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate} </if>
+		    	   	<if test="endDate   neq '' and endDate   neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate} </if>
+				GROUP BY worker_company_seq, work_company_seq
+			) t 
+			GROUP BY company_seq) fee
+			LEFT JOIN company c
+			ON fee.company_seq = c.company_seq
+	</select>
+	
+	<select id="selectSmartList2" parameterType="AccountingDTO" resultType="AccountingDTO">
+		/* selectSmartList2 */
+		SELECT
+			ilbo_date,
+  			fee.company_seq,
+  			worker_company_seq,
+  			ilbo_fee,
+  			share_fee,
+  			c.work_fee_rate,
+  			c.worker_fee_rate,
+  			c.company_name
+  		FROM	 
+			(SELECT 
+	  			ilbo_date,
+	  			company_seq,
+	  			worker_company_seq,
+	  			SUM(s1) AS ilbo_fee,
+	  			SUM(s) AS share_fee 
+			FROM
+	  			(
+	  				SELECT 
+	    				ilbo_date,
+	    				worker_company_seq,
+	    				work_company_seq AS company_seq,
+	    				SUM(ilbo_fee) AS s1,
+	    				0 AS s 
+	  				FROM
+	    				ilbo 
+	  				WHERE 
+	  					worker_company_seq <![CDATA[ <> ]]> '0' 
+	  					AND work_company_seq <![CDATA[ <> ]]> worker_company_seq
+	    				AND worker_company_seq = #{company_seq }
+	    				AND work_company_seq = #{worker_company_seq }
+	    				AND ilbo_fee > 0 
+	    				AND use_yn = '1'
+	    				<if test="startDate neq '' and startDate neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate} </if>
+			    	   	<if test="endDate   neq '' and endDate   neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate} </if>
+	  				GROUP BY ilbo_date
+	  				
+	  				UNION
+	  				
+	  				SELECT 
+	    				ilbo_date,
+	    				work_company_seq AS company_seq,
+	    				worker_company_seq,
+	    				0 AS s1,
+	    				SUM(ilbo_fee) AS s 
+	  				FROM
+	    				ilbo 
+					WHERE 
+						worker_company_seq <![CDATA[ <> ]]> '0' 
+	  					AND work_company_seq <![CDATA[ <> ]]> worker_company_seq
+	    				AND work_company_seq = #{company_seq }
+	    				AND worker_company_seq = #{worker_company_seq }
+	    				AND ilbo_fee > 0 
+	    				AND use_yn = '1'
+	    				<if test="startDate neq '' and startDate neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate} </if>
+			    	   	<if test="endDate   neq '' and endDate   neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate} </if>
+	  				GROUP BY ilbo_date
+	  			) t 
+				GROUP BY ilbo_date
+				ORDER BY ilbo_date) fee
+				LEFT JOIN company c
+				ON fee.company_seq = c.company_seq
+	</select>
+	
+	<select id="selectSmartFee" parameterType="AccountingDTO" resultType="int">
+		SELECT 
+  			IFNULL(SUM(ilbo_fee * (#{worker_fees } * 0.01)), 0) AS smartFee
+		FROM
+  			ilbo 
+		WHERE 
+  			worker_company_seq <![CDATA[ <> ]]> '0' 
+  			AND company_seq <![CDATA[ <> ]]> worker_company_seq 
+			AND ilbo_fee > 0 
+			AND use_yn = '1'
+  			<if test="startDate neq '' and startDate neq null"> 
+  				AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate} 
+  			</if>
+  			<if test="endDate   neq '' and endDate   neq null"> 
+  				AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate} 
+  			</if>
+		ORDER BY company_seq
+	</select>
+	
+	<select id="selectOrderStatisticsList" parameterType="OrderStatisticsDTO" resultType="OrderStatisticsDTO">
+		/* 오더종류 통계 리스트 */
+		SELECT 
+			statistics_seq,
+			DATE_FORMAT(ilbo_date,'%Y-%m-%d') AS ilbo_date,
+			company_seq,
+			company_name,
+			office_count,
+			app_count,
+			call_count,
+			web_member_count,
+			web_non_member_count,
+			mWeb_member_count,
+			mWeb_non_member_count,
+			again_count,
+			diff_count,
+			job_id,
+			reg_date
+		FROM 
+			tbl_order_statistics
+		WHERE
+			1 = 1
+			<if test="ilbo_date neq '' and ilbo_date neq null">
+				AND ilbo_date <![CDATA[ >= ]]> #{ ilbo_date }
+			</if>
+			<if test="company_seq neq '' and company_seq neq null">
+				AND company_seq = #{ company_seq }
+			</if>
+		ORDER BY ilbo_date DESC
+	</select>
+	<select id="selectAllOrderStatisticsList" parameterType="OrderStatisticsDTO" resultType="OrderStatisticsDTO">
+		/* 모든 지점 오더종류 통계 리스트 */
+		SELECT 
+			DATE_FORMAT(ilbo_date,'%Y-%m-%d') AS ilbo_date,
+		  	SUM(office_count) AS office_count,
+		  	SUM(app_count) AS app_count,
+		  	SUM(call_count) AS call_count,
+		  	SUM(web_member_count) AS web_member_count,
+		  	SUM(web_non_member_count) AS web_non_member_count,
+		  	SUM(mWeb_member_count) AS mWeb_member_count,
+		  	SUM(mWeb_non_member_count) AS mWeb_non_member_count,
+		  	SUM(again_count) AS again_count,
+  			SUM(diff_count) AS diff_count 
+		FROM 
+			tbl_order_statistics
+		WHERE
+			1 = 1
+			<if test="ilbo_date neq '' and ilbo_date neq null">
+				AND ilbo_date <![CDATA[ >= ]]> #{ ilbo_date }
+			</if>
+		GROUP BY ilbo_date
+		ORDER BY ilbo_date DESC	
+	</select>
+	
+	<select id="selectUseStatisticsList" parameterType="UseStatisticsDTO" resultType="UseStatisticsDTO">
+		/* 구직자지점별 공개항목 통계 리스트 */
+		SELECT 
+			use_statistics_seq,
+  			DATE_FORMAT(ilbo_date,'%Y-%m-%d') AS ilbo_date,
+  			company_seq,
+  			worker_company_seq,
+  			undisclosed_count,
+  			all_count,
+  			company_count,
+  			job_id,
+  			reg_date
+		FROM 
+			tbl_use_statistics
+		WHERE
+			1 = 1
+			<if test="ilbo_date neq '' and ilbo_date neq null">
+				AND ilbo_date <![CDATA[ >= ]]> #{ ilbo_date }
+			</if>
+			<if test="worker_company_seq neq '' and worker_company_seq neq null">
+				AND worker_company_seq = #{ worker_company_seq }
+			</if>
+			<if test="company_seq neq '' and company_seq neq null">
+				AND company_seq = #{ company_seq }
+			</if>
+		ORDER BY ilbo_date DESC
+	</select>
+	
+	<select id="selectAllUseStatisticsList" parameterType="UseStatisticsDTO" resultType="UseStatisticsDTO">
+		/* 모든 지점 공개항목 통계 리스트 */
+		SELECT 
+			DATE_FORMAT(ilbo_date, '%Y-%m-%d') AS ilbo_date,
+  			SUM(undisclosed_count) AS undisclosed_count,
+  			SUM(all_count) AS all_count,
+  			SUM(company_count) AS company_count
+		FROM 
+			tbl_use_statistics
+		WHERE
+			1 = 1
+			<if test="ilbo_date neq '' and ilbo_date neq null">
+				AND ilbo_date <![CDATA[ >= ]]> #{ ilbo_date }
+			</if>
+			<if test="company_flag eq 0 ">
+				AND company_seq IS NULL
+			</if>
+			<if test="company_flag eq 1 ">
+				AND worker_company_seq IS NULL
+			</if>
+		GROUP BY ilbo_date
+		ORDER BY ilbo_date DESC	
+	</select>
+	
+	<select id="getAccountConsultingList" parameterType="AccountingDTO" resultMap="accountConsultingMap">
+	/* 상담사 통계 getAccountConsultingList static.xml*/
+		SELECT 
+			C.admin_seq 	AS adminSeq
+			, C.admin_id 	AS adminId
+			, fn_decrypt(C.admin_name) AS adminName
+			, D.*
+		FROM admin AS C LEFT JOIN 
+		(
+			SELECT 
+			  A.ilbo_date
+			  , A.admin_id
+			  , IFNULL(B.ilbo_unit_price, 0) AS ilbo_unit_price
+			  , IFNULL(B.ilbo_fee, 0) AS ilbo_fee
+			  , IFNULL(B.share_fee, 0) AS share_fee 
+			  , IFNULL(B.counselor_fee, 0) AS counselor_fee 
+			 FROM 
+			(
+				SELECT admin_id, D.ilbo_date FROM admin a  CROSS JOIN (	
+					SELECT 
+						ilbo_date 
+					FROM
+					(
+						SELECT 
+						    ilbo_date, DAYOFMONTH(ilbo_date) AS dom, DAYOFWEEK(ilbo_date) AS dow, WEEKOFYEAR(ilbo_date) AS woy, LPAD(DAYOFMONTH(ilbo_date), 2, '0') AS dom_f 
+						FROM
+						(
+							SELECT 
+								CONCAT(LEFT( #{startDate}, 7), '-', n) AS ilbo_date 
+							FROM
+							(
+							    SELECT '01' AS n        
+							    UNION SELECT '02'  UNION SELECT '03'  UNION SELECT '04'  UNION SELECT '05'
+							    UNION SELECT '06'  UNION SELECT '07'  UNION SELECT '08'  UNION SELECT '09'  UNION SELECT '10'
+							    UNION SELECT '11' UNION SELECT '12' UNION SELECT '13' UNION SELECT '14' UNION SELECT '15'
+							    UNION SELECT '16' UNION SELECT '17' UNION SELECT '18' UNION SELECT '19' UNION SELECT '20'
+							    UNION SELECT '21' UNION SELECT '22' UNION SELECT '23' UNION SELECT '24' UNION SELECT '25'
+							    UNION SELECT '26' UNION SELECT '27' UNION SELECT '28' UNION SELECT '29' UNION SELECT '30'
+							    UNION SELECT '31' UNION SELECT '32' UNION SELECT '33' UNION SELECT '34' UNION SELECT '35'
+							) AS a
+						   ) AS b
+					) AS c
+					WHERE
+					dom IS NOT NULL
+				) D ORDER BY admin_id, ilbo_date
+			) A 
+			LEFT OUTER JOIN
+			(
+				SELECT 
+					ilbo_date
+					, work_owner
+					, SUM(ilbo_unit_price) AS ilbo_unit_price
+					, SUM(ilbo_fee) AS ilbo_fee
+					, SUM(share_fee) AS share_fee
+					, SUM(counselor_fee) AS counselor_fee 
+				FROM
+				ilbo 
+				WHERE company_seq = #{company_seq}
+					AND work_owner != 'company'
+					AND use_yn = 1 
+					AND ilbo_fee > 0 
+				GROUP BY work_owner, ilbo_date
+			) B
+			ON A.admin_id = B.work_owner AND A.ilbo_date = b.ilbo_date
+			ORDER BY admin_id, A.ilbo_date
+		) D ON C.admin_id = D.admin_id
+		 WHERE C.use_yn = 1
+		 <if test="admin_id neq '' and admin_id neq null"> admin_id = #{admin_id}  </if>
+		 AND C.company_seq = #{company_seq}
+		 AND C.auth_level = 3
+	</select>
+	
+	 
+  	<select id="selectAccountConsultingAll" parameterType="AccountingDTO" resultType="AccountingDTO">
+  		/* 기간 집계 selectAccountConsultingAll */
+		SELECT 
+			fn_decrypt(a.admin_name) as admin_name 
+			, IFNULL(s.ilbo_unit_price,0) AS ilbo_unit_price
+			, IFNULL(s.ilbo_fee,0) AS ilbo_fee
+			, IFNULL(s.share_fee,0) AS share_fee
+			, IFNULL(s.counselor_fee, 0) AS counselor_fee 
+		FROM (
+		SELECT * FROM admin WHERE use_yn =1 AND company_seq = #{company_seq}  AND auth_level = 3
+		) a LEFT OUTER JOIN (
+		SELECT 
+			 work_owner
+			  , SUM(ilbo_unit_price) AS ilbo_unit_price
+			  , SUM(ilbo_fee) AS ilbo_fee
+			  , SUM(share_fee) AS share_fee
+			  , SUM(counselor_fee) AS counselor_fee
+			FROM
+			  ilbo 
+			WHERE company_seq = #{company_seq}
+			 AND use_yn = 1 
+			  AND ilbo_fee > 0 
+			<if test="startDate neq '' and startDate neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate} </if>
+    	   <if test="endDate   neq '' and endDate   neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate} </if>
+		GROUP BY work_owner 
+		) s ON a.admin_id = s.work_owner ORDER BY admin_seq
+	</select>
+
+	<select id="selectAccountDayList" parameterType="AccountingDTO" resultType="AccountingDTO">
+    	/* 정산 조회 Static.selectAccountDayList */
+		SELECT 
+			A.ilbo_date
+			, IFNULL(B.ilbo_unit_price,0) AS ilbo_unit_price
+			, IFNULL(B.ilbo_fee,0) AS ilbo_fee
+			, IFNULL(B.share_fee,0) AS share_fee 
+		FROM 
+		(
+			SELECT 
+		  		ilbo_date 
+			FROM
+		  		(SELECT 
+		    		ilbo_date, DAYOFMONTH(ilbo_date) AS dom, DAYOFWEEK(ilbo_date) AS dow, WEEKOFYEAR(ilbo_date) AS woy, LPAD(DAYOFMONTH(ilbo_date), 2, '0') AS dom_f 
+		  		FROM
+		    		(SELECT 
+		      			CONCAT(LEFT( #{startDate}, 7), '-', n) AS ilbo_date 
+		    		FROM
+		        	(
+		            	SELECT '01' AS n        
+		            	UNION SELECT '02'  UNION SELECT '03'  UNION SELECT '04'  UNION SELECT '05'
+		            	UNION SELECT '06'  UNION SELECT '07'  UNION SELECT '08'  UNION SELECT '09'  UNION SELECT '10'
+		            	UNION SELECT '11' UNION SELECT '12' UNION SELECT '13' UNION SELECT '14' UNION SELECT '15'
+		            	UNION SELECT '16' UNION SELECT '17' UNION SELECT '18' UNION SELECT '19' UNION SELECT '20'
+		            	UNION SELECT '21' UNION SELECT '22' UNION SELECT '23' UNION SELECT '24' UNION SELECT '25'
+		            	UNION SELECT '26' UNION SELECT '27' UNION SELECT '28' UNION SELECT '29' UNION SELECT '30'
+		            	UNION SELECT '31' UNION SELECT '32' UNION SELECT '33' UNION SELECT '34' UNION SELECT '35'
+		        	) AS a
+		    	) AS b
+			) AS c
+			WHERE
+		    	dom IS NOT NULL
+		) A LEFT OUTER JOIN (
+			SELECT 
+				ilbo_date,
+				SUM(ilbo_unit_price) AS ilbo_unit_price,
+				SUM(ilbo_fee) AS ilbo_fee,
+				SUM(share_fee) AS share_fee
+			FROM
+				ilbo 
+			WHERE company_seq = 13 
+				<if test="company_seq neq '' and company_seq neq null"> AND worker_company_seq =  #{company_seq} </if>
+				AND use_yn = 1 
+				AND ilbo_fee > 0 
+			GROUP BY ilbo_date
+		) B ON A.ilbo_date = B.ilbo_date 
+  	</select>  
+  	<select id="selectAccountConsultingDayList" parameterType="AccountingDTO" resultType="AccountingDTO">
+	    /* selectAccountConsultingDayList 조회 Static.selectAccountDayList */
+		SELECT 
+			A.ilbo_date
+			, IFNULL(B.ilbo_unit_price,0) as ilbo_unit_price
+			, IFNULL(B.ilbo_fee,0) as ilbo_fee
+			, IFNULL(B.share_fee,0) as share_fee 
+			, IFNULL(B.counselor_fee, 0) AS counselor_fee 
+		FROM 
+		(
+		SELECT 
+		  ilbo_date 
+		FROM
+		  (SELECT 
+		    ilbo_date, DAYOFMONTH(ilbo_date) AS dom, DAYOFWEEK(ilbo_date) AS dow, WEEKOFYEAR(ilbo_date) AS woy, LPAD(DAYOFMONTH(ilbo_date), 2, '0') AS dom_f 
+		  FROM
+		    (SELECT 
+		      CONCAT(LEFT( #{startDate}, 7), '-', n) AS ilbo_date 
+		    FROM
+		        (
+		            SELECT '01' AS n        
+		            UNION SELECT '02'  UNION SELECT '03'  UNION SELECT '04'  UNION SELECT '05'
+		            UNION SELECT '06'  UNION SELECT '07'  UNION SELECT '08'  UNION SELECT '09'  UNION SELECT '10'
+		            UNION SELECT '11' UNION SELECT '12' UNION SELECT '13' UNION SELECT '14' UNION SELECT '15'
+		            UNION SELECT '16' UNION SELECT '17' UNION SELECT '18' UNION SELECT '19' UNION SELECT '20'
+		            UNION SELECT '21' UNION SELECT '22' UNION SELECT '23' UNION SELECT '24' UNION SELECT '25'
+		            UNION SELECT '26' UNION SELECT '27' UNION SELECT '28' UNION SELECT '29' UNION SELECT '30'
+		            UNION SELECT '31' UNION SELECT '32' UNION SELECT '33' UNION SELECT '34' UNION SELECT '35'
+		        ) AS a
+		    ) AS b
+		) AS c
+		WHERE
+		    dom IS NOT NULL
+		) A LEFT OUTER JOIN (
+		
+		SELECT 
+				  ilbo_date
+				  , SUM(ilbo_unit_price) AS ilbo_unit_price
+				  , SUM(ilbo_fee) AS ilbo_fee
+				  , SUM(share_fee) AS share_fee
+				  , SUM(counselor_fee) AS counselor_fee
+				FROM
+				  ilbo 
+				WHERE company_seq = #{company_seq}
+				  AND work_owner = #{admin_id}
+				  AND use_yn = 1 
+				  AND ilbo_fee > 0 
+				GROUP BY ilbo_date
+		) B ON A.ilbo_date = B.ilbo_date 
+   
+  	</select>
+  
+  	<select id="getCompanyStatic" parameterType="StaticDTO" resultType="StaticDTO">
+		SELECT 
+			a.*
+			, (SELECT company_name FROM company WHERE company_seq = a.company_seq) AS company_name
+		FROM(
+				SELECT 
+					ilbo_date
+					, company_seq
+					, SUM(company_fee) AS companySum
+					, SUM(open_fee) AS openSum
+					, SUM(share_fee) AS shareSum
+					, SUM(jnp_fee) AS jnpSum
+					, SUM(company_fee +open_fee+ share_fee + jnp_fee) AS feeSum
+				FROM (	
+					<!-- 지점매출 -->
+					SELECT 
+					  ilbo_date
+					  , work_company_seq AS company_seq
+					  , SUM(ilbo_fee) AS company_fee
+					  , 0 AS open_fee	  
+					  , 0 AS share_fee
+					  , 0 AS jnp_fee
+					FROM
+					  ilbo 
+					WHERE 
+					  use_yn = 1 
+					  AND ilbo_fee > 0 
+					  <if test="startDate neq '' and startDate neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate} </if>
+		    	   	  <if test="endDate   neq '' and endDate   neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate} </if>
+					  AND worker_company_seq = work_company_seq
+					GROUP BY ilbo_date, work_company_seq
+					
+					UNION ALL
+					<!-- 쉐어매출 -->
+					SELECT 
+					  ilbo_date
+					  , worker_company_seq AS company_seq
+					  , 0 AS company_fee
+					  , 0 AS open_fee
+					  , SUM(share_fee) AS share_fee
+					  , 0 AS jnp_fee
+					FROM
+					  ilbo 
+					WHERE 
+					  use_yn = 1 
+					  AND ilbo_fee > 0 
+					  <if test="startDate neq '' and startDate neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate} </if>
+		    	   	  <if test="endDate   neq '' and endDate   neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate} </if>
+					  AND worker_company_seq != work_company_seq
+					  AND work_company_seq !=13
+					GROUP BY ilbo_date, worker_company_seq
+					
+					UNION ALL
+					<!--  오픈매출 -->
+					SELECT 
+					  ilbo_date
+					  , work_company_seq AS company_seq
+					  , 0 AS company_fee
+					  , SUM(ilbo_fee) AS open_fee
+					  , 0 AS share_fee
+					  , 0 AS jnp_fee
+					FROM
+					  ilbo 
+					WHERE 
+					  use_yn = 1 
+					  AND ilbo_fee > 0 
+					  <if test="startDate neq '' and startDate neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate} </if>
+		    	   	  <if test="endDate   neq '' and endDate   neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate} </if>
+					  AND worker_company_seq != work_company_seq
+					GROUP BY ilbo_date, work_company_seq
+					
+					UNION ALL
+					<!--  jnp 쉐어매출 -->
+					SELECT 
+					  ilbo_date
+					  , worker_company_seq AS company_seq
+					  , 0 AS company_fee
+					  , 0 AS open_fee	  
+					  , 0 AS share_fee
+					  , SUM(share_fee) AS jnp_fee
+					FROM
+					  ilbo 
+					WHERE 
+					  use_yn = 1 
+					  AND ilbo_fee > 0 
+					  <if test="startDate neq '' and startDate neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate} </if>
+		    	   	  <if test="endDate   neq '' and endDate   neq null"> AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate} </if>
+					  AND work_company_seq =13
+					GROUP BY ilbo_date, worker_company_seq
+				) s 
+				WHERE company_seq > 0
+				AND company_seq != 13
+				GROUP BY ilbo_date, company_seq
+		) a		
+		ORDER BY company_seq, ilbo_date
+  	</select>
+  
+	<select id="selectSystemFeeTaxList" parameterType="AccountDTO" resultType="AccountDTO">
+		/* 지점매출통계 > 세금계산서 > 시스템이용료 selectSystemFeeTaxList static.xml */
+		SELECT
+			#{account_date} AS account_date,
+  			s.company_num AS company_num,
+  			s.business_name AS business_name,
+  			fn_decrypt (s.company_owner) AS company_owner,
+  			s.company_addr AS company_addr,
+  			s.company_business AS company_business,
+  			s.company_sector AS company_sector,
+  			fn_decrypt (s.company_email) AS company_email,
+  			c.company_num AS dest_company_num,
+  			c.business_name AS dest_business_name,
+  			FN_DECRYPT (c.company_owner) AS dest_company_owner,
+  			c.company_addr AS dest_company_addr,
+  			c.company_business AS dest_company_business,
+  			c.company_sector AS dest_company_sector,
+  			FN_DECRYPT (c.company_email) AS dest_company_email,
+  			ROUND(c.system_fee / 1.1) AS account_price,
+  			CAST(ROUND(c.system_fee / 1.1) * 0.1 AS SIGNED) AS tax_amount
+		FROM
+			company c
+			LEFT JOIN company s
+				ON s.company_seq = 13
+		WHERE 1=1 
+			AND c.use_yn = 1
+			AND c.system_fee > 0
+		<if test="company_seq neq null and company_seq neq '' and company_seq neq '0'.toString()">
+			AND c.company_seq = #{company_seq}
+		</if>
+	</select>
+	
+	<select id="selectRunningRoyaltyTaxList" parameterType="AccountDTO" resultType="AccountDTO">
+		/* 지점매출통계 > 세금계산서 > 러닝로얄티 selectRunningRoyaltyTaxList static.xml */
+		SELECT
+	  		account_date,
+	  		company_num,
+	  		business_name,
+	  		company_owner,
+	  		company_addr,
+	  		company_business,
+	  		company_sector,
+	  		company_email,
+	  		dest_company_num,
+	  		dest_business_name,
+	  		dest_company_owner,
+	  		dest_company_addr,
+	  		dest_company_business,
+	  		dest_company_sector,
+	  		dest_company_email,
+	  		CAST(account_price AS SIGNED) AS account_price,
+	  		CAST(FLOOR(account_price * 0.1) AS SIGNED) AS tax_amount
+		FROM
+  			(SELECT
+    			#{account_date} AS account_date,
+    			s.company_num AS company_num,
+    			s.business_name AS business_name,
+    			fn_decrypt (s.company_owner) AS company_owner,
+    			s.company_addr AS company_addr,
+    			s.company_business AS company_business,
+    			s.company_sector AS company_sector,
+    			fn_decrypt (s.company_email) AS company_email,
+    			c.company_num AS dest_company_num,
+    			c.business_name AS dest_business_name,
+    			FN_DECRYPT (c.company_owner) AS dest_company_owner,
+    			c.company_addr AS dest_company_addr,
+    			c.company_business AS dest_company_business,
+    			c.company_sector AS dest_company_sector,
+    			FN_DECRYPT (c.company_email) AS dest_company_email,
+    			CEIL(
+      				(SELECT
+        				SUM(
+          					IF(
+            					ilbo_fee != 0
+            					AND i.work_company_seq = c.company_seq,
+            					ilbo_fee,
+            					IF(
+              						share_fee != 0
+              						AND i.work_company_seq != c.company_seq
+              						AND i.worker_company_seq = c.company_seq,
+              						share_fee,
+              						0
+            					)
+          					)
+        				) AS feeSum
+      				FROM
+        				ilbo i
+      				WHERE
+        				i.use_yn = 1
+        				AND ilbo_date <![CDATA[ >= ]]> #{startDate}
+        				AND ilbo_date <![CDATA[ <= ]]> LAST_DAY(#{startDate})
+      				GROUP BY DATE_FORMAT(ilbo_date, '%Y-%m')) * (c.running_royalty / 100) / 1.1
+    			) AS account_price
+  			FROM
+    			company c
+    		LEFT JOIN company s
+      			ON s.company_seq = 13
+  			WHERE 
+  				c.use_yn = 1
+    		AND c.running_royalty > 0
+    	<if test="company_seq neq null and company_seq neq '' and company_seq neq '0'.toString()">
+			AND c.company_seq = #{company_seq}
+		</if>
+    		) a
+	</select>
+	
+</mapper>

@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.TestMapper">
+	
+	
+	
+	<select id="getTestTotalCnt" parameterType="String" resultType="int">	
+		/* 테스트 정보 조회 getTestTotalCnt test.xml */			
+		SELECT
+			COUNT(1)
+		FROM testgrid 
+		WHERE 1=1
+		${where}
+		<if test="reg_date neq '' and reg_date neq null"> AND DATE_FORMAT(reg_date, '%Y-%m-%d') = #{reg_date} </if>
+		
+						
+	</select>	
+	
+	
+	<select id="getTestList" parameterType="TestDTO" resultType="TestDTO">	
+		/* 테스트 정보 조회 getTestList test.xml */			
+		SELECT
+			*
+		FROM testgrid 
+		WHERE 1=1
+		${where}
+		<if test="reg_date neq '' and reg_date neq null"> AND DATE_FORMAT(reg_date, '%Y-%m-%d') = #{reg_date} </if>
+		order by ${sidx} ${sord}
+				
+		 <if test="paging.pageNo != 0">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+		
+						
+	</select>	
+	
+	<select id="selectTest" parameterType="String" resultType="TestDTO">	
+		/* 테스트 정보 조회 selectTest test.xml */			
+		SELECT
+			*
+		FROM testgrid 
+		WHERE seq=#{seq}
+		
+						
+	</select>	
+	
+	<insert id="newInsertTest" parameterType="TestDTO" useGeneratedKeys="true" keyProperty="seq">
+		/* 일반 관리자 정보 생성 newInsertTest test.xml */
+		INSERT INTO testgrid
+		(
+			name,
+			reg_date
+		) VALUES (
+			'?',
+			#{reg_date}
+		)
+	</insert>
+	
+	
+	<update id="updateTest" parameterType="TestDTO">
+		/* 수정 updateTest test.xml */
+			
+					UPDATE testgrid
+				SET
+					seq = ${seq}
+				<if test="name neq '' and name neq null">,	name = #{name} </if>/*search 박스에서 조회할때 바꿔줘야 한다.*/
+				<if test="name_seq neq '' and name_seq neq null">,	name_seq = #{name_seq} </if>
+				<if test="title neq '' and title neq null">,	title = #{title} </if>
+				<if test="flag1 neq '' and flag1 neq null">,	flag1 = #{flag1} </if>
+				<if test="flag2 neq '' and flag2 neq null">,	flag2 = #{flag2} </if>
+				<if test="flag3 neq '' and flag3 neq null">,	flag3 = #{flag3} </if>
+				<if test="man_type neq '' and man_type neq null">,	man_type = #{man_type} </if>
+				<if test="comment neq '' and comment neq null">,	comment = #{comment} </if>
+				<if test="reg_date neq '' and reg_date neq null">,	reg_date = #{reg_date} </if>
+				WHERE seq = ${seq}
+
+	</update>
+	
+	<delete id="deleteTest" parameterType="string">
+    /* 일반 관리자 정보 삭제 deleteTest test.xml */
+		DELETE
+		FROM
+		testgrid
+		<where>
+		FIND_IN_SET(seq, #{seqs})
+		</where>
+	</delete>
+
+
+	<insert id="insertTest" parameterType="TestDTO" useGeneratedKeys="true" keyProperty="seq">
+		/* 일반 관리자 정보 생성 insertTest test.xml */
+		INSERT INTO testgrid
+		(
+			name,
+			name_seq,
+			title,
+			flag1,
+			flag2,
+			flag3,
+			man_type,
+			comment,
+			reg_date
+		) VALUES (
+			#{name},
+			#{name_seq},
+			#{title},
+			#{flag1},
+			#{flag2},
+			#{flag3},
+			#{man_type},
+			#{comment},
+			#{reg_date}
+		)
+	</insert>
+	
+	
+	<select id="getNameList" parameterType="NameDTO" resultType="NameDTO">	
+		/* 테스트 정보 조회 getNameList test.xml */			
+		SELECT
+			*
+		FROM testname 
+		WHERE 1=1
+		<if test="flag neq '' and flag neq null"> AND flag = #{flag} </if>
+		
+		order by seq
+						
+	</select>
+	
+	<select id="getSearchName" parameterType="NameDTO" resultType="NameDTO">	
+		/* 테스트 정보 조회 getSearchName test.xml */			
+		SELECT
+			*, name as label
+		FROM testname 
+		WHERE 1=1
+		<if test="flag neq '' and flag neq null"> AND flag = #{flag} </if>
+		<if test="term neq '' and term neq null"> AND name like '%${term}%' </if>
+		
+		order by seq
+						
+	</select>
+	
+	<select id="selectName" parameterType="NameDTO" resultType="NameDTO">	
+		/* 테스트 정보 조회 selectName test.xml */			
+		SELECT
+			*
+		FROM testname 
+		WHERE 1=1
+		AND seq = #{seq}
+					
+	</select>
+	
+	
+	
+	<insert id="testTrans" parameterType="TestDTO" useGeneratedKeys="true" keyProperty="seq">
+		/* 일반 관리자 정보 생성 newInsertTest test.xml */
+		INSERT INTO test
+		(
+			seq
+		
+		) VALUES (
+			#{seq}
+		)
+	</insert>
+
+	<select id="getManager" parameterType="ManagerDTO" resultType="ManagerDTO">	
+		/* 부모매니져 정보 조회 getManager test.xml */			
+		
+		SELECT	manager_seq, fn_decrypt(manager_phone) as manager_phone	, fn_decrypt(manager_phone) as manager_name FROM manager 
+		WHERE 
+		 parent_company_seq = #{parent_company_seq}  
+		 AND manager_phone = fn_encrypt(#{manager_phone})
+		 			
+	</select>
+	
+	<select id="getManagerList" parameterType="ManagerDTO" resultType="ManagerDTO">	
+		/* 메니져 정보 조회 getManagerList test.xml */			
+		SELECT	manager_seq, fn_decrypt(manager_phone) as manager_phone	FROM manager 
+		where parent_company_seq <![CDATA[ > ]]> #{parent_company_seq}   AND manager_type = #{manager_type} 
+	</select>
+	
+	
+	<select id="getWorkList" parameterType="WorkDTO" resultType="WorkDTO">	
+	/* work리스트 getWorkList test.xml */
+		SELECT	*	FROM work where use_yn = #{use_yn} and manager_seq = #{manager_seq}
+	</select>
+	
+	<update id="updateWorkManger" parameterType="WorkDTO">
+		/* 수정 updateWorkManger test.xml */
+			
+				UPDATE work
+				SET
+					manager_seq = #{manager_seq}
+					,manager_phone = fn_encrypt(#{manager_phone})
+					,manager_name = fn_encrypt(#{manager_name})
+				WHERE	work_seq = ${work_seq}
+
+	</update>
+	
+	<delete id="deleteManager" parameterType="ManagerDTO">
+    	/*  삭제 deleteTest test.xml */
+		DELETE	FROM	 manager where manager_seq = #{manager_seq}
+		
+	</delete>
+	
+	 <insert id="insertRelationWm" parameterType="ManagerDTO" useGeneratedKeys="true" keyProperty="wm_seq">
+    /* Vm정보  manager.xml.insertRelationWm */
+    
+      INSERT INTO tbl_relation_wm (
+		  work_seq,
+		  manager_seq,
+		  employer_seq,
+		  reg_date,
+		  reg_admin,
+		  mod_admin
+		) 
+		(SELECT 
+		  work_seq,
+		  manager_seq,
+		  employer_seq,
+		  NOW(),
+		  'nemojjang',
+		  'nemojjang' 
+		FROM
+		  WORK 
+		WHERE use_yn = 1 
+		  AND manager_seq > 0) 
+  </insert>
+  	
+  <insert id="insertRelationEm" parameterType="ManagerDTO">
+    /* Em정보 insert manager.xml.insertRelationEm */
+    
+     INSERT INTO tbl_relation_em (
+		  employer_seq,
+		  manager_seq,
+		  reg_date,
+		  reg_admin,
+		  mod_admin
+		) 
+		(SELECT 
+		  manager_seq,
+		  employer_seq,
+		  NOW(),
+		  'nemojjang',
+		  'nemojjang' 
+		FROM
+		  WORK 
+		WHERE use_yn = 1 
+		  AND manager_seq > 0 
+		  AND employer_seq > 0
+		  GROUP BY manager_seq, employer_seq)
+  </insert>
+	
+  <select id="getEmployerList" resultType="EmployerDTO">
+  	SELECT 
+  		employer_seq
+  	FROM
+  		employer
+  	WHERE
+  		use_yn = 1
+  </select>	
+  
+  <select id="getFirstManagerSeq" resultType="EmployerDTO" parameterType="EmployerDTO">
+  	SELECT 
+  	  employer_seq,
+	  manager_seq 
+	FROM
+	  WORK 
+	WHERE employer_seq = #{employer_seq} 
+	ORDER BY reg_date 
+	LIMIT 0, 1 ;
+  </select>
+  
+  <update id="updateEmployerManagerSeq" parameterType="EmployerDTO">
+  	UPDATE
+  		employer
+  	SET
+  		manager_seq = #{manager_seq}
+  	WHERE
+  		employer_seq = #{employer_seq}		
+  </update>
+		
+		<select id="getWorkerList" resultType="WorkerDTO">
+			SELECT
+				*
+			FROM
+				worker
+			WHERE
+				use_yn = '1'
+				AND del_yn = '0'
+				AND (worker_job_code LIKE '%800%' OR worker_job_code LIKE '%900%')
+				AND worker_job_name LIKE '%자재정리'
+		</select>
+		
+		<select id="getJobList" parameterType="JobDTO" resultType="JobDTO">
+			SELECT 
+				GROUP_CONCAT(job_name SEPARATOR ',') AS job_name
+			FROM (
+				SELECT
+					job_name
+				FROM
+					tbl_job
+				WHERE 
+					use_yn = '1'
+					AND del_yn = '0'
+					AND job_rank = '1'
+					AND job_seq IN 
+					<foreach collection="job_seq_arr" item="sel_seq"  open="(" close=")" separator=", ">
+                		#{sel_seq}
+              		</foreach>
+				UNION
+				SELECT
+					code_name AS job_name
+				FROM
+					code
+				WHERE
+					code_value IN 
+					<foreach collection="job_seq_arr" item="sel_seq"  open="(" close=")" separator=", ">
+                		#{sel_seq}
+              		</foreach>
+			) AS CC
+		</select>
+		
+		<update id="updateJobName" parameterType="WorkerDTO">
+			UPDATE worker SET worker_job_name = #{worker_job_name } WHERE worker_seq = #{worker_seq }
+		</update>
+	<select id="selectWorkList" resultType="WorkDTO">
+		SELECT
+			work_seq
+			,work_latlng
+		FROM
+			work
+		ORDER BY work_seq DESC	
+		LIMIT 0, 3	
+	</select>
+	<update id="updateNewAddr" parameterType="WorkDTO">
+		UPDATE 
+			work 
+		SET
+			work_sido = #{work_sido}
+			<if test="work_sigugun neq '' and work_sigugun neq null">
+			, work_sigugun = #{work_sigugun}
+			</if>
+			<if test="work_dongmyun neq '' and work_dongmyun neq null">
+			, work_dongmyun = #{work_dongmyun}
+			</if>
+			<if test="work_rest neq '' and work_rest neq null">
+			, work_rest = #{work_rest}
+			</if>
+		WHERE work_seq = #{work_seq}
+	</update>	
+	<select id="selectIlboList" resultType="IlboDTO">
+		SELECT
+			ilbo_seq
+			,ilbo_work_latlng
+		FROM
+			ilbo
+		ORDER BY ilbo_seq DESC
+		LIMIT 0, 10	
+	</select>
+	<update id="updateNewAddrIlbo" parameterType="IlboDTO">
+		UPDATE 
+			ilbo 
+		SET
+			work_sido = #{work_sido}
+			<if test="work_sigugun neq '' and work_sigugun neq null">
+			, work_sigugun = #{work_sigugun}
+			</if>
+			<if test="work_dongmyun neq '' and work_dongmyun neq null">
+			, work_dongmyun = #{work_dongmyun}
+			</if>
+			<if test="work_rest neq '' and work_rest neq null">
+			, work_rest = #{work_rest}
+			</if>
+		WHERE ilbo_seq = #{ilbo_seq}
+	</update>
+	
+	<select id="selectWorkerList" resultType="WorkerDTO">
+		SELECT
+			worker_seq,
+			fn_decrypt(worker_jumin) AS worker_jumin
+		FROM
+			worker
+		WHERE
+			worker_sex IS NULL
+			AND worker_jumin IS NOT NULL
+			AND worker_jumin != fn_encrypt('?')
+			AND worker_jumin != fn_encrypt('')
+			AND LENGTH(fn_decrypt(worker_jumin)) = '13'
+	</select>
+	
+	<update id="updateWorkerSex" parameterType="WorkerDTO">
+		UPDATE
+			worker
+		SET
+			worker_sex = #{worker_sex }
+		WHERE
+			worker_seq = #{worker_seq }
+	</update>
+	
+	<select id="selectCompanyList" resultType="CompanyDTO">
+		SELECT
+			*
+		FROM
+			company
+	</select>
+	
+	<select id="selectLastBalance" parameterType="AccountDTO" resultType="AccountDTO">
+		SELECT
+			IFNULL(account_balance, 0) AS account_balance
+		FROM
+			tbl_account
+		WHERE
+			account_date <![CDATA[ < ]]> '2022-09-05'
+			AND company_seq = #{company_seq }
+		ORDER BY account_seq DESC
+		LIMIT 0, 1
+	</select>
+	
+	<select id="selectAccountList" parameterType="AccountDTO" resultType="AccountDTO">
+		SELECT
+			*
+		FROM
+			tbl_account 
+		WHERE
+			company_seq = #{company_seq }
+			AND account_date <![CDATA[ >= ]]> '2022-09-05' 
+	</select>
+	
+	<update id="updateAccount" parameterType="AccountDTO">
+		UPDATE
+			tbl_account
+		SET
+			account_balance = #{account_balance }
+		WHERE
+			account_seq = #{account_seq }
+	</update>
+	
+	<select id="findDeleteWorker" resultType="com.nemo.kr.dto.WorkerDTO">
+		/* 물류2호점 구직자 목록 */
+		SELECT
+			worker_seq
+			, FN_DECRYPT(worker_name) AS worker_name
+		FROM
+			worker
+		WHERE
+			company_seq = 34		 
+	</select>
+	
+	<select id="selectFileList" parameterType="com.nemo.kr.dto.FileDTO" resultType="com.nemo.kr.dto.FileDTO">
+		/* 파일 목록 조회 selectFileList readFile.xml */
+		SELECT
+	    	file_seq
+	      	,file_name
+	      	,file_org_name
+	      	,file_thum_name
+	      	,file_path
+	      	,file_url
+	      	,file_ext
+	      	,file_size
+	      	,file_rel_seq
+	      	,file_type
+	      	,service_type
+	      	,service_code
+	      	,service_seq
+	      	,file_order
+	      	,reg_date
+	      	,reg_admin
+		    ,mod_date
+		    ,mod_admin
+	    FROM
+	    	file_info
+	    WHERE
+	      	1 = 1
+	    <if test="service_type neq '' and service_type neq null"> AND service_type = #{service_type} </if>
+	    <if test="service_seq  neq null"> AND service_seq  = #{service_seq} </if>
+	</select>
+	<delete id="deleteFileInfo" parameterType="com.nemo.kr.dto.FileDTO">
+		/* 파일 정보 삭제  deleteFileInfo writeFile.xml */
+  		DELETE
+  		FROM
+			file_info
+  		WHERE
+			file_seq = #{file_seq}  
+	</delete>
+</mapper>
+

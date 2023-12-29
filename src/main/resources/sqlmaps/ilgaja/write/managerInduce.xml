@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.ManagerInduceMapper">
+	<select id="selectManagerInduceListCnt" parameterType="ManagerInduceDTO" resultType="int">
+		/* managerInduce.xml selectManagerInduceListCnt */
+		SELECT
+			COUNT(manager_induce_seq) AS totalCnt
+		FROM
+			tbl_manager_induce mi
+			LEFT OUTER JOIN manager m ON mi.manager_seq = m.manager_seq
+			LEFT OUTER JOIN company c ON m.company_seq = c.company_seq
+		WHERE
+			1 = 1
+			AND mi.del_yn = '0'
+			<if test="start_reg_date neq '' and start_reg_date neq null"> 
+				AND DATE_FORMAT(reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_reg_date} 
+			</if>
+		    <if test="end_reg_date neq '' and end_reg_date neq null"> 
+		    	AND DATE_FORMAT(reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_reg_date} 
+		    </if>
+		    <if test="where neq null">
+		    	${where }
+		    </if>
+	</select>
+	
+	<select id="selectManagerInduceList" parameterType="ManagerInduceDTO" resultType="ManagerInduceDTO">
+		/* managerInduce.xml selectManagerInduceList */
+		SELECT
+			manager_induce_seq
+			, mi.manager_seq
+			, manager_induce_memo
+			, mi.del_yn
+			, DATE_FORMAT(mi.reg_date, '%Y-%m-%d %h:%i') AS reg_date
+			, mi.reg_worker
+			, mi.mod_date
+			, mi.mod_admin
+			, fn_decrypt(m.manager_phone) AS manager_phone
+			, fn_decrypt(m.manager_name) AS manager_name
+			, m.manager_type
+			, m.manager_use_status
+			, (SELECT DATE_FORMAT(reg_date, '%Y-%m-%d %h:%i') AS last_declaration_date FROM tbl_manager_induce_sub WHERE manager_induce_seq = mi.manager_induce_seq AND del_yn = '0' ORDER BY manager_sub_seq DESC LIMIT 0, 1) AS last_declaration_date
+			, c.company_name AS manager_company_name
+			, c.company_seq AS manager_company_seq
+			, (SELECT COUNT(manager_sub_seq) FROM tbl_manager_induce_sub WHERE manager_induce_seq = mi.manager_induce_seq AND del_yn = '0') AS declaration_cnt 
+		FROM
+			tbl_manager_induce mi
+			LEFT OUTER JOIN manager m ON mi.manager_seq = m.manager_seq
+			LEFT OUTER JOIN company c ON m.company_seq = c.company_seq
+		WHERE
+			1 = 1
+			AND mi.del_yn = '0'
+			<if test="start_reg_date neq '' and start_reg_date neq null"> 
+				AND DATE_FORMAT(mi.reg_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{start_reg_date} 
+			</if>
+		    <if test="end_reg_date neq '' and end_reg_date neq null"> 
+		    	AND DATE_FORMAT(mi.reg_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{end_reg_date} 
+		    </if>
+		    <if test="where neq null">
+		    	${where }
+		    </if>
+		ORDER BY manager_induce_seq DESC
+		<if test="paging neq null">
+			<choose>
+				<when test="paging.pageNo gt 0">
+		    		LIMIT ${paging.startPage}, ${paging.endPage}
+		        </when>
+		        <otherwise>
+		    		LIMIT 0, ${paging.endPage}
+		        </otherwise>
+			</choose>
+		</if>
+	</select>
+	
+	<select id="selectManagerSubInduceList" parameterType="ManagerSubInduceDTO" resultType="ManagerSubInduceDTO">
+		/* managerInduce.xml selectManagerSubInduceList */
+		SELECT
+			manager_sub_seq
+			, mis.worker_seq
+			, FN_DECRYPT(w.worker_name) AS worker_name
+			, mis.manager_sub_memo
+			, mis.flag
+			, mis.del_yn
+			, mis.reg_date
+			, mis.reg_worker
+			, mis.mod_date
+			, mis.mod_admin
+			, c.company_name AS worker_company_name
+			, c.company_seq AS worker_company_seq
+		FROM
+			tbl_manager_induce_sub mis
+			LEFT OUTER JOIN worker w ON mis.worker_seq = w.worker_seq
+			LEFT OUTER JOIN company c ON w.company_seq = c.company_seq
+		WHERE
+			mis.del_yn = '0'
+			AND mis.manager_induce_seq = #{manager_induce_seq }
+		ORDER BY reg_date DESC
+	</select>
+	
+	<update id="updateManagerInduce" parameterType="ManagerInduceDTO">
+		/* managerInduce.xml updateManagerInduce */
+		UPDATE
+			tbl_manager_induce
+		SET
+			manager_induce_memo = #{manager_induce_memo },
+			mod_date = NOW(),
+			mod_admin = #{mod_admin }
+		WHERE
+			manager_induce_seq = #{manager_induce_seq }
+	</update>
+	
+	<update id="deleteManagerInduce" parameterType="ManagerInduceDTO">
+		/* managerInduce.xml deleteManagerInduce */
+		UPDATE
+			tbl_manager_induce
+		SET
+			del_yn = '1'
+			, mod_admin = #{mod_admin}
+		WHERE
+			manager_induce_seq IN 
+			<foreach collection="mainGridArr" item="code" open="("	close=")" separator=", ">
+				#{code}
+			</foreach>
+	</update>
+	
+	<update id="deleteManagerInduceSub" parameterType="ManagerInduceDTO">
+		/* managerInduce.xml deleteManagerInduceSub */
+		UPDATE
+			tbl_manager_induce_sub
+		SET
+			del_yn = '1'
+			, mod_admin = #{mod_admin}
+		WHERE
+			1=1
+			<if test="mainGridArr neq null">
+				AND manager_induce_seq IN
+				<foreach collection="mainGridArr" item="code" open="("	close=")" separator=", ">
+					#{code}
+				</foreach>
+			</if>
+			<if test="subGridArr neq null">
+				AND manager_sub_seq IN
+				<foreach collection="subGridArr" item="code" open="("	close=")" separator=", ">
+					#{code}
+				</foreach>
+			</if>
+	</update>
+</mapper>

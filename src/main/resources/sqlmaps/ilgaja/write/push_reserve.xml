@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.PushReserveMapper">
+
+ 
+
+  <select id="selectPushReserveInfo" parameterType="PushReservekDTO" resultType="PushReservekDTO">
+    /* push 정보 조회 selectPushInfo push.xml */
+    SELECT *
+    FROM push_send
+    WHERE 1 = 1
+    <if test="push_seq neq ''  and push_seq  neq null"> AND push_seq  = #{push_seq}           </if>
+    
+  </select>
+ 
+
+
+	<update id="updatePushReserveStatus" parameterType="PushReservekDTO">
+    /* 푸쉬 정보 수정 updatePush */
+    UPDATE push_send SET
+      send_status  = #{send_status}
+    WHERE send_seq = #{send_seq}
+  </update>
+
+  
+</mapper>

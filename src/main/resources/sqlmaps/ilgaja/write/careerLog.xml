@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.CareerLogMapper">
+	<insert id="insertCareerLog" parameterType="CareerLogDTO">
+		INSERT INTO tbl_career_log (
+			ilbo_seq
+			, career_name
+			, use_yn
+			, del_yn
+			, reg_admin
+			, reg_date
+			, mod_admin
+			, mod_date
+		) VALUES (
+			#{ilbo_seq }
+			, #{career_name }
+			, '1'
+			, '0'
+			, #{reg_admin }
+			, NOW()
+			, #{reg_admin }
+			, NOW()
+		)
+	</insert>
+</mapper>

@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.ReservesMapper">
+	<select id="selectAccountTotalAcc" parameterType="AccountDTO" resultType="AccountDTO">
+		/* selectAccountTotalAcc */
+		SELECT 
+			(
+			SELECT
+				IFNULL(SUM(account_price), 0) AS account_price
+			FROM
+				tbl_account
+			WHERE 
+				1 = 1
+				AND account_type = '0'
+				<if test="adminLevel neq '0'.toString()">
+					AND company_seq = #{company_seq }
+				</if>
+				<if test="adminLevel eq '0'.toString()">
+					<if test="company_seq neq '' and company_seq neq '0'.toString()">
+						AND company_seq = #{company_seq }
+					</if>
+				</if>
+			) - 
+			(
+			SELECT
+				IFNULL(SUM(account_price), 0) AS account_price
+			FROM
+				tbl_account
+			WHERE 
+				1 = 1
+				AND account_type = '1'
+				<if test="adminLevel neq '0'.toString()">
+					AND company_seq = #{company_seq }
+				</if>
+				<if test="adminLevel eq '0'.toString()">
+					<if test="company_seq neq '' and company_seq neq '0'.toString()">
+						AND company_seq = #{company_seq }
+					</if>
+				</if>
+			) AS totalAcc
+	</select>
+	
+	<select id="selectAccountList" parameterType="AccountDTO" resultType="AccountDTO">
+		/* selectAccountList */
+		SELECT 
+			account_seq,
+		  	DATE_FORMAT(account_date, "%Y-%m-%d %H:%i") AS account_date,
+		  	a.company_seq,
+		  	dest_company_seq,
+		  	account_type,
+		  	account_price,
+		  	account_flag,
+		  	IFNULL(account_balance, 0) AS account_balance,
+		  	a.use_yn,
+		  	a.del_yn,
+		  	a.reg_admin,
+		  	a.reg_date,
+		  	a.mod_admin,
+		  	a.mod_date,
+		  	REPLACE(c.company_num, '-', '') AS company_num,
+		  	c.business_name,
+		  	fn_decrypt(c.company_owner) as company_owner,
+		  	c.company_addr,
+		  	c.company_business,
+		  	c.company_sector,
+		  	fn_decrypt(c.company_email) as company_email
+		FROM
+		  	tbl_account a
+		  	LEFT OUTER JOIN company c ON a.dest_company_seq = c.company_seq
+		WHERE
+	  		1 = 1 		
+	  		<if test="adminLevel neq '0'.toString()">
+		  	  	AND a.company_seq = #{company_seq }
+	  		</if>
+	  		<if test="adminLevel eq '0'.toString() and company_seq neq null and company_seq neq ''">
+		  		AND a.company_seq = #{company_seq }
+		  	</if>
+	  		<if test="startDate neq '' and startDate neq null"> 
+				AND DATE_FORMAT(account_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate} 
+			</if>
+    		<if test="endDate neq '' and endDate neq null"> 
+	    		AND DATE_FORMAT(account_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate} 
+    		</if>
+    	<choose>
+    		<when test="sidx neq null and sidx neq ''">
+    			ORDER BY ${sidx } ${sord }
+    		</when>
+    		<otherwise>
+ 				ORDER BY account_seq DESC
+    		</otherwise>
+    	</choose>
+	</select>
+	
+	<select id="selectAccountExcelList" parameterType="AccountDTO" resultType="AccountDTO">
+		/* selectAccountExcelList reserves.xml */
+    	SELECT
+    		LAST_DAY(a.account_date) AS account_date
+    		, c.company_num
+    		, c.business_name
+    		, FN_DECRYPT(c.company_owner) AS company_owner
+    		, c.company_addr
+    		, c.company_business
+    		, c.company_sector
+    		, FN_DECRYPT(c.company_email) AS company_email
+    		, c2.company_num AS dest_company_num
+    		, c2.business_name AS dest_business_name
+    		, FN_DECRYPT(c2.company_owner) AS dest_company_owner
+    		, c2.company_addr AS dest_company_addr
+    		, c2.company_business AS dest_company_business
+    		, c2.company_sector AS dest_company_sector
+    		, FN_DECRYPT(c2.company_email) AS dest_company_email
+    		, SUM(a.account_price) AS account_price
+    		, SUM(a.worker_fee) AS worker_fee 
+    		, a.account_type
+    		, a.dest_company_seq
+    		, a.company_seq
+    	FROM
+    		tbl_account a
+    		LEFT OUTER JOIN company c
+    			ON a.company_seq = c.company_seq
+    		LEFT OUTER JOIN company c2
+    			ON a.dest_company_seq = c2.company_seq 
+    	WHERE
+    		1 = 1
+    		<!-- account_flag == 6은 12월 누락분도 출력하기 위함 -->
+    		AND (a.account_flag = 5 OR a.account_flag = 6)		
+	  		<if test="company_seq neq null and company_seq neq ''">
+		  		AND a.company_seq = #{company_seq }
+		  		<!-- 스마트 하우스 제외 -->
+		  		AND a.dest_company_seq != '1'
+		  	</if>
+	  		<if test="startDate neq '' and startDate neq null"> 
+				AND DATE_FORMAT(account_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate} 
+			</if>
+    		<if test="endDate neq '' and endDate neq null"> 
+	    		AND DATE_FORMAT(account_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate} 
+    		</if>
+		GROUP BY
+    		dest_company_seq
+	</select>
+	
+	<select id="selectSmartHouseAccountExcelList" parameterType="AccountDTO" resultType="AccountDTO">
+		/* selectSmartHouseAccountExcelList 스마트하우스 계산서 reserves.xml */
+    	SELECT
+    		LAST_DAY(a.account_date) AS account_date
+    		, c.company_num
+    		, c.business_name
+    		, FN_DECRYPT(c.company_owner) AS company_owner
+    		, c.company_addr
+    		, c.company_business
+    		, c.company_sector
+    		, FN_DECRYPT(c.company_email) AS company_email
+    		, c2.company_num AS dest_company_num
+    		, c2.business_name AS dest_business_name
+    		, FN_DECRYPT(c2.company_owner) AS dest_company_owner
+    		, c2.company_addr AS dest_company_addr
+    		, c2.company_business AS dest_company_business
+    		, c2.company_sector AS dest_company_sector
+    		, FN_DECRYPT(c2.company_email) AS dest_company_email
+    		, SUM(a.account_price) AS account_price
+    		, 0 AS worker_fee 
+    		, a.account_type
+    		, a.account_flag
+    		, a.dest_company_seq
+    		, a.company_seq
+    	FROM
+    		tbl_account a
+    		LEFT OUTER JOIN company c
+    			ON a.company_seq = c.company_seq
+    		LEFT OUTER JOIN company c2
+    			ON a.dest_company_seq = c2.company_seq 
+    	WHERE
+    		1 = 1 		
+	  		AND a.company_seq = '1'
+	  		AND a.account_type = '0'
+	  		<!-- account_flag == 7은 12월 누락분도 출력하기 위함 -->
+	  		AND (a.account_flag = '2' OR a.account_flag = '3' OR a.account_flag = '7')
+	  		<if test="startDate neq '' and startDate neq null"> 
+				AND DATE_FORMAT(account_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate} 
+			</if>
+    		<if test="endDate neq '' and endDate neq null"> 
+	    		AND DATE_FORMAT(account_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate} 
+    		</if>
+    	GROUP BY
+    		dest_company_seq
+	</select>
+	
+	<select id="selectAccountDetailList" parameterType="AccountDTO" resultType="AccountDTO">
+		/* selectAccountDetailList */
+		SELECT
+			log_seq,
+			ilbo_seq,
+			ilbo_date AS account_date,
+			company_seq,
+			dest_company_seq,
+			account_type,
+			account_flag,
+			SUM(account_fee) AS account_price,
+			comment,
+			job_id,
+			reg_date
+		FROM
+			tbl_account_log
+		WHERE 
+			1 = 1
+			<if test="adminLevel neq '0'.toString()">
+		  	  	AND company_seq = #{company_seq }
+	  		</if>
+	  		<if test="adminLevel eq '0'.toString() and company_seq neq null and company_seq neq ''">
+		  		AND company_seq = #{company_seq }
+		  	</if>
+	  		<if test="startDate neq '' and startDate neq null"> 
+				AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate} 
+			</if>
+    		<if test="endDate   neq '' and endDate   neq null"> 
+	    		AND DATE_FORMAT(ilbo_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate} 
+    		</if>
+    	GROUP BY company_seq, dest_company_seq, ilbo_date, account_type 
+    	<choose>
+    		<when test="sidx neq null and sidx neq ''">
+    			ORDER BY ${sidx } ${sord }
+    		</when>
+    		<otherwise>
+		    	ORDER BY ilbo_date DESC
+    		</otherwise>
+    	</choose>
+	</select>
+	
+	
+	<select id="selectReservesList" parameterType="ReservesDTO" resultType="ReservesDTO">
+		/* selectReservesList */
+		SELECT
+			reserves_seq,
+			dest_company_seq,
+		  	company_seq,
+		  	DATE_FORMAT(reserves_date, "%Y-%m-%d %H:%i") AS reserves_date,
+		  	IFNULL(reserves_price, 0) AS reserves_price,
+		  	reserves_req_admin,
+		  	reserves_req_memo,
+		  	reserves_process_status,
+		  	reserves_res_memo,
+		  	reserves_res_admin,
+		  	DATE_FORMAT(reserves_res_date, "%Y-%m-%d %H:%i") AS reserves_res_date,
+		  	reserves_type,
+		  	use_yn,
+		  	del_yn,
+		  	reg_admin,
+		  	reg_date,
+		  	mod_admin,
+		  	mod_date 
+		FROM
+		  	tbl_account_reserves
+		WHERE
+		  	1 = 1
+		  	<if test="adminLevel neq '0'.toString() and company_seq neq '1'.toString()">
+		  	  	AND company_seq = #{company_seq }
+	  		</if>
+	  		<if test="adminLevel eq '0'.toString() and company_seq neq null and company_seq neq '1'.toString()">
+		  		AND company_seq = #{company_seq }
+		  	</if>
+		  	<if test="reserves_type neq null and reserves_type neq ''">
+		    	AND reserves_type = #{reserves_type }
+		  	</if>
+		  	<if test="startDate neq '' and startDate neq null"> 
+				AND DATE_FORMAT(reserves_date, '%Y-%m-%d') <![CDATA[ >= ]]> #{startDate} 
+			</if>
+	    	<if test="endDate   neq '' and endDate   neq null"> 
+	    		AND DATE_FORMAT(reserves_date, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate} 
+	    	</if>
+	    <choose>
+    		<when test="sidx neq null and sidx neq ''">
+    			ORDER BY ${sidx } ${sord }
+    		</when>
+    		<otherwise>
+				ORDER BY reserves_date DESC
+    		</otherwise>
+    	</choose>	
+	    
+	</select>
+	
+	<insert id="insertReserves" parameterType="ReservesDTO">
+		/* insertReserves */
+		INSERT INTO tbl_account_reserves
+		(
+		  company_seq,
+		  dest_company_seq,
+		  reserves_date,
+		  reserves_type,
+		  reserves_price,
+		  reserves_req_admin,
+		  reserves_req_memo,
+		  reserves_process_status,
+		  reserves_res_admin,
+		  reserves_res_memo,
+		  reserves_res_date,
+		  use_yn,
+		  del_yn,
+		  reg_admin,
+		  reg_date,
+		  mod_admin,
+		  mod_date 
+		) 
+		VALUES
+		(
+		    #{company_seq },
+		    #{dest_company_seq },
+		    NOW(),
+		    #{reserves_type },
+		    #{reserves_price },
+		    #{reserves_req_admin },
+	    	#{reserves_req_memo },
+		    '0',
+		    NULL,
+		    NULL,
+		    NULL,
+		    1,
+		  	0,
+		  	#{reg_admin },
+		  	NOW(),
+		  	NULL,
+		  	NULL 
+		)
+	</insert>
+	
+	<update id="updateReserves" parameterType="ReservesDTO">
+		/* updateReserves */
+		UPDATE 
+			tbl_account_reserves
+		SET
+			<if test="cellname eq 'reserves_res_memo'.toString()">
+				reserves_res_memo = #{reserves_res_memo },
+			</if>
+			<if test="cellname eq 'reserves_process_status'.toString()">
+				reserves_process_status = #{reserves_process_status },
+				reserves_res_admin = #{reserves_res_admin },
+				reserves_res_date = NOW(),
+			</if>
+			<if test="cellname eq 'reserves_price'.toString()">
+				reserves_price = #{reserves_price },
+			</if>
+			mod_date = NOW(),
+			mod_admin = #{reserves_res_admin }
+		WHERE
+			reserves_seq = #{reserves_seq }
+	</update>
+	
+	<insert id="insertAccount" parameterType="AccountDTO">
+		/* insertAccount */
+		<selectKey resultType="string" keyProperty="account_balance" order="BEFORE">
+			SELECT 
+				CASE 
+					WHEN
+						(SELECT
+							COUNT(account_balance)
+						FROM 
+							tbl_account
+						WHERE 
+							company_seq = #{dest_company_seq }
+						) = 0
+					THEN
+						0
+					ELSE
+						(SELECT
+							IFNULL(account_balance, 0) AS account_balance
+						FROM
+							tbl_account
+						WHERE	
+							company_seq = #{dest_company_seq }
+						ORDER BY account_seq DESC
+						LIMIT 0, 1
+						)
+					END AS account_balance
+		</selectKey>
+		INSERT INTO tbl_account
+		(
+			account_date,
+			company_seq,
+			dest_company_seq,
+			account_type,
+			account_price,
+			account_flag,
+			account_balance,
+			use_yn,
+			del_yn,
+			reg_admin,
+			reg_date,
+			mod_admin,
+			mod_date
+		)
+		VALUES
+		(
+			NOW(),
+			#{dest_company_seq },
+			#{dest_company_seq },
+			#{account_type },
+			#{account_price },
+			#{account_flag },
+			<if test="account_type eq '0'.toString()">
+				#{account_balance } + #{account_price },
+			</if>
+			<if test="account_type eq '1'.toString()">
+				#{account_balance } - #{account_price },
+			</if>
+			'1',
+			'0',
+			#{reg_admin },
+			NOW(),
+			NULL,
+			NULL
+		)
+	</insert>
+</mapper>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.FileMapper">
+
+  <insert id="insertUploadFile" parameterType="FileDTO" useGeneratedKeys="true" keyProperty="file_seq"> 
+    /* 파일 정보 등록 insertUploadFile file.xml */
+    	<if test="status eq '99'">
+		    DELETE FROM file_info	   WHERE service_type = #{service_type}	      AND service_code = #{service_code}  AND service_seq  = #{service_seq};
+	    </if>
+	
+	   
+	    INSERT INTO file_info (
+	       file_name, file_org_name, file_thum_name, file_path, file_url,
+	       service_type, service_code, service_seq,
+	       file_order, file_size, file_ext,
+	       reg_date, reg_admin, mod_admin
+	    ) VALUES (
+	       #{file_name}, #{file_org_name}, #{file_thum_name}, #{file_path}, #{file_url},
+	       #{service_type}, #{service_code}, #{service_seq},
+	       #{file_order}, #{file_size}, #{file_ext},
+	       now(), #{reg_admin}, #{reg_admin}
+	    ) 
+  </insert>
+
+  <select id="selectFileList" parameterType="FileDTO" resultType="FileDTO">
+    /* 파일 목록 조회 selectFileList file.xml */
+    SELECT
+      *
+    FROM file_info
+    WHERE 1 = 1
+    <if test="service_type neq '' and service_type neq null"> AND service_type = #{service_type} </if>
+    <if test="service_code neq '' and service_code neq null"> AND service_code = #{service_code} </if>
+    <if test="service_seq  neq '' and service_seq  neq null"> AND service_seq  = #{service_seq} </if>
+    ORDER BY file_order DESC
+  </select>
+  
+  <select id="selectInfo" parameterType="FileDTO" resultType="FileDTO">
+    /* 파일 목록 조회 selectFileList file.xml */
+    SELECT
+      *
+    FROM file_info
+    WHERE 1 = 1
+    <if test="file_seq neq '' and file_seq neq null"> AND file_seq = #{file_seq} </if>
+    <if test="service_type neq '' and service_type neq null"> AND service_type = #{service_type} </if>
+    <if test="service_code neq '' and service_code neq null"> AND service_code = #{service_code} </if>
+    <if test="service_seq  neq '' and service_seq  neq null"> AND service_seq  = #{service_seq} </if>
+    ORDER BY file_order DESC LIMIT 0,1
+  </select>
+  
+
+  <delete id="deleteFile" parameterType="FileDTO" >
+    /* 파일 삭제 deleteFile file.xml */
+    DELETE FROM file_info WHERE 1 = 1
+    <choose>
+			<when test="file_seq neq '' and file_seq neq	null">
+				AND	file_seq = #{file_seq}	
+			</when>
+			<otherwise>
+				AND service_type = #{service_type}	      AND service_code = #{service_code}	      AND service_seq  = #{service_seq}		
+			</otherwise>
+	</choose>
+  </delete>
+
+</mapper>

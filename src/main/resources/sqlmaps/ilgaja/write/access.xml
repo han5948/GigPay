@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.AccessMapper">
+
+	<select id="getTotalCnt" parameterType="AccessDTO" resultType="int">
+    	/* 코드 조회 access_log.getAccessTotalCnt */
+    	SELECT 
+	    	COUNT(1)
+	    FROM 
+    		access_log
+    	WHERE 
+	    	1 = 1
+  	</select>
+
+  	<select id="getAccessList" parameterType="AccessDTO" resultType="AccessDTO">
+    	/* 코드 조회 access_log.getAccessList */
+    	SELECT 
+    		*
+    	FROM 
+    		access_log
+    	WHERE 
+    		1 = 1
+    		<if test="paging neq null">
+      			<choose>
+        			<when test="paging.pageNo gt 0">
+    					LIMIT ${paging.startPage}, ${paging.endPage}
+        			</when>
+        			<otherwise>
+    					LIMIT 0, ${paging.endPage}
+        			</otherwise>
+      			</choose>
+    		</if>
+  	</select>
+
+  	<insert id="insertInfo" parameterType="AccessDTO" useGeneratedKeys="true" keyProperty="a_seq">
+    	/* 로그 생성 access_log.insertInfo */
+    
+    	INSERT 
+    		access_log 
+    	SET
+    		reg_date = now()
+    		<if test="utm_campaign neq '' and utm_campaign neq null">
+    			, utm_campaign = #{utm_campaign } 
+    		</if>
+    		<if test="utm_source neq '' and utm_source neq null"> 
+    			, utm_source = #{utm_source } </if>
+    		<if test="utm_medium neq '' and utm_medium neq null"> 
+    			, utm_medium = #{utm_medium } </if>
+    		<if test="utm_content neq '' and utm_content neq null"> 
+    			, utm_content = #{utm_content } </if>
+    		<if test="utm_term neq '' and utm_term neq null"> 
+    			, utm_term = #{utm_term } </if>
+    		<if test="n_media neq '' and n_media neq null"> 
+    			, n_media = #{n_media } </if>
+    		<if test="n_query neq '' and n_query neq null"> 
+    			, n_query = #{n_query } </if>
+    		<if test="n_rank neq '' and n_rank neq null"> 
+    			, n_rank = #{n_rank } </if>
+    		<if test="n_ad_group neq '' and n_ad_group neq null"> 
+    			, n_ad_group = #{n_ad_group } 
+    		</if>
+    		<if test="n_ad neq '' and n_ad neq null"> 
+    			, n_ad = #{n_ad } 
+    		</if>
+    		<if test="n_keyword_id neq '' and n_keyword_id neq null"> 
+    			, n_keyword_id = #{n_keyword_id } 
+    		</if>
+    		<if test="n_keyword neq '' and n_keyword neq null"> 
+    			, n_keyword = #{n_keyword } 
+    		</if>
+    		<if test="n_campaign_type neq '' and n_campaign_type neq null"> 
+    			, n_campaign_type = #{n_campaign_type} 
+    		</if>
+    		<if test="a_ip neq '' and a_ip neq null"> 
+    			, a_ip = #{a_ip } 
+    		</if>
+    		<if test="a_type neq '' and a_type neq null"> 
+    			, a_type = #{a_type } 
+    		</if>
+			<if test="a_os neq '' and a_os neq null"> 
+				, a_os = #{a_os } 
+			</if>
+			<if test="a_agent neq '' and a_agent neq null"> 
+				, a_agent = #{a_agent } 
+			</if>
+			<if test="a_referer neq '' and a_referer neq null"> 
+				, a_referer = #{a_referer } 
+			</if>
+	</insert>
+
+  	<update id="setAccessInfo" parameterType="AccessDTO">
+   
+  	</update>
+
+  	<update id="removeAccessInfo" parameterType="AccessDTO">
+  
+  	</update>
+  
+  	<select id="getAccessInfo" parameterType="AccessDTO" resultType="AccessDTO">
+    
+  	</select>
+</mapper>

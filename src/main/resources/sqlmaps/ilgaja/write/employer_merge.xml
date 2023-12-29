@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.EmployerMergeMapper">
+	<update id="updateWorkEmployer" parameterType="EmployerDTO">
+		/* wok 의 employer 를 수정한다. updateWorkEmployer  */
+		UPDATE 
+			work 
+		SET
+		  	employer_seq = #{employer_seq}
+		WHERE 
+			1=1
+			AND employer_seq = #{source_employer_seq } 
+	</update>
+	 
+	<select id="selectWorkList" parameterType="EmployerDTO" resultType="WorkDTO">
+	 	/* selectWorkList */
+		SELECT 
+			work_seq 
+		FROM	 
+			work 
+		WHERE 
+			use_yn= 1 
+<!-- 			source_employer_seq 를 조회해야함 -->
+<!-- 			AND employer_seq = #{employer_seq}  -->
+			AND employer_seq = #{source_employer_seq} 
+	</select>
+	  
+	<select id="selectWmList" parameterType="WmDTO" resultType="WmDTO">
+	  	/*selectWmList*/
+  		SELECT
+  			*
+  		FROM 
+  			tbl_relation_wm 
+  		WHERE 
+  			1 =1 
+  			AND employer_seq =#{employer_seq}
+  			AND work_seq =#{work_seq}
+	</select>
+	  
+	<select id="selectWm" parameterType="WmDTO" resultType="WmDTO">
+	  	/*selectWm*/
+  		SELECT
+  			*
+  		FROM 
+  			tbl_relation_wm 
+  		WHERE 
+  			1 = 1 
+  			AND employer_seq =#{employer_seq}
+  			AND work_seq =#{work_seq}
+  			AND manager_seq =#{manager_seq}
+	</select>
+	  
+	<update id="updateWm" parameterType="WmDTO">
+		/* updateWm  */
+		UPDATE 
+			tbl_relation_wm 
+		SET
+		  	employer_seq = #{employer_seq}
+		WHERE 
+			1=1
+			AND wm_seq = #{wm_seq } 
+	</update>
+	 
+   	<delete id="deleteWm" parameterType="WmDTO">
+		/* updateWm  */
+		DELETE 
+		FROM 
+			tbl_relation_wm
+		WHERE 
+			1=1
+			AND wm_seq = #{wm_seq } 
+	</delete>
+
+	<select id="selectEmList" parameterType="EmDTO" resultType="EmDTO">
+		/*selectEmList*/
+  		SELECT
+  			*
+  		FROM 
+  			tbl_relation_em 
+  		WHERE 
+  			1 = 1 
+  			AND employer_seq =#{employer_seq}
+	</select>
+	  
+	<select id="selectEm" parameterType="EmDTO" resultType="EmDTO">
+	  	/*selectEm*/
+  		SELECT
+  			*
+  		FROM 
+  			tbl_relation_em 
+  		WHERE 
+  			1 = 1 
+  			AND employer_seq =#{employer_seq}
+  			AND manager_seq =#{manager_seq}
+	</select>
+	  
+	<update id="updateEm" parameterType="EmDTO">
+	   	/* updateEm  */
+		UPDATE 
+			tbl_relation_em 
+		SET
+		  	employer_seq = #{employer_seq}
+		WHERE 
+			1=1
+			AND em_seq = #{em_seq } 
+	</update>
+	 
+   	<delete id="deleteEm" parameterType="EmDTO">
+	   	/* updateEm  */
+		DELETE 
+		FROM 
+			tbl_relation_em
+		WHERE 
+			1=1
+			AND em_seq = #{em_seq } 
+	</delete>
+  
+	<update id="updateManagerEmployer" parameterType="EmployerDTO">
+	   	/* updateManagerEmployer  */
+		UPDATE 
+			manager 
+		SET
+		  	employer_seq = #{employer_seq}
+		WHERE 
+			1=1
+			AND employer_seq = #{source_employer_seq }
+			AND manager_type = 'E' 
+	</update>
+	
+	<update id="updateIlboEmployer" parameterType="EmployerDTO">
+		/* updateIlboEmployer  */
+		UPDATE 
+			ilbo 
+		SET
+		  	employer_seq = #{employer_seq}
+		WHERE 
+			1=1
+			AND employer_seq = #{source_employer_seq }
+	</update>
+	
+	<delete id="deleteEmployer" parameterType="EmDTO">
+	   	/* deleteEmployer  */
+		DELETE 
+		FROM 
+			employer
+		WHERE 
+			1=1
+			AND employer_seq = #{source_employer_seq } 
+	</delete>
+</mapper>

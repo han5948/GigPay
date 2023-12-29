@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.ProcedureMapper">
+
+	<select id="getProcedureList" parameterType="ProcedureDTO" resultType="ProcedureDTO">
+    	/* 프로시저 조회 procedure.xml getProcedureList */
+    	SELECT
+    		log_seq
+    		, proc_name
+    		, r_count
+    		, DATE_FORMAT(reg_date, '%Y-%m-%d') AS reg_date
+    	FROM 
+    		tbl_procedure_log 
+    	WHERE 
+    		DATE_FORMAT(reg_date, '%Y-%m-%d') >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL #{sub_day} DAY), '%Y-%m-%d') 
+    	ORDER BY log_seq DESC
+    	<if test="paging neq null">
+			LIMIT ${paging.startPage}, ${paging.endPage}
+		</if>
+  	</select>
+
+  	<select id="getProcedureTotalCnt" parameterType="ProcedureDTO" resultType="int">
+    	/* 프로시저 갯수 조회 procedure.xml getProcedureTotalCnt */
+    	SELECT 
+    		COUNT(1)
+    	FROM 
+    		tbl_procedure_log
+    	WHERE 
+    		DATE_FORMAT(reg_date, '%Y-%m-%d') >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL #{sub_day} DAY), '%Y-%m-%d')
+  	</select>
+
+</mapper>

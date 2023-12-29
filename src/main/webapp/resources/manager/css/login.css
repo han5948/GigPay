@@ -1,0 +1,60 @@
+@charset "utf-8";
+.login-wrap{max-width:640px; margin:0 auto}
+.login-wrap .list{}
+.login-wrap .list li{margin-top:10px;}
+.login-wrap .list li:first-child{margin-top:0;}
+.login-wrap input[type="text"],.login-wrap input[type="number"], .login-wrap input[type="password"]{border:none;border-radius:3px; font-weight:300; font-size:17px; letter-spacing:-0.03em;height:54px; background:#fff; text-indent:15px; box-sizing:border-box; width:100%;}
+
+.login-set{ padding:15px 0; text-align:center;}
+.login-set .login-btn{ display:inline-block; vertical-align:top;width:80px; height:80px;font-size:17px;background:#fde718; border-radius:100%; text-align:center; color:#197ccc;border:none;  letter-spacing:-0.03em;}
+
+.login-set .login-type{ 
+	vertical-align: top;
+	display:inline-block;
+	    width: 80px;
+	    margin-left:15px;
+	}
+
+.login-check{display:inline-block; margin-right:10px;vertical-align:top;    height: 60px;}
+.login-check input[type="radio"]{ display:none;}
+.login-check label{position:relative; padding-left:25px; font-size:15px ; color:#fff; line-height:80px;}
+.login-check label:after{width:20px; height:20px; position:absolute;  background-color:#fde718 !important; left:0; top:50%;margin-top:-8px; ; display:block; content:""; border:none}
+.login-check input[type="radio"]:checked +  label:after{background:url(/resources/manager/image/Sub/check-on.png) no-repeat center center; background-size:22px auto}
+.login-check input[type="radio"]:checked +  label{color:#fff}
+
+.login-check2{display:inline-block; margin-right:10px;vertical-align:top;    height: 60px;}
+.login-check2 input[type="radio"]{ display:none;}
+.login-check2 label{position:relative; padding-left:25px; font-size:15px ; color:#fff; line-height:80px;}
+.login-check2 label:after{width:20px; height:20px; position:absolute;  background-color:#fde718 !important; left:0; top:50%;margin-top:-8px; ; display:block; content:""; border:none}
+.login-check2 input[type="radio"]:checked +  label:after{background:url(/resources/manager/image/Sub/check-on.png) no-repeat center center; background-size:22px auto}
+.login-check2 input[type="radio"]:checked +  label{color:#fff}
+
+
+.login-save{display:inline-block; margin-right:5px;vertical-align:top;}
+.login-save input[type="checkbox"]{ display:none;}
+.login-save label{position:relative; padding-left:25px;color:#fff; line-height:80px;}
+.login-save label:after{width:20px; height:20px; position:absolute;  background-color:#fde718 !important; left:0; top:50%;margin-top:-8px; ; display:block; content:""; border:none}
+.login-save input[type="checkbox"]:checked +  label:after{background:url(/resources/manager/image/Sub/check-on.png) no-repeat center center; background-size:22px auto}
+.login-save input[type="checkbox"]:checked +  label{color:#fff}
+
+
+	@media all and (max-width:250px) {
+		
+		.login-wrap input[type="text"], .login-wrap input[type="password"]{height:44px;text-indent:10px; font-size:15px;}
+
+		.login-set .login-btn{width:70px; height:70px;}
+		.login-save label{line-height:70px;}
+	}
+
+.login-type ul{overflow:hidden; padding:0 5% 35px 5%}
+.login-type ul li{float:left; width:50%;text-align:center;}
+.login-type ul li a{width:70px; height:70px; border:1px solid #fff; position:relative;display:inline-block; vertical-align:top; border-radius:100%;}
+.login-type ul li a span{position:absolute;height:20px; letter-spacing:-0.03em; line-height:20px; width:90px; text-align:center; color:#fff; font-size:15px; left:50%;margin-left:-45px; bottom:-30px;}
+
+.login-type ul li:first-child a{background:url(/resources/manager/image/Content/login-tp01.png) no-repeat center bottom; }
+.login-type ul li a{background:url(/resources/manager/image/Content/login-tp02.png) no-repeat center bottom; background-size:70px auto !important;-webkit-transition: all 0.3s ease-out;-moz-transition: all 0.3s ease-out;-o-transition: all 0.3s ease-out;transition: all 0.3s ease-out;}
+
+.login-type ul li a:after{ opacity:0;position:absolute; left:0; top:0; width:100%; height:100%; z-index:-1; display:block; content:""; border-radius:100%;-webkit-transition: all 0.3s ease-out;-moz-transition: all 0.3s ease-out;-o-transition: all 0.3s ease-out;transition: all 0.3s ease-out;}
+.login-type ul li a.active{	box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3); -webkit-box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3) ; -moz-box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);}
+.login-type ul li a.active:after{opacity:0.5;background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #61b7ec), color-stop(1, #7184d1));background: -moz-linear-gradient(top, #61b7ec 0%, #7184d1 100%);background: -webkit-linear-gradient(top,  #61b7ec 0%, #7184d1 100%);	background: -o-linear-gradient(top,  #61b7ec 0%, #7184d1 100%);background: -ms-linear-gradient(top,  #61b7ec 0%, #7184d1 100%);	background: linear-gradient(top,  #61b7ec 0%, #7184d1 100%);filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#61b7ec', endColorstr='#7184d1', gradientType=0);}
+

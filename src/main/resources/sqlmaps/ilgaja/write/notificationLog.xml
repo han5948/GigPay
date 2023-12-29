@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.NotificationLogMapper">
+
+	<update id="updateNotificationLog" parameterType="notificationLogDTO">
+		/* notificationLog.xml updateNotificationLog */
+		UPDATE
+			tbl_notification_log
+		SET
+			mod_date = now()
+			<if test="read_yn neq null and read_yn neq '' ">
+				, read_date = now()
+				, read_yn = 1
+			</if>
+			<if test="mod_admin neq null and mod_admin neq '' ">
+				, mod_admin = #{mod_admin}
+			</if>
+		WHERE	notification_log_seq= #{notification_log_seq}
+				
+	</update>
+</mapper>

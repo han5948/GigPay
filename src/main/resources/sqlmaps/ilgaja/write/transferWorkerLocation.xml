@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="com.nemo.kr.mapper.ilgaja.write.TransferWorkerLocationMapper">
+	
+	<insert id="insertTransferWorkerLocationList" parameterType="TransferWorkerLocationDTO">
+		/* insertTransferWorkerLocationList 구직자 이관 지역 추가 write.transferWorkerLocation.xml */
+		INSERT INTO tbl_transfer_worker_location(
+			transfer_seq
+			, sido_code
+			, sido_name
+			, sigungu_code
+			, sigungu_name
+			, eupmyeondong_code
+			, eupmyeondong_name
+			, reg_admin
+		)VALUES
+		<foreach collection="add_location_list" item="locationInfo" open="(" close=")" separator="), (" >
+			#{transfer_seq}
+			, #{locationInfo.sido_code}
+			, #{locationInfo.sido_name}
+			, #{locationInfo.sigungu_code}
+			, #{locationInfo.sigungu_name}
+			, #{locationInfo.eupmyeondong_code}
+			, #{locationInfo.eupmyeondong_name}
+			, #{reg_admin}
+		</foreach>
+	</insert>    
+	
+	<delete id="deleteTransferWorkerLocation" parameterType="TransferWorkerLocationDTO">
+		/* deleteTransferWorkerLocation 구직자 이관 지역 삭제 write.transferWorkerLocation.xml */
+		DELETE FROM tbl_transfer_worker_location
+		WHERE
+		<if test="del_location_list neq null">
+			<foreach collection="del_location_list" open="location_seq IN (" close=")" separator=", " item="locationSeq">
+			#{locationSeq}
+			</foreach>
+		</if>
+		<if test="sel_transfer_seq neq null">
+			<foreach collection="sel_transfer_seq" open="transfer_seq IN (" close=")" separator=", " item = "transferSeq">
+				#{transferSeq} 
+			</foreach>
+		</if>
+	</delete>
+	
+</mapper>
